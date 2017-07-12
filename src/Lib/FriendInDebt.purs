@@ -77,32 +77,36 @@ absMoney (Money m) = Money $ abs m
 mkNegative ∷ Money → Money
 mkNegative (Money m) = Money $ m * (-1.0)
 
-newtype FriendDebt = FriendDebt { friend ∷ UserAddress
-                                , debt   ∷ Money }
+newtype FriendDebt = FriendDebt { friend     ∷ UserAddress
+                                , debt       ∷ Money
+                                , debtId     ∷ Int
+                                , desc       ∷ String}
 instance showFriendDebt ∷ Show FriendDebt where
   show (FriendDebt fd) = show fd.debt <> ": " <> show fd.friend
 instance eqFriendDebt ∷ Eq FriendDebt where
   eq (FriendDebt fd1) (FriendDebt fd2) =
     (fd1.friend == fd2.friend) && (fd1.debt == fd2.debt)
 blankFriendDebt ∷ FriendDebt
-blankFriendDebt = (FriendDebt { friend: UserAddress "0x0", debt: Money 0.0 })
+blankFriendDebt = FriendDebt { friend: UserAddress "0x0", debt: Money 0.0
+                             , debtId: 0, desc: "" }
+
 friendDebtZero ∷ UserAddress → FriendDebt
-friendDebtZero ua = FriendDebt { friend: ua, debt: (Money 0.0) }
+friendDebtZero ua = changeDebtor ua blankFriendDebt
 getDebt ∷ FriendDebt → Money
 getDebt (FriendDebt fd) = fd.debt
 setDebt ∷ FriendDebt → Number → FriendDebt
-setDebt (FriendDebt fd) m = FriendDebt {friend: fd.friend, debt: (Money m)}
+setDebt (FriendDebt fd) m = FriendDebt $ fd { debt = (Money m)}
 getFriendAddr ∷ FriendDebt → UserAddress
 getFriendAddr (FriendDebt fd) = fd.friend
 changeDebtor ∷ UserAddress → FriendDebt → FriendDebt
-changeDebtor newDebtor (FriendDebt fd) = FriendDebt {friend: newDebtor, debt: fd.debt}
+changeDebtor newDebtor (FriendDebt fd) = FriendDebt $ fd {friend = newDebtor}
 newDebt ∷ UserAddress → Number → FriendDebt
-newDebt f d = FriendDebt { friend: f, debt: Money d }
+newDebt f d = FriendDebt { friend: f, debt: Money d, debtId: 0, desc: "" }
 addDebt :: FriendDebt -> Money -> FriendDebt
 addDebt fd money = setDebt fd $ (amount (getDebt fd)) + (amount money)
 --make a debt value negative
 flipDebt ∷ FriendDebt → FriendDebt
-flipDebt (FriendDebt fd) = FriendDebt { friend: fd.friend, debt: mkNegative fd.debt}
+flipDebt (FriendDebt fd) = FriendDebt $ fd { debt = mkNegative fd.debt }
 
 data DebtCompare = Positive | Negative | Zero
 posNegZero ∷ FriendDebt → DebtCompare
@@ -162,7 +166,7 @@ friends (UserAddress ua) = do
 getDebtOrPending ∷ ∀ e. DebtLookupFn → UserAddress → UserAddress → Aff e FriendDebt
 getDebtOrPending lookupFnImpl (UserAddress d) (UserAddress c) = do
   m ← makeAff (\err succ → lookupFnImpl succ d c)
-  pure $ FriendDebt $ { friend: (UserAddress c), debt: Money m }
+  pure $ newDebt (UserAddress c) m
 
 allDebtOrPending ∷ ∀ e. DebtLookupFn → UserAddress → Array UserAddress
                  → Aff e (Array FriendDebt)
