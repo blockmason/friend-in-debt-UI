@@ -80,7 +80,8 @@ mkNegative (Money m) = Money $ m * (-1.0)
 newtype FriendDebt = FriendDebt { friend     ∷ UserAddress
                                 , debt       ∷ Money
                                 , debtId     ∷ Int
-                                , desc       ∷ String}
+                                , desc       ∷ String
+                                , currency   ∷ String }
 instance showFriendDebt ∷ Show FriendDebt where
   show (FriendDebt fd) = show fd.debt <> ": " <> show fd.friend
 instance eqFriendDebt ∷ Eq FriendDebt where
@@ -88,7 +89,7 @@ instance eqFriendDebt ∷ Eq FriendDebt where
     (fd1.friend == fd2.friend) && (fd1.debt == fd2.debt)
 blankFriendDebt ∷ FriendDebt
 blankFriendDebt = FriendDebt { friend: UserAddress "0x0", debt: Money 0.0
-                             , debtId: 0, desc: "" }
+                             , debtId: 0, desc: "", currency: "USDcents" }
 
 friendDebtZero ∷ UserAddress → FriendDebt
 friendDebtZero ua = changeDebtor ua blankFriendDebt
@@ -271,3 +272,25 @@ allNames friendList = do
   where f (Tuple address userName) map = insertMap map address userName
         insertMap map address Nothing         = map
         insertMap map address (Just userName) = M.insert address userName map
+
+
+{-
+to modify:
+currentUserDebts
+-qu
+currentUserPending
+currentUserSentPendings
+currentUserFriends
+get/set UserName
+
+newPending
+confirmPending
+cancelPending
+
+to add:
+pendingFriendships
+- have to collate the response into a JS object
+description fetching
+
+
+-}

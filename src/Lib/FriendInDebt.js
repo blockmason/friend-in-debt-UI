@@ -115,3 +115,67 @@ exports.setNameImpl = function(newName) {
         });
     };
 };
+
+//helper functions
+var confirmedFriends2Js = function(friends) {
+    var friendList = [];
+    for ( var i=0; i < friends.length; i++ ) {
+        var friend = {
+            friendId: b2s(friends[i])
+        };
+        friendList.push(friend);
+    }
+    return friendList;
+};
+
+var pendingFriends2Js = function(friends) {
+    var friendList = [];
+    for ( var i=0; i < friends[0].length; i++ ) {
+        var friend = {
+            friendId: b2s(friends[0][i]),
+            confirmerId: b2s(friends[1][i])
+        };
+        friendList.push(friend);
+    }
+    return friendList;
+};
+
+var pendingDebts2Js = function(debts) {
+    var debtList = [];
+    //debts[0] is all the debtIds, debts[1] is confirmerIds, etc
+    for ( var i=0; i < debts[0].length; i++ ) {
+        var debt = { id: debts[0][i].toNumber(),
+                     confirmerId: b2s(debts[1][i]),
+                     currency: b2s(debts[2][i]),
+                     amount: debts[3][i].toNumber(),
+                     desc: b2s(debts[4][i]),
+                     debtor: b2s(debts[5][i]),
+                     creditor: b2s(debts[6][i])  };
+        debtList.push(debt);
+    }
+    return debtList;
+};
+
+var confirmedDebts2Js = function(debts) {
+    var debtList = [];
+    for ( var i=0; i < debts[0].length; i++ ) {
+        var debt = { currency: b2s(debts[0][i]),
+                     amount: debts[1][i].toNumber(),
+                     desc: b2s(debts[2][i]),
+                     debtor: b2s(debts[3][i]),
+                     creditor: b2s(debts[4][i])  };
+        debtList.push(debt);
+    }
+    return debtList;
+};
+
+var debtBalances2Js = function(debts) {
+    var balanceList = [];
+    for ( var i=0; i < debts[0].length; i++ ) {
+        var debt = { currency: b2s(debts[0][i]),
+                     amount: debts[1][i].toNumber(),
+                     creditor: b2s(debts[2][i]) };
+        balanceList.push(debt);
+    }
+    return balanceList;
+};
