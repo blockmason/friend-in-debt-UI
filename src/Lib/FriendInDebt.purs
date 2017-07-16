@@ -1,6 +1,7 @@
 module Network.Eth.FriendInDebt
        (
-         currentUser
+         FID
+       , currentUser
        , currentUserDebts
        , currentUserPending
        , currentUserSentPendings
@@ -12,7 +13,6 @@ module Network.Eth.FriendInDebt
        , allNames
        , getCurrentUserName
        , setCurrentUserName
-       , getName --DELETE
        , getDebt
        , amount
        , absMoney
@@ -25,6 +25,7 @@ module Network.Eth.FriendInDebt
        , blankFriendDebt
        , friendDebtZero
        , addDebt
+       , runMonadF
        , Error (..)
        , Money (..)
        , UserAddress (..)
@@ -35,22 +36,23 @@ module Network.Eth.FriendInDebt
        ) where
 
 import Prelude
-import Control.Monad.Eff         (Eff, kind Effect)
-import Math                      (abs)
-import Control.Monad.Eff.Class   (liftEff)
-import Control.Monad.Aff         (Aff, makeAff)
+import Control.Monad.Eff           (Eff, kind Effect)
+import Math                        (abs)
+import Control.Monad.Eff.Class     (liftEff)
+import Control.Monad.Aff.Class     (liftAff)
+import Control.Monad.Aff           (Aff, makeAff)
 import Control.Monad.Except.Trans  (ExceptT, throwError, runExceptT, lift)
-import Data.Either               (Either(Left, Right))
-import Data.Maybe                (Maybe(..))
-import Data.Traversable          (traverse)
-import Data.Format.Money         (formatDollar)
-import Data.Int                  (toNumber)
-import Data.String               (localeCompare)
-import Math                      (abs)
+import Data.Either                 (Either(Left, Right))
+import Data.Maybe                  (Maybe(..), fromMaybe)
+import Data.Traversable            (traverse)
+import Data.Format.Money           (formatDollar)
+import Data.Int                    (toNumber)
+import Data.String                 (localeCompare)
+import Math                        (abs)
 import Data.Map                                                    as M
 import Data.Array                                                  as A
-import Data.Tuple                (Tuple(..))
-import Data.Foldable             (foldr)
+import Data.Tuple                  (Tuple(..))
+import Data.Foldable               (foldr)
 import Network.Eth.Metamask                                        as MM
 
 infixr 9 compose as ∘
@@ -148,21 +150,17 @@ foreign import createFriendshipImpl ∷ ∀ e. BProgAddress → Eff e Unit
 foreign import getNameImpl ∷ NameLookupFn
 foreign import setNameImpl ∷ ∀ e. String → Eff e Unit
 
-checkAndInit ∷ ∀ e. Eff e (Either Error Unit)
+checkAndInit ∷ MonadF Unit
 checkAndInit = do
-  loggedIn ← MM.loggedIn <$> MM.checkStatus
+  loggedIn ← liftEff (MM.loggedIn <$> MM.checkStatus)
   if loggedIn
-    then Right <$> (initImpl "dummy")
-    else pure $ Left NoMetamask
+    then liftEff $ initImpl "dummy"
+    else throwError NoMetamask
 
-currentUser ∷ ∀ e. Eff e (Either Error UserAddress)
+currentUser ∷ MonadF UserAddress
 currentUser = do
-  c ← checkAndInit
-  case c of
-    Left error → pure $ Left error
-    Right _ → do
-      res ← currentUserImpl "dummy"
-      pure $ Right $ UserAddress res
+  checkAndInit
+  UserAddress <$> (liftEff $ currentUserImpl "dummy")
 
 friends ∷ ∀ e. UserAddress → Aff e (Array UserAddress)
 friends (UserAddress ua) = do
@@ -179,101 +177,72 @@ allDebtOrPending ∷ ∀ e. DebtLookupFn → UserAddress → Array UserAddress
 allDebtOrPending lookupFn debtor creditors =
   traverse (getDebtOrPending lookupFn debtor) creditors
 
-currentUserFriends ∷ ∀ e. Aff e (Either Error (Array UserAddress))
+currentUserFriends ∷ MonadF (Array UserAddress)
 currentUserFriends = do
-  currUser ← liftEff currentUser
-  case currUser of
-    Left  error → pure $ Left error
-    Right user  → Right <$> friends user
-
-currentUserDebts ∷ ∀ e. Array UserAddress → Aff e (Either Error (Array FriendDebt))
-currentUserDebts friendList = do
-  currUser ← liftEff currentUser
-  case currUser of
-    Left  error → pure $ Left error
-    Right user  → Right <$> allDebtOrPending friendDebtImpl user friendList
-
-currentUserPending ∷ ∀ e. Array UserAddress → Aff e (Either Error (Array FriendDebt))
-currentUserPending friendList = do
-  u ← liftEff currentUser
-  case u of
-    Right user  → Right <$> allDebtOrPending friendPendingImpl user friendList
-    Left  error → pure $ Left error
-
-currentUserSentPendings ∷ ∀ e. Array UserAddress → Aff e (Either Error (Array FriendDebt))
-currentUserSentPendings friendList = do
-  u ← liftEff currentUser
-  case u of
-    Left error → pure $ Left error
-    Right user → Right <$> do
-      traverse (\f → (flipDebt ∘ (changeDebtor f)) <$> getDebtOrPending friendPendingImpl f user) friendList
-
-newPending ∷ ∀ e. FriendDebt → Eff e (Either Error Unit)
-newPending (FriendDebt debtor) = do
   cu ← currentUser
-  case cu of
-    Right (UserAddress user) →
-      Right <$> newPendingImpl (getUa debtor.friend) (amount debtor.debt)
-    Left  error → pure $ Left error
+  liftAff $ friends cu
 
-confirmPending ∷ ∀ e. FriendDebt → Eff e (Either Error Unit)
+currentUserDebts ∷ Array UserAddress → MonadF (Array FriendDebt)
+currentUserDebts friendList = do
+  cu ← currentUser
+  liftAff $ allDebtOrPending friendDebtImpl cu friendList
+
+currentUserPending ∷ Array UserAddress → MonadF (Array FriendDebt)
+currentUserPending friendList = do
+  cu ← currentUser
+  liftAff $ allDebtOrPending friendPendingImpl cu friendList
+
+currentUserSentPendings ∷ Array UserAddress → MonadF (Array FriendDebt)
+currentUserSentPendings friendList = do
+  cu ← currentUser
+  liftAff $ traverse
+    (\f → (flipDebt ∘ (changeDebtor f)) <$> getDebtOrPending friendPendingImpl f cu)
+    friendList
+
+newPending ∷ FriendDebt → MonadF Unit
+newPending (FriendDebt debtor) = do
+  (UserAddress user) ← currentUser
+  liftEff $ newPendingImpl (getUa debtor.friend) (amount debtor.debt)
+
+confirmPending ∷ FriendDebt → MonadF Unit
 confirmPending (FriendDebt fd) = do
   cu ← currentUser
-  case cu of
-    Right (UserAddress user) →
-      Right <$> confirmPendingImpl (getUa fd.friend) (amount fd.debt)
-    Left  error → pure $ Left error
+  liftEff $ confirmPendingImpl (getUa fd.friend) (amount fd.debt)
 
-cancelPending ∷ ∀ e. UserAddress → Eff e (Either Error Unit)
+cancelPending ∷ ∀ e. UserAddress → MonadF Unit
 cancelPending (UserAddress user) = do
-  c ← checkAndInit
-  case c of
-    Left error → pure $ Left error
-    Right _ → do
-      cancelPendingImpl user
-      pure $ Right unit
+  checkAndInit
+  liftEff $ cancelPendingImpl user
 
-createFriendship ∷ ∀ e. UserAddress → Eff e (Either Error Unit)
+createFriendship ∷ ∀ e. UserAddress → MonadF Unit
 createFriendship (UserAddress newFriend) = do
-  c ← checkAndInit
-  case c of
-    Left error → pure $ Left error
-    Right _ → do
-      createFriendshipImpl newFriend
-      pure $ Right unit
+   checkAndInit
+   liftEff $  createFriendshipImpl newFriend
 
 getName ∷ ∀ e. UserAddress → Aff e (Maybe UserName)
 getName (UserAddress ua) = do
   userName ← makeAff (\err succ → getNameImpl succ ua)
   if userName == "" then pure Nothing else pure $ Just userName
 
-getCurrentUserName ∷ ∀ e. Aff e (Either Error (Either UserAddress UserName))
+getCurrentUserName ∷ ∀ e. MonadF (Either UserAddress UserName)
 getCurrentUserName = do
-  cu ← liftEff currentUser
-  case cu of
-    Left error → pure $ Left error
-    Right user → do
-      maybeName ← getName user
-      case maybeName of
-        Nothing → pure $ Right $ Left  user
-        Just n  → pure $ Right $ Right n
+  cu ← currentUser
+  maybeName ← liftAff $ getName cu
+  case maybeName of
+    Nothing → pure $ Left cu
+    Just n  → pure $ Right n
 
-setCurrentUserName ∷ ∀ e. UserName → Eff e (Either Error Unit)
+setCurrentUserName ∷ ∀ e. UserName → MonadF Unit
 setCurrentUserName userNameStr = do
-  c ← liftEff checkAndInit
-  case c of
-    Left error → pure $ Left error
-    Right _    → Right <$> setNameImpl userNameStr
+  checkAndInit
+  liftEff $ setNameImpl userNameStr
 
-allNames ∷ ∀ e. Array UserAddress → Aff e (Either Error (M.Map UserAddress UserName))
+allNames ∷ ∀ e. Array UserAddress → MonadF (M.Map UserAddress UserName)
 allNames friendList = do
-  cu ← liftEff currentUser
-  case cu of
-    Left error → pure $ Left error
-    Right user → do
-      let allUsers = friendList <> [user]
-      names ← traverse getName $ allUsers
-      pure $ Right <$> foldr f M.empty $ A.zip allUsers names
+  cu ← currentUser
+  let allUsers = friendList <> [cu]
+  names ← liftAff $ traverse getName $ allUsers
+  pure $ foldr f M.empty $ A.zip allUsers names
   where f (Tuple address userName) map = insertMap map address userName
         insertMap map address Nothing         = map
         insertMap map address (Just userName) = M.insert address userName map

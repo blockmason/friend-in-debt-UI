@@ -130,7 +130,7 @@ component =
       case eitherFriend of
         Left str → pure next
         Right ua → do H.modify (_ { newFriend = Left "" })
-                      handleFIDCallEff s.errorBus unit (F.createFriendship ua)
+                      handleFIDCall s.errorBus unit (F.createFriendship ua)
                       pure next
     InputFriend friendStr next → do
       if ((S.length friendStr) == 42)
@@ -142,7 +142,7 @@ component =
       pure next
     UpdateName inputName next → do
       s ← H.get
-      handleFIDCallEff s.errorBus unit (F.setCurrentUserName s.inputName)
+      handleFIDCall s.errorBus unit (F.setCurrentUserName s.inputName)
       H.modify (_ { inputName = "" })
       pure next
     CreateDebt fd next → do
@@ -154,19 +154,19 @@ component =
       let key = creditor
       case M.lookup key s.creating of
         Nothing   → pure next
-        Just debt → do handleFIDCallEff s.errorBus unit (F.newPending debt)
+        Just debt → do handleFIDCall s.errorBus unit (F.newPending debt)
                        H.modify (_ { creating = M.delete key s.creating })
                        pure next
     ConfirmPending debt next → do
       s ← H.get
-      handleFIDCallEff s.errorBus unit (F.confirmPending debt)
+      handleFIDCall s.errorBus unit (F.confirmPending debt)
       H.modify (_ { pending =
                       (filter (\fd → fd /= debt) s.pending)
                       <> [ F.setDebt debt (toNumber 0) ] })
       pure next
     CancelPending (F.FriendDebt debt) next → do
       s ← H.get
-      handleFIDCallEff s.errorBus unit (F.cancelPending debt.friend)
+      handleFIDCall s.errorBus unit (F.cancelPending debt.friend)
       pure next
     RefreshDebts next → do
       errorBus ← H.gets _.errorBus
@@ -180,12 +180,12 @@ refreshButton =
 
 loadFriendsAndDebts errorBus = do
   H.modify (_ { loading = true })
-  friends     ← handleFIDCallAff errorBus [] F.currentUserFriends
-  userName    ← handleFIDCallAff errorBus (Right "") F.getCurrentUserName
-  names       ← handleFIDCallAff errorBus M.empty (F.allNames friends)
-  debts       ← handleFIDCallAff errorBus [] (F.currentUserDebts friends)
-  pending     ← handleFIDCallAff errorBus [] (F.currentUserPending friends)
-  sentPending ← handleFIDCallAff errorBus [] (F.currentUserSentPendings friends)
+  friends     ← handleFIDCall errorBus [] F.currentUserFriends
+  userName    ← handleFIDCall errorBus (Right "") F.getCurrentUserName
+  names       ← handleFIDCall errorBus M.empty (F.allNames friends)
+  debts       ← handleFIDCall errorBus [] (F.currentUserDebts friends)
+  pending     ← handleFIDCall errorBus [] (F.currentUserPending friends)
+  sentPending ← handleFIDCall errorBus [] (F.currentUserSentPendings friends)
   H.modify (_ { friends = friends, debts = debts, pending = pending, loading = false
               , sentPending = sentPending, names = names, userName = userName  })
 
@@ -339,18 +339,19 @@ numberFromString s = fromMaybe (toNumber 0) (N.fromString s)
 --helper to query the blockchain
 --blankVal is a value to return if there's an error
 --writes a message to the error bus if there's an error
-handleFIDCallAff errorBus blankVal fidAffCall = do
+handleFIDCall errorBus blankVal fidAffCall = do
   case errorBus of
     Nothing → do
       H.liftEff $ logShow "No bus initialized"
       pure blankVal
     Just b → do
-      result ← H.liftAff fidAffCall
+      result ← H.liftAff $ F.runMonadF fidAffCall
       case result of
         Left error → do _ ← H.liftAff $ Bus.write (FIDError error) b
                         pure blankVal
         Right val  → pure val
 
+{-
 handleFIDCallEff errorBus blankVal fidAffCall = do
   case errorBus of
     Nothing → do
@@ -362,3 +363,4 @@ handleFIDCallEff errorBus blankVal fidAffCall = do
         Left error → do _ ← H.liftAff $ Bus.write (FIDError error) b
                         pure blankVal
         Right val  → pure val
+-}

@@ -2282,7 +2282,14 @@ var PS = {};
   };
   var runExceptT = function (v) {
       return v;
-  }; 
+  };          
+  var monadTransExceptT = new Control_Monad_Trans_Class.MonadTrans(function (dictMonad) {
+      return function (m) {
+          return Control_Bind.bind(dictMonad.Bind1())(m)(function (v) {
+              return Control_Applicative.pure(dictMonad.Applicative0())(new Data_Either.Right(v));
+          });
+      };
+  });
   var mapExceptT = function (f) {
       return function (v) {
           return f(v);
@@ -2331,6 +2338,13 @@ var PS = {};
           return ExceptT(Control_Applicative.pure(dictMonad.Applicative0())(Data_Either.Right.create($98)));
       });
   };
+  var monadEffExceptT = function (dictMonadEff) {
+      return new Control_Monad_Eff_Class.MonadEff(function () {
+          return monadExceptT(dictMonadEff.Monad0());
+      }, function ($99) {
+          return Control_Monad_Trans_Class.lift(monadTransExceptT)(dictMonadEff.Monad0())(Control_Monad_Eff_Class.liftEff(dictMonadEff)($99));
+      });
+  };
   var monadThrowExceptT = function (dictMonad) {
       return new Control_Monad_Error_Class.MonadThrow(function () {
           return monadExceptT(dictMonad);
@@ -2347,6 +2361,8 @@ var PS = {};
   exports["applicativeExceptT"] = applicativeExceptT;
   exports["bindExceptT"] = bindExceptT;
   exports["monadExceptT"] = monadExceptT;
+  exports["monadTransExceptT"] = monadTransExceptT;
+  exports["monadEffExceptT"] = monadEffExceptT;
   exports["monadThrowExceptT"] = monadThrowExceptT;
 })(PS["Control.Monad.Except.Trans"] = PS["Control.Monad.Except.Trans"] || {});
 (function(exports) {
@@ -3084,9 +3100,17 @@ var PS = {};
   var liftAff = function (dict) {
       return dict.liftAff;
   };
+  var monadAffExceptT = function (dictMonadAff) {
+      return new MonadAff(function () {
+          return Control_Monad_Except_Trans.monadEffExceptT(dictMonadAff.MonadEff0());
+      }, function ($11) {
+          return Control_Monad_Trans_Class.lift(Control_Monad_Except_Trans.monadTransExceptT)((dictMonadAff.MonadEff0()).Monad0())(liftAff(dictMonadAff)($11));
+      });
+  };
   exports["MonadAff"] = MonadAff;
   exports["liftAff"] = liftAff;
   exports["monadAffAff"] = monadAffAff;
+  exports["monadAffExceptT"] = monadAffExceptT;
 })(PS["Control.Monad.Aff.Class"] = PS["Control.Monad.Aff.Class"] || {});
 (function(exports) {
     "use strict";
@@ -7956,8 +7980,10 @@ var PS = {};
   var Control_Applicative = PS["Control.Applicative"];
   var Control_Bind = PS["Control.Bind"];
   var Control_Monad_Aff = PS["Control.Monad.Aff"];
+  var Control_Monad_Aff_Class = PS["Control.Monad.Aff.Class"];
   var Control_Monad_Eff = PS["Control.Monad.Eff"];
   var Control_Monad_Eff_Class = PS["Control.Monad.Eff.Class"];
+  var Control_Monad_Error_Class = PS["Control.Monad.Error.Class"];
   var Control_Monad_Except_Trans = PS["Control.Monad.Except.Trans"];
   var Control_Semigroupoid = PS["Control.Semigroupoid"];
   var Data_Array = PS["Data.Array"];
@@ -7980,7 +8006,6 @@ var PS = {};
   var Data_String = PS["Data.String"];
   var Data_Traversable = PS["Data.Traversable"];
   var Data_Tuple = PS["Data.Tuple"];
-  var Data_Unit = PS["Data.Unit"];
   var $$Math = PS["Math"];
   var Network_Eth_Metamask = PS["Network.Eth.Metamask"];
   var Prelude = PS["Prelude"];        
@@ -8023,8 +8048,8 @@ var PS = {};
   }; 
   var showMoney = new Data_Show.Show(function (v) {
       return (function () {
-          var $58 = v < Data_Int.toNumber(0);
-          if ($58) {
+          var $53 = v < Data_Int.toNumber(0);
+          if ($53) {
               return "-";
           };
           return "";
@@ -8033,17 +8058,18 @@ var PS = {};
   var setDebt = function (v) {
       return function (m) {
           return FriendDebt((function () {
-              var $63 = {};
-              for (var $64 in v) {
-                  if ({}.hasOwnProperty.call(v, $64)) {
-                      $63[$64] = v[$64];
+              var $58 = {};
+              for (var $59 in v) {
+                  if ({}.hasOwnProperty.call(v, $59)) {
+                      $58[$59] = v[$59];
                   };
               };
-              $63.debt = m;
-              return $63;
+              $58.debt = m;
+              return $58;
           })());
       };
-  };                                                    
+  };
+  var runMonadF = Control_Monad_Except_Trans.runExceptT;
   var newDebt = function (f) {
       return function (d) {
           return {
@@ -8067,8 +8093,8 @@ var PS = {};
               return $foreign.getNameImpl(succ)(v);
           };
       }))(function (v1) {
-          var $70 = v1 === "";
-          if ($70) {
+          var $65 = v1 === "";
+          if ($65) {
               return Control_Applicative.pure(Control_Monad_Aff.applicativeAff)(Data_Maybe.Nothing.value);
           };
           return Control_Applicative.pure(Control_Monad_Aff.applicativeAff)(new Data_Maybe.Just(v1));
@@ -8104,14 +8130,14 @@ var PS = {};
   };
   var flipDebt = function (v) {
       return FriendDebt((function () {
-          var $80 = {};
-          for (var $81 in v) {
-              if ({}.hasOwnProperty.call(v, $81)) {
-                  $80[$81] = v[$81];
+          var $75 = {};
+          for (var $76 in v) {
+              if ({}.hasOwnProperty.call(v, $76)) {
+                  $75[$76] = v[$76];
               };
           };
-          $80.debt = mkNegative(v.debt);
-          return $80;
+          $75.debt = mkNegative(v.debt);
+          return $75;
       })());
   };
   var eqUserAddress = new Data_Eq.Eq(function (v) {
@@ -8136,116 +8162,66 @@ var PS = {};
           return Data_Eq.eq(eqUserAddress)(v.friend)(v1.friend) && Data_Eq.eq(eqMoney)(v.debt)(v1.debt);
       };
   });
-  var checkAndInit = function __do() {
-      var v = Data_Functor.map(Control_Monad_Eff.functorEff)(Network_Eth_Metamask.loggedIn)(Network_Eth_Metamask.checkStatus)();
+  var checkAndInit = Control_Bind.bind(Control_Monad_Except_Trans.bindExceptT(Control_Monad_Aff.monadAff))(Control_Monad_Eff_Class.liftEff(Control_Monad_Except_Trans.monadEffExceptT(Control_Monad_Aff.monadEffAff))(Data_Functor.map(Control_Monad_Eff.functorEff)(Network_Eth_Metamask.loggedIn)(Network_Eth_Metamask.checkStatus)))(function (v) {
       if (v) {
-          return Data_Functor.map(Control_Monad_Eff.functorEff)(Data_Either.Right.create)($foreign.initImpl("dummy"))();
+          return Control_Monad_Eff_Class.liftEff(Control_Monad_Except_Trans.monadEffExceptT(Control_Monad_Aff.monadEffAff))($foreign.initImpl("dummy"));
       };
-      return new Data_Either.Left(NoMetamask.value);
-  };
-  var createFriendship = function (v) {
-      return function __do() {
-          var v1 = checkAndInit();
-          if (v1 instanceof Data_Either.Left) {
-              return new Data_Either.Left(v1.value0);
-          };
-          if (v1 instanceof Data_Either.Right) {
-              $foreign.createFriendshipImpl(v)();
-              return new Data_Either.Right(Data_Unit.unit);
-          };
-          throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 239, column 3 - line 243, column 24: " + [ v1.constructor.name ]);
-      };
-  };
-  var currentUser = function __do() {
-      var v = checkAndInit();
-      if (v instanceof Data_Either.Left) {
-          return new Data_Either.Left(v.value0);
-      };
-      if (v instanceof Data_Either.Right) {
-          var v1 = $foreign.currentUserImpl("dummy")();
-          return Data_Either.Right.create(v1);
-      };
-      throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 161, column 3 - line 165, column 37: " + [ v.constructor.name ]);
-  };
-  var currentUserFriends = Control_Bind.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(currentUser))(function (v) {
-      if (v instanceof Data_Either.Left) {
-          return Control_Applicative.pure(Control_Monad_Aff.applicativeAff)(new Data_Either.Left(v.value0));
-      };
-      if (v instanceof Data_Either.Right) {
-          return Data_Functor.map(Control_Monad_Aff.functorAff)(Data_Either.Right.create)(friends(v.value0));
-      };
-      throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 185, column 3 - line 187, column 41: " + [ v.constructor.name ]);
+      return Control_Monad_Error_Class.throwError(Control_Monad_Except_Trans.monadThrowExceptT(Control_Monad_Aff.monadAff))(NoMetamask.value);
   });
-  var getCurrentUserName = Control_Bind.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(currentUser))(function (v) {
-      if (v instanceof Data_Either.Left) {
-          return Control_Applicative.pure(Control_Monad_Aff.applicativeAff)(new Data_Either.Left(v.value0));
-      };
-      if (v instanceof Data_Either.Right) {
-          return Control_Bind.bind(Control_Monad_Aff.bindAff)(getName(v.value0))(function (v1) {
-              if (v1 instanceof Data_Maybe.Nothing) {
-                  return Control_Applicative.pure(Control_Monad_Aff.applicativeAff)(Data_Either.Right.create(new Data_Either.Left(v.value0)));
-              };
-              if (v1 instanceof Data_Maybe.Just) {
-                  return Control_Applicative.pure(Control_Monad_Aff.applicativeAff)(Data_Either.Right.create(new Data_Either.Right(v1.value0)));
-              };
-              throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 257, column 7 - line 259, column 41: " + [ v1.constructor.name ]);
-          });
-      };
-      throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 253, column 3 - line 259, column 41: " + [ v.constructor.name ]);
+  var createFriendship = function (v) {
+      return Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_Except_Trans.bindExceptT(Control_Monad_Aff.monadAff))(checkAndInit)(function () {
+          return Control_Monad_Eff_Class.liftEff(Control_Monad_Except_Trans.monadEffExceptT(Control_Monad_Aff.monadEffAff))($foreign.createFriendshipImpl(v));
+      });
+  };
+  var currentUser = Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_Except_Trans.bindExceptT(Control_Monad_Aff.monadAff))(checkAndInit)(function () {
+      return Data_Functor.map(Control_Monad_Except_Trans.functorExceptT(Control_Monad_Aff.functorAff))(UserAddress)(Control_Monad_Eff_Class.liftEff(Control_Monad_Except_Trans.monadEffExceptT(Control_Monad_Aff.monadEffAff))($foreign.currentUserImpl("dummy")));
+  });
+  var currentUserFriends = Control_Bind.bind(Control_Monad_Except_Trans.bindExceptT(Control_Monad_Aff.monadAff))(currentUser)(function (v) {
+      return Control_Monad_Aff_Class.liftAff(Control_Monad_Aff_Class.monadAffExceptT(Control_Monad_Aff_Class.monadAffAff))(friends(v));
+  });
+  var getCurrentUserName = Control_Bind.bind(Control_Monad_Except_Trans.bindExceptT(Control_Monad_Aff.monadAff))(currentUser)(function (v) {
+      return Control_Bind.bind(Control_Monad_Except_Trans.bindExceptT(Control_Monad_Aff.monadAff))(Control_Monad_Aff_Class.liftAff(Control_Monad_Aff_Class.monadAffExceptT(Control_Monad_Aff_Class.monadAffAff))(getName(v)))(function (v1) {
+          if (v1 instanceof Data_Maybe.Nothing) {
+              return Control_Applicative.pure(Control_Monad_Except_Trans.applicativeExceptT(Control_Monad_Aff.monadAff))(new Data_Either.Left(v));
+          };
+          if (v1 instanceof Data_Maybe.Just) {
+              return Control_Applicative.pure(Control_Monad_Except_Trans.applicativeExceptT(Control_Monad_Aff.monadAff))(new Data_Either.Right(v1.value0));
+          };
+          throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 231, column 3 - line 233, column 29: " + [ v1.constructor.name ]);
+      });
   });
   var setCurrentUserName = function (userNameStr) {
-      return function __do() {
-          var v = Control_Monad_Eff_Class.liftEff(Control_Monad_Eff_Class.monadEffEff)(checkAndInit)();
-          if (v instanceof Data_Either.Left) {
-              return new Data_Either.Left(v.value0);
-          };
-          if (v instanceof Data_Either.Right) {
-              return Data_Functor.map(Control_Monad_Eff.functorEff)(Data_Either.Right.create)($foreign.setNameImpl(userNameStr))();
-          };
-          throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 264, column 3 - line 266, column 51: " + [ v.constructor.name ]);
-      };
+      return Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_Except_Trans.bindExceptT(Control_Monad_Aff.monadAff))(checkAndInit)(function () {
+          return Control_Monad_Eff_Class.liftEff(Control_Monad_Except_Trans.monadEffExceptT(Control_Monad_Aff.monadEffAff))($foreign.setNameImpl(userNameStr));
+      });
   };
   var changeDebtor = function (newDebtor) {
       return function (v) {
           return FriendDebt((function () {
-              var $122 = {};
-              for (var $123 in v) {
-                  if ({}.hasOwnProperty.call(v, $123)) {
-                      $122[$123] = v[$123];
+              var $98 = {};
+              for (var $99 in v) {
+                  if ({}.hasOwnProperty.call(v, $99)) {
+                      $98[$99] = v[$99];
                   };
               };
-              $122.friend = newDebtor;
-              return $122;
+              $98.friend = newDebtor;
+              return $98;
           })());
       };
   };
   var currentUserSentPendings = function (friendList) {
-      return Control_Bind.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(currentUser))(function (v) {
-          if (v instanceof Data_Either.Left) {
-              return Control_Applicative.pure(Control_Monad_Aff.applicativeAff)(new Data_Either.Left(v.value0));
-          };
-          if (v instanceof Data_Either.Right) {
-              return Data_Functor.map(Control_Monad_Aff.functorAff)(Data_Either.Right.create)(Data_Traversable.traverse(Data_Traversable.traversableArray)(Control_Monad_Aff.applicativeAff)(function (f) {
-                  return Data_Functor.map(Control_Monad_Aff.functorAff)(function ($168) {
-                      return flipDebt(changeDebtor(f)($168));
-                  })(getDebtOrPending($foreign.friendPendingImpl)(f)(v.value0));
-              })(friendList));
-          };
-          throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 206, column 3 - line 209, column 109: " + [ v.constructor.name ]);
+      return Control_Bind.bind(Control_Monad_Except_Trans.bindExceptT(Control_Monad_Aff.monadAff))(currentUser)(function (v) {
+          return Control_Monad_Aff_Class.liftAff(Control_Monad_Aff_Class.monadAffExceptT(Control_Monad_Aff_Class.monadAffAff))(Data_Traversable.traverse(Data_Traversable.traversableArray)(Control_Monad_Aff.applicativeAff)(function (f) {
+              return Data_Functor.map(Control_Monad_Aff.functorAff)(function ($122) {
+                  return flipDebt(changeDebtor(f)($122));
+              })(getDebtOrPending($foreign.friendPendingImpl)(f)(v));
+          })(friendList));
       });
   };
   var cancelPending = function (v) {
-      return function __do() {
-          var v1 = checkAndInit();
-          if (v1 instanceof Data_Either.Left) {
-              return new Data_Either.Left(v1.value0);
-          };
-          if (v1 instanceof Data_Either.Right) {
-              $foreign.cancelPendingImpl(v)();
-              return new Data_Either.Right(Data_Unit.unit);
-          };
-          throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 230, column 3 - line 234, column 24: " + [ v1.constructor.name ]);
-      };
+      return Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_Except_Trans.bindExceptT(Control_Monad_Aff.monadAff))(checkAndInit)(function () {
+          return Control_Monad_Eff_Class.liftEff(Control_Monad_Except_Trans.monadEffExceptT(Control_Monad_Aff.monadEffAff))($foreign.cancelPendingImpl(v));
+      });
   };
   var blankFriendDebt = {
       friend: "0x0", 
@@ -8261,28 +8237,14 @@ var PS = {};
       return v;
   };
   var confirmPending = function (v) {
-      return function __do() {
-          var v1 = currentUser();
-          if (v1 instanceof Data_Either.Right) {
-              return Data_Functor.map(Control_Monad_Eff.functorEff)(Data_Either.Right.create)($foreign.confirmPendingImpl(getUa(v.friend))(amount(v.debt)))();
-          };
-          if (v1 instanceof Data_Either.Left) {
-              return new Data_Either.Left(v1.value0);
-          };
-          throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 222, column 3 - line 225, column 36: " + [ v1.constructor.name ]);
-      };
+      return Control_Bind.bind(Control_Monad_Except_Trans.bindExceptT(Control_Monad_Aff.monadAff))(currentUser)(function (v1) {
+          return Control_Monad_Eff_Class.liftEff(Control_Monad_Except_Trans.monadEffExceptT(Control_Monad_Aff.monadEffAff))($foreign.confirmPendingImpl(getUa(v.friend))(amount(v.debt)));
+      });
   };
   var newPending = function (v) {
-      return function __do() {
-          var v1 = currentUser();
-          if (v1 instanceof Data_Either.Right) {
-              return Data_Functor.map(Control_Monad_Eff.functorEff)(Data_Either.Right.create)($foreign.newPendingImpl(getUa(v.friend))(amount(v.debt)))();
-          };
-          if (v1 instanceof Data_Either.Left) {
-              return new Data_Either.Left(v1.value0);
-          };
-          throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 214, column 3 - line 217, column 36: " + [ v1.constructor.name ]);
-      };
+      return Control_Bind.bind(Control_Monad_Except_Trans.bindExceptT(Control_Monad_Aff.monadAff))(currentUser)(function (v1) {
+          return Control_Monad_Eff_Class.liftEff(Control_Monad_Except_Trans.monadEffExceptT(Control_Monad_Aff.monadEffAff))($foreign.newPendingImpl(getUa(v.friend))(amount(v.debt)));
+      });
   };
   var posNegZero = function (v) {
       if (amount(v.debt) > 0.0) {
@@ -8294,7 +8256,7 @@ var PS = {};
       if (Data_Boolean.otherwise) {
           return Zero.value;
       };
-      throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 119, column 1 - line 121, column 57: " + [ v.constructor.name ]);
+      throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 121, column 1 - line 123, column 57: " + [ v.constructor.name ]);
   };
   var allNames = function (friendList) {
       var insertMap = function (map) {
@@ -8306,7 +8268,7 @@ var PS = {};
                   if (v instanceof Data_Maybe.Just) {
                       return Data_Map.insert(ordUserAddress)(address)(v.value0)(map);
                   };
-                  throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 277, column 9 - line 277, column 72: " + [ map.constructor.name, address.constructor.name, v.constructor.name ]);
+                  throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 246, column 9 - line 246, column 72: " + [ map.constructor.name, address.constructor.name, v.constructor.name ]);
               };
           };
       };
@@ -8315,17 +8277,11 @@ var PS = {};
               return insertMap(map)(v.value0)(v.value1);
           };
       };
-      return Control_Bind.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(currentUser))(function (v) {
-          if (v instanceof Data_Either.Left) {
-              return Control_Applicative.pure(Control_Monad_Aff.applicativeAff)(new Data_Either.Left(v.value0));
-          };
-          if (v instanceof Data_Either.Right) {
-              var allUsers = Data_Semigroup.append(Data_Semigroup.semigroupArray)(friendList)([ v.value0 ]);
-              return Control_Bind.bind(Control_Monad_Aff.bindAff)(Data_Traversable.traverse(Data_Traversable.traversableArray)(Control_Monad_Aff.applicativeAff)(getName)(allUsers))(function (v1) {
-                  return Control_Applicative.pure(Control_Monad_Aff.applicativeAff)(Data_Functor.map(Data_Functor.functorFn)(Data_Either.Right.create)(Data_Foldable.foldr(Data_Foldable.foldableArray)(f)(Data_Map.empty))(Data_Array.zip(allUsers)(v1)));
-              });
-          };
-          throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 271, column 3 - line 276, column 62: " + [ v.constructor.name ]);
+      return Control_Bind.bind(Control_Monad_Except_Trans.bindExceptT(Control_Monad_Aff.monadAff))(currentUser)(function (v) {
+          var allUsers = Data_Semigroup.append(Data_Semigroup.semigroupArray)(friendList)([ v ]);
+          return Control_Bind.bind(Control_Monad_Except_Trans.bindExceptT(Control_Monad_Aff.monadAff))(Control_Monad_Aff_Class.liftAff(Control_Monad_Aff_Class.monadAffExceptT(Control_Monad_Aff_Class.monadAffAff))(Data_Traversable.traverse(Data_Traversable.traversableArray)(Control_Monad_Aff.applicativeAff)(getName)(allUsers)))(function (v1) {
+              return Control_Applicative.pure(Control_Monad_Except_Trans.applicativeExceptT(Control_Monad_Aff.monadAff))(Data_Foldable.foldr(Data_Foldable.foldableArray)(f)(Data_Map.empty)(Data_Array.zip(allUsers)(v1)));
+          });
       });
   };
   var allDebtOrPending = function (lookupFn) {
@@ -8336,25 +8292,13 @@ var PS = {};
       };
   };
   var currentUserDebts = function (friendList) {
-      return Control_Bind.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(currentUser))(function (v) {
-          if (v instanceof Data_Either.Left) {
-              return Control_Applicative.pure(Control_Monad_Aff.applicativeAff)(new Data_Either.Left(v.value0));
-          };
-          if (v instanceof Data_Either.Right) {
-              return Data_Functor.map(Control_Monad_Aff.functorAff)(Data_Either.Right.create)(allDebtOrPending($foreign.friendDebtImpl)(v.value0)(friendList));
-          };
-          throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 192, column 3 - line 194, column 76: " + [ v.constructor.name ]);
+      return Control_Bind.bind(Control_Monad_Except_Trans.bindExceptT(Control_Monad_Aff.monadAff))(currentUser)(function (v) {
+          return Control_Monad_Aff_Class.liftAff(Control_Monad_Aff_Class.monadAffExceptT(Control_Monad_Aff_Class.monadAffAff))(allDebtOrPending($foreign.friendDebtImpl)(v)(friendList));
       });
   };
   var currentUserPending = function (friendList) {
-      return Control_Bind.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(currentUser))(function (v) {
-          if (v instanceof Data_Either.Right) {
-              return Data_Functor.map(Control_Monad_Aff.functorAff)(Data_Either.Right.create)(allDebtOrPending($foreign.friendPendingImpl)(v.value0)(friendList));
-          };
-          if (v instanceof Data_Either.Left) {
-              return Control_Applicative.pure(Control_Monad_Aff.applicativeAff)(new Data_Either.Left(v.value0));
-          };
-          throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 199, column 3 - line 201, column 36: " + [ v.constructor.name ]);
+      return Control_Bind.bind(Control_Monad_Except_Trans.bindExceptT(Control_Monad_Aff.monadAff))(currentUser)(function (v) {
+          return Control_Monad_Aff_Class.liftAff(Control_Monad_Aff_Class.monadAffExceptT(Control_Monad_Aff_Class.monadAffAff))(allDebtOrPending($foreign.friendPendingImpl)(v)(friendList));
       });
   };
   var addDebt = function (fd) {
@@ -8390,11 +8334,11 @@ var PS = {};
   exports["getCurrentUserName"] = getCurrentUserName;
   exports["getDebt"] = getDebt;
   exports["getFriendAddr"] = getFriendAddr;
-  exports["getName"] = getName;
   exports["getUa"] = getUa;
   exports["newDebt"] = newDebt;
   exports["newPending"] = newPending;
   exports["posNegZero"] = posNegZero;
+  exports["runMonadF"] = runMonadF;
   exports["setCurrentUserName"] = setCurrentUserName;
   exports["setDebt"] = setDebt;
   exports["showMoney"] = showMoney;
@@ -8612,8 +8556,8 @@ var PS = {};
           return Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("nameChange") ])([ Halogen_HTML_Elements.input([ Halogen_HTML_Properties.type_(Halogen_HTML_Core.inputTypeIsProp)(DOM_HTML_Indexed_InputType.InputText.value), Halogen_HTML_Properties.value(inputName), Halogen_HTML_Events.onValueInput(Halogen_HTML_Events.input(function (val) {
               return InputName.create(val);
           })) ]), Halogen_HTML_Elements.button([ Halogen_HTML_Events.onClick(Halogen_HTML_Events.input_(UpdateName.create(inputName))), Halogen_HTML_Properties.class_("btn-info") ])([ Halogen_HTML_Core.text("Change My Name from " + (Data_Either.either(Network_Eth_FriendInDebt.getUa)(Control_Category.id(Control_Category.categoryFn))(userName) + (function () {
-              var $52 = Data_String.length(inputName) > 0;
-              if ($52) {
+              var $47 = Data_String.length(inputName) > 0;
+              if ($47) {
                   return " to " + inputName;
               };
               return "";
@@ -8649,15 +8593,15 @@ var PS = {};
       };
       throw new Error("Failed pattern match at Debts line 257, column 17 - line 262, column 1: " + [ v.constructor.name ]);
   };
-  var reverseMoneyClass = function ($171) {
-      return moneyClass(Network_Eth_FriendInDebt.flipDebt($171));
+  var reverseMoneyClass = function ($160) {
+      return moneyClass(Network_Eth_FriendInDebt.flipDebt($160));
   };
   var mkDebt = function (friend) {
       return function (debtStr) {
           return Network_Eth_FriendInDebt.newDebt(friend)(numberFromString(debtStr));
       };
   };
-  var handleFIDCallEff = function (dictBind) {
+  var handleFIDCall = function (dictBind) {
       return function (dictMonadEff) {
           return function (dictMonadAff) {
               return function (errorBus) {
@@ -8669,7 +8613,7 @@ var PS = {};
                               });
                           };
                           if (errorBus instanceof Data_Maybe.Just) {
-                              return Control_Bind.bind(dictBind)(Control_Monad_Eff_Class.liftEff(dictMonadEff)(fidAffCall))(function (v) {
+                              return Control_Bind.bind(dictBind)(Control_Monad_Aff_Class.liftAff(dictMonadAff)(Network_Eth_FriendInDebt.runMonadF(fidAffCall)))(function (v) {
                                   if (v instanceof Data_Either.Left) {
                                       return Control_Bind.bind(dictBind)(Control_Monad_Aff_Class.liftAff(dictMonadAff)(Control_Monad_Aff_Bus.write(new Types.FIDError(v.value0))(errorBus.value0)))(function (v1) {
                                           return Control_Applicative.pure((dictMonadEff.Monad0()).Applicative0())(blankVal);
@@ -8678,41 +8622,10 @@ var PS = {};
                                   if (v instanceof Data_Either.Right) {
                                       return Control_Applicative.pure((dictMonadEff.Monad0()).Applicative0())(v.value0);
                                   };
-                                  throw new Error("Failed pattern match at Debts line 361, column 7 - line 364, column 27: " + [ v.constructor.name ]);
+                                  throw new Error("Failed pattern match at Debts line 349, column 7 - line 352, column 27: " + [ v.constructor.name ]);
                               });
                           };
-                          throw new Error("Failed pattern match at Debts line 355, column 3 - line 364, column 27: " + [ errorBus.constructor.name ]);
-                      };
-                  };
-              };
-          };
-      };
-  };
-  var handleFIDCallAff = function (dictBind) {
-      return function (dictMonadEff) {
-          return function (dictMonadAff) {
-              return function (errorBus) {
-                  return function (blankVal) {
-                      return function (fidAffCall) {
-                          if (errorBus instanceof Data_Maybe.Nothing) {
-                              return Control_Bind.discard(Control_Bind.discardUnit)(dictBind)(Control_Monad_Eff_Class.liftEff(dictMonadEff)(Control_Monad_Eff_Console.logShow(Data_Show.showString)("No bus initialized")))(function () {
-                                  return Control_Applicative.pure((dictMonadEff.Monad0()).Applicative0())(blankVal);
-                              });
-                          };
-                          if (errorBus instanceof Data_Maybe.Just) {
-                              return Control_Bind.bind(dictBind)(Control_Monad_Aff_Class.liftAff(dictMonadAff)(fidAffCall))(function (v) {
-                                  if (v instanceof Data_Either.Left) {
-                                      return Control_Bind.bind(dictBind)(Control_Monad_Aff_Class.liftAff(dictMonadAff)(Control_Monad_Aff_Bus.write(new Types.FIDError(v.value0))(errorBus.value0)))(function (v1) {
-                                          return Control_Applicative.pure((dictMonadEff.Monad0()).Applicative0())(blankVal);
-                                      });
-                                  };
-                                  if (v instanceof Data_Either.Right) {
-                                      return Control_Applicative.pure((dictMonadEff.Monad0()).Applicative0())(v.value0);
-                                  };
-                                  throw new Error("Failed pattern match at Debts line 349, column 7 - line 352, column 30: " + [ v.constructor.name ]);
-                              });
-                          };
-                          throw new Error("Failed pattern match at Debts line 343, column 3 - line 352, column 30: " + [ errorBus.constructor.name ]);
+                          throw new Error("Failed pattern match at Debts line 343, column 3 - line 352, column 27: " + [ errorBus.constructor.name ]);
                       };
                   };
               };
@@ -8725,36 +8638,36 @@ var PS = {};
               return function (dictMonadAff) {
                   return function (errorBus) {
                       return Control_Bind.discard(Control_Bind.discardUnit)(dictBind)(Control_Monad_State_Class.modify(dictMonadState)(function (v) {
-                          var $68 = {};
-                          for (var $69 in v) {
-                              if ({}.hasOwnProperty.call(v, $69)) {
-                                  $68[$69] = v[$69];
+                          var $57 = {};
+                          for (var $58 in v) {
+                              if ({}.hasOwnProperty.call(v, $58)) {
+                                  $57[$58] = v[$58];
                               };
                           };
-                          $68.loading = true;
-                          return $68;
+                          $57.loading = true;
+                          return $57;
                       }))(function () {
-                          return Control_Bind.bind(dictBind)(handleFIDCallAff(dictBind)(dictMonadEff)(dictMonadAff)(errorBus)([  ])(Network_Eth_FriendInDebt.currentUserFriends))(function (v) {
-                              return Control_Bind.bind(dictBind)(handleFIDCallAff(dictBind)(dictMonadEff)(dictMonadAff)(errorBus)(new Data_Either.Right(""))(Network_Eth_FriendInDebt.getCurrentUserName))(function (v1) {
-                                  return Control_Bind.bind(dictBind)(handleFIDCallAff(dictBind)(dictMonadEff)(dictMonadAff)(errorBus)(Data_Map.empty)(Network_Eth_FriendInDebt.allNames(v)))(function (v2) {
-                                      return Control_Bind.bind(dictBind)(handleFIDCallAff(dictBind)(dictMonadEff)(dictMonadAff)(errorBus)([  ])(Network_Eth_FriendInDebt.currentUserDebts(v)))(function (v3) {
-                                          return Control_Bind.bind(dictBind)(handleFIDCallAff(dictBind)(dictMonadEff)(dictMonadAff)(errorBus)([  ])(Network_Eth_FriendInDebt.currentUserPending(v)))(function (v4) {
-                                              return Control_Bind.bind(dictBind)(handleFIDCallAff(dictBind)(dictMonadEff)(dictMonadAff)(errorBus)([  ])(Network_Eth_FriendInDebt.currentUserSentPendings(v)))(function (v5) {
+                          return Control_Bind.bind(dictBind)(handleFIDCall(dictBind)(dictMonadEff)(dictMonadAff)(errorBus)([  ])(Network_Eth_FriendInDebt.currentUserFriends))(function (v) {
+                              return Control_Bind.bind(dictBind)(handleFIDCall(dictBind)(dictMonadEff)(dictMonadAff)(errorBus)(new Data_Either.Right(""))(Network_Eth_FriendInDebt.getCurrentUserName))(function (v1) {
+                                  return Control_Bind.bind(dictBind)(handleFIDCall(dictBind)(dictMonadEff)(dictMonadAff)(errorBus)(Data_Map.empty)(Network_Eth_FriendInDebt.allNames(v)))(function (v2) {
+                                      return Control_Bind.bind(dictBind)(handleFIDCall(dictBind)(dictMonadEff)(dictMonadAff)(errorBus)([  ])(Network_Eth_FriendInDebt.currentUserDebts(v)))(function (v3) {
+                                          return Control_Bind.bind(dictBind)(handleFIDCall(dictBind)(dictMonadEff)(dictMonadAff)(errorBus)([  ])(Network_Eth_FriendInDebt.currentUserPending(v)))(function (v4) {
+                                              return Control_Bind.bind(dictBind)(handleFIDCall(dictBind)(dictMonadEff)(dictMonadAff)(errorBus)([  ])(Network_Eth_FriendInDebt.currentUserSentPendings(v)))(function (v5) {
                                                   return Control_Monad_State_Class.modify(dictMonadState)(function (v6) {
-                                                      var $77 = {};
-                                                      for (var $78 in v6) {
-                                                          if ({}.hasOwnProperty.call(v6, $78)) {
-                                                              $77[$78] = v6[$78];
+                                                      var $66 = {};
+                                                      for (var $67 in v6) {
+                                                          if ({}.hasOwnProperty.call(v6, $67)) {
+                                                              $66[$67] = v6[$67];
                                                           };
                                                       };
-                                                      $77.friends = v;
-                                                      $77.debts = v3;
-                                                      $77.pending = v4;
-                                                      $77.loading = false;
-                                                      $77.sentPending = v5;
-                                                      $77.names = v2;
-                                                      $77.userName = v1;
-                                                      return $77;
+                                                      $66.friends = v;
+                                                      $66.debts = v3;
+                                                      $66.pending = v4;
+                                                      $66.loading = false;
+                                                      $66.sentPending = v5;
+                                                      $66.names = v2;
+                                                      $66.userName = v1;
+                                                      return $66;
                                                   });
                                               });
                                           });
@@ -8888,14 +8801,14 @@ var PS = {};
       var $$eval = function (v) {
           if (v instanceof HandleInput) {
               return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.modify(Halogen_Query_HalogenM.monadStateHalogenM)(function (v1) {
-                  var $112 = {};
-                  for (var $113 in v1) {
-                      if ({}.hasOwnProperty.call(v1, $113)) {
-                          $112[$113] = v1[$113];
+                  var $101 = {};
+                  for (var $102 in v1) {
+                      if ({}.hasOwnProperty.call(v1, $102)) {
+                          $101[$102] = v1[$102];
                       };
                   };
-                  $112.errorBus = v.value0;
-                  return $112;
+                  $101.errorBus = v.value0;
+                  return $101;
               }))(function () {
                   return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value1);
               });
@@ -8907,16 +8820,16 @@ var PS = {};
                   };
                   if (v.value0 instanceof Data_Either.Right) {
                       return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.modify(Halogen_Query_HalogenM.monadStateHalogenM)(function (v2) {
-                          var $120 = {};
-                          for (var $121 in v2) {
-                              if ({}.hasOwnProperty.call(v2, $121)) {
-                                  $120[$121] = v2[$121];
+                          var $109 = {};
+                          for (var $110 in v2) {
+                              if ({}.hasOwnProperty.call(v2, $110)) {
+                                  $109[$110] = v2[$110];
                               };
                           };
-                          $120.newFriend = new Data_Either.Left("");
-                          return $120;
+                          $109.newFriend = new Data_Either.Left("");
+                          return $109;
                       }))(function () {
-                          return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(handleFIDCallEff(Halogen_Query_HalogenM.bindHalogenM)(Halogen_Query_HalogenM.monadEffHalogenM(Control_Monad_Aff.monadEffAff))(Halogen_Query_HalogenM.monadAffHalogenM(Control_Monad_Aff_Class.monadAffAff))(v1.errorBus)(Data_Unit.unit)(Network_Eth_FriendInDebt.createFriendship(v.value0.value0)))(function () {
+                          return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(handleFIDCall(Halogen_Query_HalogenM.bindHalogenM)(Halogen_Query_HalogenM.monadEffHalogenM(Control_Monad_Aff.monadEffAff))(Halogen_Query_HalogenM.monadAffHalogenM(Control_Monad_Aff_Class.monadAffAff))(v1.errorBus)(Data_Unit.unit)(Network_Eth_FriendInDebt.createFriendship(v.value0.value0)))(function () {
                               return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value1);
                           });
                       });
@@ -8926,28 +8839,28 @@ var PS = {};
           };
           if (v instanceof InputFriend) {
               return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)((function () {
-                  var $126 = Data_String.length(v.value0) === 42;
-                  if ($126) {
+                  var $115 = Data_String.length(v.value0) === 42;
+                  if ($115) {
                       return Control_Monad_State_Class.modify(Halogen_Query_HalogenM.monadStateHalogenM)(function (v1) {
-                          var $127 = {};
-                          for (var $128 in v1) {
-                              if ({}.hasOwnProperty.call(v1, $128)) {
-                                  $127[$128] = v1[$128];
+                          var $116 = {};
+                          for (var $117 in v1) {
+                              if ({}.hasOwnProperty.call(v1, $117)) {
+                                  $116[$117] = v1[$117];
                               };
                           };
-                          $127.newFriend = Data_Either.Right.create(v.value0);
-                          return $127;
+                          $116.newFriend = Data_Either.Right.create(v.value0);
+                          return $116;
                       });
                   };
                   return Control_Monad_State_Class.modify(Halogen_Query_HalogenM.monadStateHalogenM)(function (v1) {
-                      var $130 = {};
-                      for (var $131 in v1) {
-                          if ({}.hasOwnProperty.call(v1, $131)) {
-                              $130[$131] = v1[$131];
+                      var $119 = {};
+                      for (var $120 in v1) {
+                          if ({}.hasOwnProperty.call(v1, $120)) {
+                              $119[$120] = v1[$120];
                           };
                       };
-                      $130.newFriend = new Data_Either.Left(v.value0);
-                      return $130;
+                      $119.newFriend = new Data_Either.Left(v.value0);
+                      return $119;
                   });
               })())(function () {
                   return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value1);
@@ -8955,30 +8868,30 @@ var PS = {};
           };
           if (v instanceof InputName) {
               return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.modify(Halogen_Query_HalogenM.monadStateHalogenM)(function (v1) {
-                  var $135 = {};
-                  for (var $136 in v1) {
-                      if ({}.hasOwnProperty.call(v1, $136)) {
-                          $135[$136] = v1[$136];
+                  var $124 = {};
+                  for (var $125 in v1) {
+                      if ({}.hasOwnProperty.call(v1, $125)) {
+                          $124[$125] = v1[$125];
                       };
                   };
-                  $135.inputName = v.value0;
-                  return $135;
+                  $124.inputName = v.value0;
+                  return $124;
               }))(function () {
                   return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value1);
               });
           };
           if (v instanceof UpdateName) {
               return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.get(Halogen_Query_HalogenM.monadStateHalogenM))(function (v1) {
-                  return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(handleFIDCallEff(Halogen_Query_HalogenM.bindHalogenM)(Halogen_Query_HalogenM.monadEffHalogenM(Control_Monad_Aff.monadEffAff))(Halogen_Query_HalogenM.monadAffHalogenM(Control_Monad_Aff_Class.monadAffAff))(v1.errorBus)(Data_Unit.unit)(Network_Eth_FriendInDebt.setCurrentUserName(v1.inputName)))(function () {
+                  return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(handleFIDCall(Halogen_Query_HalogenM.bindHalogenM)(Halogen_Query_HalogenM.monadEffHalogenM(Control_Monad_Aff.monadEffAff))(Halogen_Query_HalogenM.monadAffHalogenM(Control_Monad_Aff_Class.monadAffAff))(v1.errorBus)(Data_Unit.unit)(Network_Eth_FriendInDebt.setCurrentUserName(v1.inputName)))(function () {
                       return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.modify(Halogen_Query_HalogenM.monadStateHalogenM)(function (v2) {
-                          var $141 = {};
-                          for (var $142 in v2) {
-                              if ({}.hasOwnProperty.call(v2, $142)) {
-                                  $141[$142] = v2[$142];
+                          var $130 = {};
+                          for (var $131 in v2) {
+                              if ({}.hasOwnProperty.call(v2, $131)) {
+                                  $130[$131] = v2[$131];
                               };
                           };
-                          $141.inputName = "";
-                          return $141;
+                          $130.inputName = "";
+                          return $130;
                       }))(function () {
                           return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value1);
                       });
@@ -8990,14 +8903,14 @@ var PS = {};
                   return v1.creating;
               }))(function (v1) {
                   return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.modify(Halogen_Query_HalogenM.monadStateHalogenM)(function (v2) {
-                      var $147 = {};
-                      for (var $148 in v2) {
-                          if ({}.hasOwnProperty.call(v2, $148)) {
-                              $147[$148] = v2[$148];
+                      var $136 = {};
+                      for (var $137 in v2) {
+                          if ({}.hasOwnProperty.call(v2, $137)) {
+                              $136[$137] = v2[$137];
                           };
                       };
-                      $147.creating = Data_Map.insert(Network_Eth_FriendInDebt.ordUserAddress)(Network_Eth_FriendInDebt.getFriendAddr(v.value0))(v.value0)(v1);
-                      return $147;
+                      $136.creating = Data_Map.insert(Network_Eth_FriendInDebt.ordUserAddress)(Network_Eth_FriendInDebt.getFriendAddr(v.value0))(v.value0)(v1);
+                      return $136;
                   }))(function () {
                       return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value1);
                   });
@@ -9010,16 +8923,16 @@ var PS = {};
                       return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value1);
                   };
                   if (v2 instanceof Data_Maybe.Just) {
-                      return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(handleFIDCallEff(Halogen_Query_HalogenM.bindHalogenM)(Halogen_Query_HalogenM.monadEffHalogenM(Control_Monad_Aff.monadEffAff))(Halogen_Query_HalogenM.monadAffHalogenM(Control_Monad_Aff_Class.monadAffAff))(v1.errorBus)(Data_Unit.unit)(Network_Eth_FriendInDebt.newPending(v2.value0)))(function () {
+                      return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(handleFIDCall(Halogen_Query_HalogenM.bindHalogenM)(Halogen_Query_HalogenM.monadEffHalogenM(Control_Monad_Aff.monadEffAff))(Halogen_Query_HalogenM.monadAffHalogenM(Control_Monad_Aff_Class.monadAffAff))(v1.errorBus)(Data_Unit.unit)(Network_Eth_FriendInDebt.newPending(v2.value0)))(function () {
                           return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.modify(Halogen_Query_HalogenM.monadStateHalogenM)(function (v3) {
-                              var $154 = {};
-                              for (var $155 in v3) {
-                                  if ({}.hasOwnProperty.call(v3, $155)) {
-                                      $154[$155] = v3[$155];
+                              var $143 = {};
+                              for (var $144 in v3) {
+                                  if ({}.hasOwnProperty.call(v3, $144)) {
+                                      $143[$144] = v3[$144];
                                   };
                               };
-                              $154.creating = Data_Map["delete"](Network_Eth_FriendInDebt.ordUserAddress)(v.value0)(v1.creating);
-                              return $154;
+                              $143.creating = Data_Map["delete"](Network_Eth_FriendInDebt.ordUserAddress)(v.value0)(v1.creating);
+                              return $143;
                           }))(function () {
                               return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value1);
                           });
@@ -9030,18 +8943,18 @@ var PS = {};
           };
           if (v instanceof ConfirmPending) {
               return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.get(Halogen_Query_HalogenM.monadStateHalogenM))(function (v1) {
-                  return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(handleFIDCallEff(Halogen_Query_HalogenM.bindHalogenM)(Halogen_Query_HalogenM.monadEffHalogenM(Control_Monad_Aff.monadEffAff))(Halogen_Query_HalogenM.monadAffHalogenM(Control_Monad_Aff_Class.monadAffAff))(v1.errorBus)(Data_Unit.unit)(Network_Eth_FriendInDebt.confirmPending(v.value0)))(function () {
+                  return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(handleFIDCall(Halogen_Query_HalogenM.bindHalogenM)(Halogen_Query_HalogenM.monadEffHalogenM(Control_Monad_Aff.monadEffAff))(Halogen_Query_HalogenM.monadAffHalogenM(Control_Monad_Aff_Class.monadAffAff))(v1.errorBus)(Data_Unit.unit)(Network_Eth_FriendInDebt.confirmPending(v.value0)))(function () {
                       return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.modify(Halogen_Query_HalogenM.monadStateHalogenM)(function (v2) {
-                          var $161 = {};
-                          for (var $162 in v2) {
-                              if ({}.hasOwnProperty.call(v2, $162)) {
-                                  $161[$162] = v2[$162];
+                          var $150 = {};
+                          for (var $151 in v2) {
+                              if ({}.hasOwnProperty.call(v2, $151)) {
+                                  $150[$151] = v2[$151];
                               };
                           };
-                          $161.pending = Data_Semigroup.append(Data_Semigroup.semigroupArray)(Data_Array.filter(function (fd) {
+                          $150.pending = Data_Semigroup.append(Data_Semigroup.semigroupArray)(Data_Array.filter(function (fd) {
                               return Data_Eq.notEq(Network_Eth_FriendInDebt.eqFriendDebt)(fd)(v.value0);
                           })(v1.pending))([ Network_Eth_FriendInDebt.setDebt(v.value0)(Data_Int.toNumber(0)) ]);
-                          return $161;
+                          return $150;
                       }))(function () {
                           return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value1);
                       });
@@ -9050,7 +8963,7 @@ var PS = {};
           };
           if (v instanceof CancelPending) {
               return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.get(Halogen_Query_HalogenM.monadStateHalogenM))(function (v1) {
-                  return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(handleFIDCallEff(Halogen_Query_HalogenM.bindHalogenM)(Halogen_Query_HalogenM.monadEffHalogenM(Control_Monad_Aff.monadEffAff))(Halogen_Query_HalogenM.monadAffHalogenM(Control_Monad_Aff_Class.monadAffAff))(v1.errorBus)(Data_Unit.unit)(Network_Eth_FriendInDebt.cancelPending(v.value0.friend)))(function () {
+                  return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(handleFIDCall(Halogen_Query_HalogenM.bindHalogenM)(Halogen_Query_HalogenM.monadEffHalogenM(Control_Monad_Aff.monadEffAff))(Halogen_Query_HalogenM.monadAffHalogenM(Control_Monad_Aff_Class.monadAffAff))(v1.errorBus)(Data_Unit.unit)(Network_Eth_FriendInDebt.cancelPending(v.value0.friend)))(function () {
                       return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value1);
                   });
               });
@@ -9095,8 +9008,7 @@ var PS = {};
   exports["displayFriendDebtSpan"] = displayFriendDebtSpan;
   exports["displayFriendLi"] = displayFriendLi;
   exports["displayPending"] = displayPending;
-  exports["handleFIDCallAff"] = handleFIDCallAff;
-  exports["handleFIDCallEff"] = handleFIDCallEff;
+  exports["handleFIDCall"] = handleFIDCall;
   exports["loadFriendsAndDebts"] = loadFriendsAndDebts;
   exports["mkDebt"] = mkDebt;
   exports["moneyClass"] = moneyClass;
