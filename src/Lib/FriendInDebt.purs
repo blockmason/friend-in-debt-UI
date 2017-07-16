@@ -35,10 +35,11 @@ module Network.Eth.FriendInDebt
        ) where
 
 import Prelude
-import Control.Monad.Eff         (Eff)
+import Control.Monad.Eff         (Eff, kind Effect)
 import Math                      (abs)
 import Control.Monad.Eff.Class   (liftEff)
 import Control.Monad.Aff         (Aff, makeAff)
+import Control.Monad.Except.Trans  (ExceptT, throwError, runExceptT, lift)
 import Data.Either               (Either(Left, Right))
 import Data.Maybe                (Maybe(..))
 import Data.Traversable          (traverse)
@@ -53,6 +54,10 @@ import Data.Foldable             (foldr)
 import Network.Eth.Metamask                                        as MM
 
 infixr 9 compose as ∘
+
+foreign import data FID ∷ Effect
+type MonadF a = ∀ e. ExceptT Error (Aff (fid ∷ FID, metamask ∷ MM.METAMASK | e)) a
+runMonadF = runExceptT
 
 type BProgAddress = String
 type DummyVal = String
@@ -102,7 +107,7 @@ getFriendAddr (FriendDebt fd) = fd.friend
 changeDebtor ∷ UserAddress → FriendDebt → FriendDebt
 changeDebtor newDebtor (FriendDebt fd) = FriendDebt $ fd {friend = newDebtor}
 newDebt ∷ UserAddress → Number → FriendDebt
-newDebt f d = FriendDebt { friend: f, debt: Money d, debtId: 0, desc: "" }
+newDebt f d = FriendDebt { friend: f, debt: Money d, debtId: 0, desc: "", currency: "USDcents" }
 addDebt :: FriendDebt -> Money -> FriendDebt
 addDebt fd money = setDebt fd $ (amount (getDebt fd)) + (amount money)
 --make a debt value negative
@@ -288,9 +293,8 @@ confirmPending
 cancelPending
 
 to add:
-pendingFriendships
-- have to collate the response into a JS object
-description fetching
+-pendingFriendships
+-description fetching
 
 
 -}

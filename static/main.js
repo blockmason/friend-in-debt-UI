@@ -7958,6 +7958,7 @@ var PS = {};
   var Control_Monad_Aff = PS["Control.Monad.Aff"];
   var Control_Monad_Eff = PS["Control.Monad.Eff"];
   var Control_Monad_Eff_Class = PS["Control.Monad.Eff.Class"];
+  var Control_Monad_Except_Trans = PS["Control.Monad.Except.Trans"];
   var Control_Semigroupoid = PS["Control.Semigroupoid"];
   var Data_Array = PS["Data.Array"];
   var Data_Boolean = PS["Data.Boolean"];
@@ -8042,14 +8043,15 @@ var PS = {};
               return $63;
           })());
       };
-  };
+  };                                                    
   var newDebt = function (f) {
       return function (d) {
           return {
               friend: f, 
               debt: d, 
               debtId: 0, 
-              desc: ""
+              desc: "", 
+              currency: "USDcents"
           };
       };
   };
@@ -8151,7 +8153,7 @@ var PS = {};
               $foreign.createFriendshipImpl(v)();
               return new Data_Either.Right(Data_Unit.unit);
           };
-          throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 233, column 3 - line 237, column 24: " + [ v1.constructor.name ]);
+          throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 239, column 3 - line 243, column 24: " + [ v1.constructor.name ]);
       };
   };
   var currentUser = function __do() {
@@ -8163,7 +8165,7 @@ var PS = {};
           var v1 = $foreign.currentUserImpl("dummy")();
           return Data_Either.Right.create(v1);
       };
-      throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 155, column 3 - line 159, column 37: " + [ v.constructor.name ]);
+      throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 161, column 3 - line 165, column 37: " + [ v.constructor.name ]);
   };
   var currentUserFriends = Control_Bind.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(currentUser))(function (v) {
       if (v instanceof Data_Either.Left) {
@@ -8172,7 +8174,7 @@ var PS = {};
       if (v instanceof Data_Either.Right) {
           return Data_Functor.map(Control_Monad_Aff.functorAff)(Data_Either.Right.create)(friends(v.value0));
       };
-      throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 179, column 3 - line 181, column 41: " + [ v.constructor.name ]);
+      throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 185, column 3 - line 187, column 41: " + [ v.constructor.name ]);
   });
   var getCurrentUserName = Control_Bind.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(currentUser))(function (v) {
       if (v instanceof Data_Either.Left) {
@@ -8186,10 +8188,10 @@ var PS = {};
               if (v1 instanceof Data_Maybe.Just) {
                   return Control_Applicative.pure(Control_Monad_Aff.applicativeAff)(Data_Either.Right.create(new Data_Either.Right(v1.value0)));
               };
-              throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 251, column 7 - line 253, column 41: " + [ v1.constructor.name ]);
+              throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 257, column 7 - line 259, column 41: " + [ v1.constructor.name ]);
           });
       };
-      throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 247, column 3 - line 253, column 41: " + [ v.constructor.name ]);
+      throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 253, column 3 - line 259, column 41: " + [ v.constructor.name ]);
   });
   var setCurrentUserName = function (userNameStr) {
       return function __do() {
@@ -8200,7 +8202,7 @@ var PS = {};
           if (v instanceof Data_Either.Right) {
               return Data_Functor.map(Control_Monad_Eff.functorEff)(Data_Either.Right.create)($foreign.setNameImpl(userNameStr))();
           };
-          throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 258, column 3 - line 260, column 51: " + [ v.constructor.name ]);
+          throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 264, column 3 - line 266, column 51: " + [ v.constructor.name ]);
       };
   };
   var changeDebtor = function (newDebtor) {
@@ -8229,7 +8231,7 @@ var PS = {};
                   })(getDebtOrPending($foreign.friendPendingImpl)(f)(v.value0));
               })(friendList));
           };
-          throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 200, column 3 - line 203, column 109: " + [ v.constructor.name ]);
+          throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 206, column 3 - line 209, column 109: " + [ v.constructor.name ]);
       });
   };
   var cancelPending = function (v) {
@@ -8242,14 +8244,15 @@ var PS = {};
               $foreign.cancelPendingImpl(v)();
               return new Data_Either.Right(Data_Unit.unit);
           };
-          throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 224, column 3 - line 228, column 24: " + [ v1.constructor.name ]);
+          throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 230, column 3 - line 234, column 24: " + [ v1.constructor.name ]);
       };
   };
   var blankFriendDebt = {
       friend: "0x0", 
       debt: 0.0, 
       debtId: 0, 
-      desc: ""
+      desc: "", 
+      currency: "USDcents"
   };
   var friendDebtZero = function (ua) {
       return changeDebtor(ua)(blankFriendDebt);
@@ -8266,7 +8269,7 @@ var PS = {};
           if (v1 instanceof Data_Either.Left) {
               return new Data_Either.Left(v1.value0);
           };
-          throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 216, column 3 - line 219, column 36: " + [ v1.constructor.name ]);
+          throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 222, column 3 - line 225, column 36: " + [ v1.constructor.name ]);
       };
   };
   var newPending = function (v) {
@@ -8278,7 +8281,7 @@ var PS = {};
           if (v1 instanceof Data_Either.Left) {
               return new Data_Either.Left(v1.value0);
           };
-          throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 208, column 3 - line 211, column 36: " + [ v1.constructor.name ]);
+          throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 214, column 3 - line 217, column 36: " + [ v1.constructor.name ]);
       };
   };
   var posNegZero = function (v) {
@@ -8291,7 +8294,7 @@ var PS = {};
       if (Data_Boolean.otherwise) {
           return Zero.value;
       };
-      throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 113, column 1 - line 115, column 57: " + [ v.constructor.name ]);
+      throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 119, column 1 - line 121, column 57: " + [ v.constructor.name ]);
   };
   var allNames = function (friendList) {
       var insertMap = function (map) {
@@ -8303,7 +8306,7 @@ var PS = {};
                   if (v instanceof Data_Maybe.Just) {
                       return Data_Map.insert(ordUserAddress)(address)(v.value0)(map);
                   };
-                  throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 271, column 9 - line 271, column 72: " + [ map.constructor.name, address.constructor.name, v.constructor.name ]);
+                  throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 277, column 9 - line 277, column 72: " + [ map.constructor.name, address.constructor.name, v.constructor.name ]);
               };
           };
       };
@@ -8322,7 +8325,7 @@ var PS = {};
                   return Control_Applicative.pure(Control_Monad_Aff.applicativeAff)(Data_Functor.map(Data_Functor.functorFn)(Data_Either.Right.create)(Data_Foldable.foldr(Data_Foldable.foldableArray)(f)(Data_Map.empty))(Data_Array.zip(allUsers)(v1)));
               });
           };
-          throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 265, column 3 - line 270, column 62: " + [ v.constructor.name ]);
+          throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 271, column 3 - line 276, column 62: " + [ v.constructor.name ]);
       });
   };
   var allDebtOrPending = function (lookupFn) {
@@ -8340,7 +8343,7 @@ var PS = {};
           if (v instanceof Data_Either.Right) {
               return Data_Functor.map(Control_Monad_Aff.functorAff)(Data_Either.Right.create)(allDebtOrPending($foreign.friendDebtImpl)(v.value0)(friendList));
           };
-          throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 186, column 3 - line 188, column 76: " + [ v.constructor.name ]);
+          throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 192, column 3 - line 194, column 76: " + [ v.constructor.name ]);
       });
   };
   var currentUserPending = function (friendList) {
@@ -8351,7 +8354,7 @@ var PS = {};
           if (v instanceof Data_Either.Left) {
               return Control_Applicative.pure(Control_Monad_Aff.applicativeAff)(new Data_Either.Left(v.value0));
           };
-          throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 193, column 3 - line 195, column 36: " + [ v.constructor.name ]);
+          throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 199, column 3 - line 201, column 36: " + [ v.constructor.name ]);
       });
   };
   var addDebt = function (fd) {
