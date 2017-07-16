@@ -8050,8 +8050,8 @@ var PS = {};
   })();
   var showMoney = new Data_Show.Show(function (v) {
       return (function () {
-          var $56 = v < Data_Int.toNumber(0);
-          if ($56) {
+          var $54 = v < Data_Int.toNumber(0);
+          if ($54) {
               return "-";
           };
           return "";
@@ -8060,14 +8060,14 @@ var PS = {};
   var setDebt = function (v) {
       return function (m) {
           return FriendDebt((function () {
-              var $62 = {};
-              for (var $63 in v) {
-                  if ({}.hasOwnProperty.call(v, $63)) {
-                      $62[$63] = v[$63];
+              var $60 = {};
+              for (var $61 in v) {
+                  if ({}.hasOwnProperty.call(v, $61)) {
+                      $60[$61] = v[$61];
                   };
               };
-              $62.debt = m;
-              return $62;
+              $60.debt = m;
+              return $60;
           })());
       };
   };
@@ -8095,8 +8095,8 @@ var PS = {};
               return $foreign.getNameImpl(succ)(v);
           };
       }))(function (v1) {
-          var $69 = v1 === "";
-          if ($69) {
+          var $67 = v1 === "";
+          if ($67) {
               return Control_Applicative.pure(Control_Monad_Aff.applicativeAff)(Data_Maybe.Nothing.value);
           };
           return Control_Applicative.pure(Control_Monad_Aff.applicativeAff)(new Data_Maybe.Just(v1));
@@ -8132,14 +8132,14 @@ var PS = {};
   };
   var flipDebt = function (v) {
       return FriendDebt((function () {
-          var $79 = {};
-          for (var $80 in v) {
-              if ({}.hasOwnProperty.call(v, $80)) {
-                  $79[$80] = v[$80];
+          var $77 = {};
+          for (var $78 in v) {
+              if ({}.hasOwnProperty.call(v, $78)) {
+                  $77[$78] = v[$78];
               };
           };
-          $79.debt = mkNegative(v.debt);
-          return $79;
+          $77.debt = mkNegative(v.debt);
+          return $77;
       })());
   };
   var eqMoney = new Data_Eq.Eq(function (v) {
@@ -8191,7 +8191,7 @@ var PS = {};
           };
           throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 263, column 3 - line 265, column 29: " + [ v1.constructor.name ]);
       });
-  });  
+  });                                                                                          
   var setCurrentUserName = function (userNameStr) {
       return Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_Except_Trans.bindExceptT(Control_Monad_Aff.monadAff))(checkAndInit)(function () {
           return Control_Monad_Eff_Class.liftEff(Control_Monad_Except_Trans.monadEffExceptT(Control_Monad_Aff.monadEffAff))($foreign.setNameImpl(userNameStr));
@@ -8200,22 +8200,22 @@ var PS = {};
   var changeDebtor = function (newDebtor) {
       return function (v) {
           return FriendDebt((function () {
-              var $108 = {};
-              for (var $109 in v) {
-                  if ({}.hasOwnProperty.call(v, $109)) {
-                      $108[$109] = v[$109];
+              var $103 = {};
+              for (var $104 in v) {
+                  if ({}.hasOwnProperty.call(v, $104)) {
+                      $103[$104] = v[$104];
                   };
               };
-              $108.friend = newDebtor;
-              return $108;
+              $103.friend = newDebtor;
+              return $103;
           })());
       };
   };
   var currentUserSentPendings = function (friendList) {
       return Control_Bind.bind(Control_Monad_Except_Trans.bindExceptT(Control_Monad_Aff.monadAff))(currentUser)(function (v) {
           return Control_Monad_Aff_Class.liftAff(Control_Monad_Aff_Class.monadAffExceptT(Control_Monad_Aff_Class.monadAffAff))(Data_Traversable.traverse(Data_Traversable.traversableArray)(Control_Monad_Aff.applicativeAff)(function (f) {
-              return Data_Functor.map(Control_Monad_Aff.functorAff)(function ($132) {
-                  return flipDebt(changeDebtor(f)($132));
+              return Data_Functor.map(Control_Monad_Aff.functorAff)(function ($127) {
+                  return flipDebt(changeDebtor(f)($127));
               })(getDebtOrPending($foreign.friendPendingImpl)(f)(v));
           })(friendList));
       });
@@ -8258,7 +8258,7 @@ var PS = {};
       if (Data_Boolean.otherwise) {
           return Zero.value;
       };
-      throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 123, column 1 - line 125, column 57: " + [ v.constructor.name ]);
+      throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 125, column 1 - line 127, column 57: " + [ v.constructor.name ]);
   };
   var allNames = function (friendList) {
       var insertMap = function (map) {

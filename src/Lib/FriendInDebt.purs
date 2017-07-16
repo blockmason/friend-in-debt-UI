@@ -6,6 +6,8 @@ module Network.Eth.FriendInDebt
        , currentUserPending
        , currentUserSentPendings
        , currentUserFriends
+       , pendingFriendsSent
+       , pendingFriendsTodo
        , newPending
        , confirmPending
        , cancelPending
@@ -213,23 +215,21 @@ currentUserSentPendings friendList = do
     (\f → (flipDebt ∘ (changeDebtor f)) <$> getDebtOrPending friendPendingImpl f cu)
     friendList
 
-pendingFriendsSent ∷ MonadF (Array FoundationId)
-pendingFriendsSent = do
+pendingFriends ∷ ∀ a. (FoundationId → FoundationId → Boolean)
+                 → MonadF (Array FoundationId)
+pendingFriends compFn = do
   (FoundationId fi) ← foundationId
   friendList ← liftAff $ makeAff (\err succ → pendingFriendshipsImpl succ fi)
   pure $ A.catMaybes $ (g (FoundationId fi)) <$> friendList
-    where g myId pending = if (FoundationId pending.confirmerId) /= myId
+    where g myId pending = if compFn (FoundationId pending.confirmerId) myId
                            then Just (FoundationId pending.friendId)
                            else Nothing
 
+pendingFriendsSent ∷ MonadF (Array FoundationId)
+pendingFriendsSent = pendingFriends (/=)
+
 pendingFriendsTodo ∷ MonadF (Array FoundationId)
-pendingFriendsTodo = do
-  (FoundationId fi) ← foundationId
-  friendList ← liftAff $ makeAff (\err succ → pendingFriendshipsImpl succ fi)
-  pure $ A.catMaybes $ (g (FoundationId fi)) <$> friendList
-    where g myId pending = if (FoundationId pending.confirmerId) == myId
-                           then Just (FoundationId pending.friendId)
-                           else Nothing
+pendingFriendsTodo = pendingFriends (==)
 
 newPending ∷ FriendDebt → MonadF Unit
 newPending (FriendDebt debtor) = do
@@ -294,8 +294,6 @@ confirmPending
 cancelPending
 
 to add:
--pendingFriendships
 -description fetching
-
 
 -}
