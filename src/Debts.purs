@@ -24,22 +24,22 @@ data Query a
   = RefreshDebts a
   | HandleInput Input a
   | CreateDebt F.FriendDebt a
-  | SendDebt F.UserAddress a
+  | SendDebt F.EthAddress a
   | ConfirmPending F.FriendDebt a
   | CancelPending F.FriendDebt a
-  | AddFriend (Either String F.UserAddress) a
+  | AddFriend (Either String F.EthAddress) a
   | InputFriend String a
   | InputName String a
   | UpdateName String a
 
-type State = { friends     ∷ Array F.UserAddress
+type State = { friends     ∷ Array F.EthAddress
              , debts       ∷ Array F.FriendDebt
              , pending     ∷ Array F.FriendDebt
              , sentPending ∷ Array F.FriendDebt
              , creating    ∷ DebtMap
              , names       ∷ NameMap
-             , newFriend   ∷ Either String F.UserAddress
-             , userName    ∷ Either F.UserAddress F.UserName
+             , newFriend   ∷ Either String F.EthAddress
+             , userName    ∷ Either F.EthAddress F.UserName
              , inputName   ∷ String
              , loading     ∷ Boolean
              , errorBus    ∷ ContainerMsgBus }
@@ -134,7 +134,7 @@ component =
                       pure next
     InputFriend friendStr next → do
       if ((S.length friendStr) == 42)
-        then H.modify (_ { newFriend = Right $ F.UserAddress friendStr })
+        then H.modify (_ { newFriend = Right $ F.EthAddress friendStr })
         else H.modify (_ { newFriend = Left friendStr })
       pure next
     InputName inputName next → do
@@ -286,7 +286,7 @@ addFriendWidget state =
   ]
   where inputVal = either id F.getUa
 
-nameChangeWidget ∷ String → Either F.UserAddress F.UserName → H.ComponentHTML Query
+nameChangeWidget ∷ String → Either F.EthAddress F.UserName → H.ComponentHTML Query
 nameChangeWidget inputName userName =
   HH.div [ HP.class_ $ HH.ClassName "nameChange" ]
   [
@@ -313,7 +313,7 @@ displayPending nm (Tuple originalDebt pendingDebt) = HH.li
     ], displayFriendDebtSpan nm (Tuple originalDebt pendingDebt)
    ]
 
-createDebt ∷ NameMap → DebtMap → F.UserAddress → H.ComponentHTML Query
+createDebt ∷ NameMap → DebtMap → F.EthAddress → H.ComponentHTML Query
 createDebt nm creating friend =
   let fd = fromMaybe (F.friendDebtZero friend) $ M.lookup friend creating
   in HH.div [ HP.class_ $ HH.ClassName "createDebt" ]
@@ -330,7 +330,7 @@ createDebt nm creating friend =
          $ append [HH.text "Debt: "] (displayDebt nm $ F.flipDebt fd)
      ]
 
-mkDebt ∷ F.UserAddress → String → F.FriendDebt
+mkDebt ∷ F.EthAddress → String → F.FriendDebt
 mkDebt friend debtStr = F.newDebt friend $ numberFromString debtStr
 
 numberFromString ∷ String → Number
@@ -350,17 +350,3 @@ handleFIDCall errorBus blankVal fidAffCall = do
         Left error → do _ ← H.liftAff $ Bus.write (FIDError error) b
                         pure blankVal
         Right val  → pure val
-
-{-
-handleFIDCallEff errorBus blankVal fidAffCall = do
-  case errorBus of
-    Nothing → do
-      H.liftEff $ logShow "No bus initialized"
-      pure blankVal
-    Just b → do
-      result ← H.liftEff fidAffCall
-      case result of
-        Left error → do _ ← H.liftAff $ Bus.write (FIDError error) b
-                        pure blankVal
-        Right val  → pure val
--}

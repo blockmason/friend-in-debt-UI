@@ -25,6 +25,18 @@ exports.friendsImpl = function(callback) {
     };
 };
 
+exports.pendingFriendshipsImpl = function(callback) {
+    return function(userAddress) {
+        return function() {
+            FriendInDebt.deployed().then(function(instance) {
+                return instance.pendingFriends.call(userAddress);
+            }).then(function(res) {
+                callback(pendingFriends2Js(res.valueOf()))();
+            });
+        };
+    };
+};
+
 exports.friendDebtImpl = function(callback) {
     return function(debtor) {
         return function(creditor) {
@@ -56,6 +68,16 @@ exports.friendPendingImpl = function(callback) {
 exports.currentUserImpl = function(dummyVal) {
     return function() {
         return web3.eth.accounts[0];
+    };
+};
+
+exports.getMyFoundationIdImpl = function(callback) {
+    return function() {
+        FriendInDebt.deployed().then(function(instance) {
+            return instance.getMyFoundationId();
+        }).then(function(res) {
+            callback(res.valueOf())();
+        });
     };
 };
 

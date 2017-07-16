@@ -16,11 +16,11 @@ import Control.Monad.Eff.Exception (EXCEPTION)
 import Network.Eth.Metamask (MetamaskStatus(..), METAMASK)
 import Network.Eth.FriendInDebt as F
 
-type NameMap = M.Map F.UserAddress String
-type DebtMap = M.Map F.UserAddress F.FriendDebt
+type NameMap = M.Map F.EthAddress String
+type DebtMap = M.Map F.EthAddress F.FriendDebt
 
 ------------------- App Monad(s) ---------------------------
-type FIDMonad eff = (Aff (exception ∷ EXCEPTION, timer ∷ TIMER, random ∷ RANDOM, avar ∷ AVAR, console ∷ CONSOLE, ajax ∷ AJAX, metamask ∷ METAMASK | eff))
+type FIDMonad eff = (Aff (exception ∷ EXCEPTION, timer ∷ TIMER, random ∷ RANDOM, avar ∷ AVAR, console ∷ CONSOLE, ajax ∷ AJAX, fid ∷ F.FID, metamask ∷ METAMASK | eff))
 
 ------------------- App State -----------------------------
 data ContainerMsg
