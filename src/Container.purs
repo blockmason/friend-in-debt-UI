@@ -95,8 +95,6 @@ ui =
         H.liftAff $ delay (Milliseconds (toNumber 1500))
         H.modify (_ { loading = false })
         refreshMetamask
---        fname ← H.liftAff $ F.runMonadF F.foundationId
---        hLog fname
         startCheckInterval (Just bus) 5000
         pure next
       HandleMsg msg next → do

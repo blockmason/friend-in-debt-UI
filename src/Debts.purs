@@ -170,7 +170,7 @@ component =
       pure next
     RefreshDebts next → do
       errorBus ← H.gets _.errorBus
-      loadFriendsAndDebts errorBus
+--      loadFriendsAndDebts errorBus
       pure next
 
 refreshButton =
