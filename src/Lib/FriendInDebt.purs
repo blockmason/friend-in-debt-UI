@@ -2,6 +2,7 @@ module Network.Eth.FriendInDebt
        (
          FID
        , currentUser
+       , foundationId
        , currentUserDebts
        , currentUserPending
        , currentUserSentPendings
@@ -295,5 +296,6 @@ cancelPending
 
 to add:
 -description fetching
+-confirm debts by debtId
 
 -}

@@ -22,6 +22,7 @@ import Halogen.Query.EventSource as ES
 
 import Debts as D
 import Network.Eth.Metamask as MM
+import Network.Eth.FriendInDebt as F
 
 data Query a
   = Init a
@@ -94,6 +95,8 @@ ui =
         H.liftAff $ delay (Milliseconds (toNumber 1500))
         H.modify (_ { loading = false })
         refreshMetamask
+--        fname ← H.liftAff $ F.runMonadF F.foundationId
+--        hLog fname
         startCheckInterval (Just bus) 5000
         pure next
       HandleMsg msg next → do

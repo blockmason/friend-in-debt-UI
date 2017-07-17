@@ -74,7 +74,7 @@ exports.currentUserImpl = function(dummyVal) {
 exports.getMyFoundationIdImpl = function(callback) {
     return function() {
         FriendInDebt.deployed().then(function(instance) {
-            return instance.getMyFoundationId();
+            return instance.getMyFoundationId.call();
         }).then(function(res) {
             callback(res.valueOf())();
         });

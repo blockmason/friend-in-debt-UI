@@ -2,6 +2,7 @@ module FriendInDebt.Prelude
   ( (∘), (⊕), (⋙), (⋘), (≡), (≠), (×), (≪), (≫)
   , (∨), (∧), (⨁), (⊹)
   , flipCompose, applyRight, applyLeft
+  , hLog
   , type (⨁), type (⊹), type (×)
   , module Prelude
   , module Control.Alt
@@ -65,6 +66,8 @@ import Data.Traversable (class Traversable, traverse, sequence, for)
 import Data.Tuple (Tuple(..), fst, snd, uncurry)
 import Data.Void (Void, absurd)
 
+import Halogen as H
+import Control.Monad.Eff.Console (logShow)
 
 flipCompose ∷ ∀ a b c d. Semigroupoid a ⇒ a b c → a c d → a b d
 flipCompose = flip compose
@@ -94,3 +97,5 @@ infixr 5 either as ⊹
 infixr 5 coproduct as ⨁
 
 infixr 4 type Tuple as ×
+
+hLog = H.liftEff ∘ logShow

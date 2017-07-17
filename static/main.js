@@ -8189,7 +8189,7 @@ var PS = {};
           if (v1 instanceof Data_Maybe.Just) {
               return Control_Applicative.pure(Control_Monad_Except_Trans.applicativeExceptT(Control_Monad_Aff.monadAff))(new Data_Either.Right(v1.value0));
           };
-          throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 263, column 3 - line 265, column 29: " + [ v1.constructor.name ]);
+          throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 264, column 3 - line 266, column 29: " + [ v1.constructor.name ]);
       });
   });                                                                                          
   var setCurrentUserName = function (userNameStr) {
@@ -8258,7 +8258,7 @@ var PS = {};
       if (Data_Boolean.otherwise) {
           return Zero.value;
       };
-      throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 125, column 1 - line 127, column 57: " + [ v.constructor.name ]);
+      throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 126, column 1 - line 128, column 57: " + [ v.constructor.name ]);
   };
   var allNames = function (friendList) {
       var insertMap = function (map) {
@@ -8270,7 +8270,7 @@ var PS = {};
                   if (v instanceof Data_Maybe.Just) {
                       return Data_Map.insert(ordEthAddress)(address)(v.value0)(map);
                   };
-                  throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 278, column 9 - line 278, column 72: " + [ map.constructor.name, address.constructor.name, v.constructor.name ]);
+                  throw new Error("Failed pattern match at Network.Eth.FriendInDebt line 279, column 9 - line 279, column 72: " + [ map.constructor.name, address.constructor.name, v.constructor.name ]);
               };
           };
       };
@@ -9159,6 +9159,7 @@ var PS = {};
   var Halogen_Query = PS["Halogen.Query"];
   var Halogen_Query_EventSource = PS["Halogen.Query.EventSource"];
   var Halogen_Query_HalogenM = PS["Halogen.Query.HalogenM"];
+  var Network_Eth_FriendInDebt = PS["Network.Eth.FriendInDebt"];
   var Network_Eth_Metamask = PS["Network.Eth.Metamask"];
   var Types = PS["Types"];        
   var Init = (function () {
@@ -9222,7 +9223,7 @@ var PS = {};
                               return Control_Applicative.pure(dictApplicative)(Data_Unit.unit);
                           });
                       };
-                      throw new Error("Failed pattern match at Container line 149, column 3 - line 153, column 16: " + [ maybeBus.constructor.name ]);
+                      throw new Error("Failed pattern match at Container line 152, column 3 - line 156, column 16: " + [ maybeBus.constructor.name ]);
                   };
               };
           };
@@ -9367,7 +9368,7 @@ var PS = {};
                       });
                   });
               };
-              throw new Error("Failed pattern match at Container line 100, column 9 - line 108, column 22: " + [ v.value0.constructor.name ]);
+              throw new Error("Failed pattern match at Container line 103, column 9 - line 111, column 22: " + [ v.value0.constructor.name ]);
           };
           if (v instanceof RefreshMetamask) {
               return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(refreshMetamask)(function () {
@@ -9388,7 +9389,7 @@ var PS = {};
                   return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value1);
               });
           };
-          throw new Error("Failed pattern match at Container line 89, column 12 - line 114, column 18: " + [ v.constructor.name ]);
+          throw new Error("Failed pattern match at Container line 90, column 12 - line 117, column 18: " + [ v.constructor.name ]);
       };
       return Halogen_Component.lifecycleParentComponent(Data_Either.ordEither(Data_Ord.ordUnit)(Data_Ord.ordVoid))({
           initialState: Data_Function["const"](initialState), 
@@ -10775,12 +10776,14 @@ var PS = {};
   var Container = PS["Container"];
   var Control_Bind = PS["Control.Bind"];
   var Control_Monad_Aff = PS["Control.Monad.Aff"];
+  var Control_Monad_Eff_Console = PS["Control.Monad.Eff.Console"];
   var Data_Function = PS["Data.Function"];
   var Data_Unit = PS["Data.Unit"];
   var FriendInDebt_Prelude = PS["FriendInDebt.Prelude"];
   var Halogen_Aff = PS["Halogen.Aff"];
   var Halogen_Aff_Util = PS["Halogen.Aff.Util"];
-  var Halogen_VDom_Driver = PS["Halogen.VDom.Driver"];        
+  var Halogen_VDom_Driver = PS["Halogen.VDom.Driver"];
+  var Test_Main = PS["Test.Main"];        
   var main = Halogen_Aff_Util.runHalogenAff(Control_Bind.bind(Control_Monad_Aff.bindAff)(Halogen_Aff_Util.awaitBody)(function (v) {
       return Halogen_VDom_Driver.runUI(Container.ui)(Data_Unit.unit)(v);
   }));
