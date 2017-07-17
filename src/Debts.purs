@@ -32,6 +32,7 @@ data Query a
   | InputFriend String a
   | InputName String a
   | UpdateName String a
+  | ShowItemizedDebtFor String a
 
 type Input = ContainerMsgBus
 
@@ -46,11 +47,14 @@ type State = { friends     ∷ Array F.FoundationId
              , newFriend   ∷ Either String F.FoundationId
              , userName    ∷ Either F.FoundationId F.UserName
              , inputName   ∷ String
+             , showItemizedDebtFor :: String
              , loading     ∷ Boolean
              , errorBus    ∷ ContainerMsgBus }
 
+type Input = ContainerMsgBus
+type Message = String
+component ∷ ∀ eff. H.Component HH.HTML Query Input Message (FIDMonad eff)
 
-component ∷ ∀ eff. H.Component HH.HTML Query Input Void (FIDMonad eff)
 component =
   H.component
   { initialState: initialState
@@ -71,6 +75,7 @@ component =
                        , newFriend: Left ""
                        , userName: (Right "")
                        , inputName: ""
+                       , showItemizedDebtFor: ""
                        , loading: false
                        , errorBus: input }
 
@@ -82,7 +87,7 @@ component =
                            , HP.width 25 ] ]
     else
       HH.div_
-      [
+      $ append [
         -- HH.div
         -- [ HP.class_ $ HH.ClassName "refresh-button-container" ]
         -- [ refreshButton ],
@@ -121,12 +126,16 @@ component =
           HH.h5_ [ HH.text "Create Debt" ]
         , HH.ul_ $ (\friend → HH.li_ [ createDebt state.names state.creating state.myId friend]) <$> state.friends
         ]
-      ]
+      ] $ (itemizedDebtsForFriendContainer state.showItemizedDebtFor) <$> friendNames
     where pending = filter (\(Tuple _ fd2) -> nonZero fd2) $ zip state.debts state.pending
           friendNames = fromFoldable $ M.values state.names
 
-  eval ∷ Query ~> H.ComponentDSL State Query Void (FIDMonad eff)
+  eval ∷ Query ~> H.ComponentDSL State Query Message (FIDMonad eff)
   eval = case _ of
+    ShowItemizedDebtFor name next → do
+      H.modify (_ {showItemizedDebtFor = name})
+      H.raise "show-itemized-debt"
+      pure next
     HandleInput input next → do
       H.modify (_ { errorBus = input })
       pure next
@@ -206,10 +215,16 @@ loadFriendsAndDebts errorBus = do
   H.modify (_ { friends = friends, debts = debts, pending = pending, loading = false
               , sentPending = sentPending, names = names, userName = userName  })
 
+itemizedDebtsForFriendContainer :: String → String → H.ComponentHTML Query
+itemizedDebtsForFriendContainer friendToShow nm =
+  HH.div
+    [ HP.class_ $ HH.ClassName $ "itemized-debts-for-friend", HP.attr (HH.AttrName "style") $ if (nm == friendToShow) then "display: initial" else "display: none" ]
+    [ HH.ul_ $ itemizedDebtLi <$> [F.mockDebt, F.mockDebt]]
+
 displayFriendLi ∷ String → H.ComponentHTML Query
 displayFriendLi n =
   HH.li [HP.class_ $ HH.ClassName "friend-row"]
-  [HH.text n]
+  [HH.a [HP.href "#", HE.onClick $ HE.input_ $ ShowItemizedDebtFor n] [HH.text n]]
 
 displayFriendDebtLi ∷ NameMap → F.FriendDebt → H.ComponentHTML Query
 displayFriendDebtLi nm fd =
@@ -232,10 +247,13 @@ displayAllDebt nm (Tuple fd1 fd2) =
       fName friend = fromMaybe (S.take 10 $ F.getAddr fdRec1.friend) (M.lookup friend nm)
       combinedDebt = fd1
       nameSpan n = HH.span [HP.class_ $ HH.ClassName "user-name user-id col-sm-8"] [HH.text n]
-  in [HH.div [HP.class_ $ HH.ClassName "confirmation-amount"][nameSpan $ (fName fdRec1.friend)]]
---    F.Negative → [HH.div [HP.class_ $ HH.ClassName "confirmation-amount"][nameSpan $ fName fdRec1.friend,
---      HH.div [HP.class_ $ HH.ClassName "current-debt-amount"] [moneySpan combinedDebt, moneySpan fd2]]]
---    F.Zero     → [HH.div [HP.class_ $ HH.ClassName "confirmation-amount"][nameSpan $ fName fdRec1.friend ]]
+      desc = F.getDesc fd1
+  in case compRes of
+    F.Positive → [HH.div [HP.class_ $ HH.ClassName "confirmation-amount"][nameSpan $ (fName fdRec1.friend),
+      HH.div [HP.class_ $ HH.ClassName "current-debt-amount"] [moneySpan combinedDebt, moneySpan fd2]]]
+    F.Negative → [HH.div [HP.class_ $ HH.ClassName "confirmation-amount"][nameSpan $ fName fdRec1.friend,
+      HH.div [HP.class_ $ HH.ClassName "current-debt-amount"] [moneySpan combinedDebt, moneySpan fd2]]]
+    F.Zero     → [HH.div [HP.class_ $ HH.ClassName "confirmation-amount"][nameSpan $ fName fdRec1.friend ]]
 
 displayDebt ∷ NameMap → F.FriendDebt → Array (H.ComponentHTML Query)
 displayDebt nm (F.FriendDebt fd) =
@@ -246,6 +264,20 @@ displayDebt nm (F.FriendDebt fd) =
 --    F.Negative → [HH.div [HP.class_ $ HH.ClassName "confirmation-amount"][nameSpan $ fName fd.friend <> " ", moneySpan fd' ]]
 --    F.Zero     → [HH.div [HP.class_ $ HH.ClassName "confirmation-amount"][nameSpan $ fName fd.friend <> " ", moneySpan fd' ]]
 
+itemizedDebtLi ∷ F.FriendDebt → H.ComponentHTML Query
+itemizedDebtLi fd =
+  HH.li [HP.class_ $ HH.ClassName $ moneyClass fd] $
+  itemizedDebt fd
+
+itemizedDebt :: F.FriendDebt → Array (H.ComponentHTML Query)
+itemizedDebt fd =
+  let compRes = F.posNegZero fd
+  in case compRes of
+    F.Positive → [HH.div [HP.class_ $ HH.ClassName "confirmation-amount"][descSpan fd, moneySpan fd]]
+    F.Negative → [HH.div [HP.class_ $ HH.ClassName "confirmation-amount"][descSpan fd, moneySpan fd]]
+    F.Zero     → [HH.div [HP.class_ $ HH.ClassName "confirmation-amount"][descSpan fd, moneySpan fd]]
+
+
 displayDebtChanges ∷ NameMap → Tuple F.FriendDebt F.FriendDebt → Array (H.ComponentHTML Query)
 displayDebtChanges nm (Tuple originalDebt pendingDebt) =
    [HH.div
@@ -254,6 +286,14 @@ displayDebtChanges nm (Tuple originalDebt pendingDebt) =
      HH.span [HP.class_ $ HH.ClassName "originalDebt"] [moneySpan originalDebt],
      HH.span [HP.class_ $ HH.ClassName "changedDebt"] [moneySpan originalDebt]
    ]]
+
+descSpan ∷ F.FriendDebt → H.ComponentHTML Query
+descSpan (F.FriendDebt fd) =
+  HH.span [] [ HH.text $ fd.desc ]
+
+currencySpan ∷ F.FriendDebt → H.ComponentHTML Query
+currencySpan (F.FriendDebt fd) =
+  HH.span [] [ HH.text $ fd.currency ]
 
 moneySpan ∷ F.FriendDebt → H.ComponentHTML Query
 moneySpan (F.FriendDebt fd) =

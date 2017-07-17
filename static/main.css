@@ -102,47 +102,64 @@ body {
   height: 100%;
 }
 
+.show-itemized-debt .create-debt-container,
+.show-itemized-debt .add-friend-container,
+.show-itemized-debt .name-change-container,
+.show-itemized-debt .all-friends-container,
+.show-itemized-debt .confirm-debts-container,
+.show-itemized-debt .current-debts-container,
+.show-itemized-debt h1,
+.show-itemized-debt .add-friend-name-change-container,
+.show-itemized-debt #header {
+  display: none !important;
+}
+
+
 .show-debts .create-debt-container,
 .show-debts .add-friend-container,
 .show-debts .name-change-container,
 .show-debts .all-friends-container,
+.show-debts .itemized-debts-for-friend,
 .show-debts .add-friend-name-change-container {
-  display: none;
+  display: none  !important;
 }
 
 .show-friends .create-debt-container,
 .show-friends .add-friend-container,
+.show-friends .itemized-debts-for-friend,
 .show-friends .name-change-container,
 .show-friends .confirm-debts-container,
 .show-friends .current-debts-container,
 .show-friends h1,
 .show-friends .add-friend-name-change-container {
-  display: none;
+  display: none  !important;
 }
 
 .show-create-debt .confirm-debts-container,
 .show-create-debt .current-debts-container,
 .show-create-debt .add-friend-container,
 .show-create-debt .name-change-container,
+.show-create-debt .itemized-debts-for-friend,
 .show-create-debt h1,
 .show-create-debt #header,
 .show-create-debt .all-friends-container,
 .show-create-debt .add-friend-name-change-container {
-  display: none;
+  display: none !important;
 }
 
 .show-add-friend .confirm-debts-container,
 .show-add-friend .current-debts-container,
 .show-add-friend .create-debt-container,
+.show-add-friend .itemized-debts-for-friend,
 .show-add-friend h1,
 .show-add-friend #header,
 .show-add-friend .all-friends-container {
-  display: none;
+  display: none !important;
 }
 
 .show-debts .close-pop-button,
 .show-friends .close-pop-button {
-  display: none;
+  display: none !important;
 }
 
 .close-pop-button {
@@ -179,7 +196,19 @@ body {
 }
 
 .friend-row:hover {
-  animation: pulse 1s;
+  background: rgba(255,255,255,0.3);
+}
+
+.friend-row a {
+  display: block;
+  width: 100%;
+  color: white;
+  text-decoration: none;
+}
+
+.friend-row a:visited {
+  color: white;
+  text-decoration: none;
 }
 
 .btn-clear {
@@ -369,7 +398,7 @@ h1 {
 }
 
 .current-debts-container li:hover {
-  animation: pulse 0.5s;
+  background: rgba(255,255,255,0.3);
 }
 
 .current-debts-container .current-debt-amount {
@@ -446,4 +475,10 @@ h1 {
 
 .add-friend-name-change-container {
   overflow: hidden;
+}
+
+.itemized-debts-for-friend li {
+  display: block;
+  background: rgba(255,255,255, 0.1);
+  margin-bottom: 1px;
 }

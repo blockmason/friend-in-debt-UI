@@ -29,11 +29,13 @@ data Query a
   | HandleMsg ContainerMsg a
   | RefreshMetamask a
   | SetScreen String a
+  | ShowPreviousScreen a
 
 type State = { loggedIn ∷ Boolean
              , loading  ∷ Boolean
              , errorBus ∷ ContainerMsgBus
-             , currentScreen :: String }
+             , currentScreen :: String
+             , previousScreen :: String}
 
 type ChildQuery = Coproduct1 D.Query
 type ChildSlot = Either1 Unit
@@ -54,14 +56,15 @@ ui =
     initialState = { loggedIn: true
                    , loading: true
                    , errorBus: Nothing
-                   , currentScreen: "show-debts"}
+                   , currentScreen: "show-debts"
+                   , previousScreen: "show-debts"}
 
     render :: State → H.ParentHTML Query ChildQuery ChildSlot (FIDMonad eff)
     render state =
       HH.div [ HP.id_ "container", HP.class_ (HH.ClassName $ "container-fluid " <> state.currentScreen) ]
       [ promptMetamask state.loggedIn
       , loadingOverlay state.loading
-      , HH.a [HP.href "#", HP.class_ (HH.ClassName "close-pop-button"), HE.onClick $ HE.input_ $ SetScreen "show-debts"][HH.text "╳"]
+      , HH.a [HP.href "#", HP.class_ (HH.ClassName "close-pop-button"), HE.onClick $ HE.input_ $ ShowPreviousScreen][HH.text "╳"]
       , HH.div [ HP.id_ "header", HP.class_ (HH.ClassName "row")]
         [
           HH.a [HP.href "#", HP.class_ (HH.ClassName $ "col-3 " <> if state.currentScreen == "show-friends" then "active" else "" ), HE.onClick $ HE.input_ $ SetScreen "show-friends"] [ HH.text "Friend"],
@@ -113,7 +116,11 @@ ui =
         refreshMetamask
         pure next
       SetScreen className next → do
+        H.modify (\state -> state {previousScreen = state.currentScreen})
         H.modify (_ {currentScreen = className})
+        pure next
+      ShowPreviousScreen next → do
+        H.modify (\state -> state {currentScreen = state.previousScreen})
         pure next
 
 loadingOverlay ∷ ∀ p i. Boolean → H.HTML p i
