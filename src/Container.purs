@@ -95,7 +95,7 @@ ui =
         H.liftAff $ delay (Milliseconds (toNumber 1500))
         H.modify (_ { loading = false })
         refreshMetamask
-        hLog "test"
+        hLog "test1"
 --        hLog $ H.liftAff $ F.runMonadF $ confirmedFriends
         startCheckInterval (Just bus) 5000
         pure next
