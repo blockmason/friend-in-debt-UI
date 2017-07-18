@@ -49,7 +49,7 @@ type Input = ContainerMsgBus
 component ∷ ∀ eff. H.Component HH.HTML Query Input Void (FIDMonad eff)
 component =
   H.component
-    { initialState: initialState
+  { initialState: initialState
     , render
     , eval
     , receiver: HE.input HandleInput

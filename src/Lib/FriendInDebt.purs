@@ -36,9 +36,11 @@ module Network.Eth.FriendInDebt
        , StringAddr
        , FriendDebt (..)
        , DebtCompare(..)
+       , module FTypes
        ) where
 
 import Prelude
+import Network.Eth.FriendInDebt.Types                             as FTypes
 import Control.Monad.Eff           (Eff, kind Effect)
 import Math                        (abs)
 import Control.Monad.Eff.Class     (liftEff)
