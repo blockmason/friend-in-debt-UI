@@ -180,10 +180,11 @@ refreshButton =
 
 loadFriendsAndDebts errorBus = do
   H.modify (_ { loading = true })
-  friends     ← handleFIDCall errorBus [] F.currentUserFriends
+--  friends     ← handleFIDCall errorBus [] F.currentUserFriends
   userName    ← handleFIDCall errorBus (Right "") F.getCurrentUserName
 --  names       ← handleFIDCall errorBus M.empty (F.allNames friends)
   let debts = []
+      friends = []
       pending = []
       sentPending = []
       names = M.empty

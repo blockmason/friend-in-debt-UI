@@ -19,10 +19,10 @@ exports.initImpl = function(dummyVal) {
 exports.friendsImpl = function(callback) {
     return function(foundationId) {
         return function() {
-            FriendInDebt.deployed().then(function(instance) {
-                return instance.getFriends.call(userAddress);
+            Friendships.deployed().then(function(instance) {
+                return instance.confirmedFriends.call(foundationId);
             }).then(function(res) {
-                callback(res.valueOf())();
+                callback(confirmedFriends2Js(res.valueOf()))();
             });
         };
     };
@@ -143,14 +143,10 @@ exports.setNameImpl = function(newName) {
 
 //helper functions
 var confirmedFriends2Js = function(friends) {
-    var friendList = [];
     for ( var i=0; i < friends.length; i++ ) {
-        var friend = {
-            friendId: b2s(friends[i])
-        };
-        friendList.push(friend);
+        friends[i] = b2s(friends[i]);
     }
-    return friendList;
+    return friends;
 };
 
 var pendingFriends2Js = function(friends) {

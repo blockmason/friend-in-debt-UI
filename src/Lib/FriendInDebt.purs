@@ -1,12 +1,11 @@
 module Network.Eth.FriendInDebt
        (
          FID
-       , currentUser
        , foundationId
+       , confirmedFriends
        , currentUserDebts
        , currentUserPending
        , currentUserSentPendings
-       , currentUserFriends
        , pendingFriendsSent
        , pendingFriendsTodo
        , newPending
@@ -105,8 +104,8 @@ allDebtOrPending ∷ ∀ e. DebtLookupFn → EthAddress → Array EthAddress
 allDebtOrPending lookupFn debtor creditors =
   traverse (getDebtOrPending lookupFn debtor) creditors
 
-currentUserFriends ∷ MonadF (Array FoundationId)
-currentUserFriends = do
+confirmedFriends ∷ MonadF (Array FoundationId)
+confirmedFriends = do
   fi ← foundationId
   liftAff $ friends fi
 
