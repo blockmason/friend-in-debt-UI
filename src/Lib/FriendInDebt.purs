@@ -181,7 +181,7 @@ foundationId = do
   checkAndInit
   liftAff $ FoundationId <$> (makeAff (\err succ → getMyFoundationIdImpl succ))
 
-friends ∷ ∀ e. FoundationId → Aff e (Array EthAddress)
+friends ∷ ∀ e. FoundationId → Aff e (Array FoundationId)
 friends (FoundationId fi) = do
   friendList ← makeAff (\error success → friendsImpl success fi)
   pure $ FoundationId <$> friendList
@@ -196,10 +196,10 @@ allDebtOrPending ∷ ∀ e. DebtLookupFn → EthAddress → Array EthAddress
 allDebtOrPending lookupFn debtor creditors =
   traverse (getDebtOrPending lookupFn debtor) creditors
 
-currentUserFriends ∷ MonadF (Array EthAddress)
+currentUserFriends ∷ MonadF (Array FoundationId)
 currentUserFriends = do
-  cu ← currentUser
-  liftAff $ friends cu
+  fi ← foundationId
+  liftAff $ friends fi
 
 currentUserDebts ∷ Array EthAddress → MonadF (Array FriendDebt)
 currentUserDebts friendList = do

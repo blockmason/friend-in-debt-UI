@@ -182,10 +182,14 @@ loadFriendsAndDebts errorBus = do
   H.modify (_ { loading = true })
   friends     ← handleFIDCall errorBus [] F.currentUserFriends
   userName    ← handleFIDCall errorBus (Right "") F.getCurrentUserName
-  names       ← handleFIDCall errorBus M.empty (F.allNames friends)
-  debts       ← handleFIDCall errorBus [] (F.currentUserDebts friends)
-  pending     ← handleFIDCall errorBus [] (F.currentUserPending friends)
-  sentPending ← handleFIDCall errorBus [] (F.currentUserSentPendings friends)
+--  names       ← handleFIDCall errorBus M.empty (F.allNames friends)
+  let debts = []
+      pending = []
+      sentPending = []
+      names = M.empty
+--  debts       ← handleFIDCall errorBus [] (F.currentUserDebts friends)
+--  pending     ← handleFIDCall errorBus [] (F.currentUserPending friends)
+--  sentPending ← handleFIDCall errorBus [] (F.currentUserSentPendings friends)
   H.modify (_ { friends = friends, debts = debts, pending = pending, loading = false
               , sentPending = sentPending, names = names, userName = userName  })
 
