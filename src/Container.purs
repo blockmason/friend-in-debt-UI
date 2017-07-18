@@ -161,4 +161,7 @@ startCheckInterval maybeBus ms = do
 runTests = do
   (H.liftAff $ F.runMonadF $ F.pendingFriendsSent) >>= hLog
   (H.liftAff $ F.runMonadF $ F.pendingFriendsTodo) >>= hLog
+  (H.liftAff $ F.runMonadF $ F.confirmedFriends)   >>= hLog
 --        _ ← H.liftAff $ F.runMonadF $ F.createFriendship (F.FoundationId "timtime")
+--  _ ← H.liftAff $ F.runMonadF $ F.confirmFriendship (F.FoundationId "timgalebach")
+  pure unit

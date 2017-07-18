@@ -40,6 +40,26 @@ exports.pendingFriendshipsImpl = function(callback) {
     };
 };
 
+exports.createFriendshipImpl = function(myId) {
+    return function(friendId) {
+        return function() {
+            Friendships.deployed().then(function(instance) {
+                return instance.addFriend(myId, friendId);
+            });
+        };
+    };
+};
+
+exports.confirmFriendshipImpl = function(myId) {
+    return function(friendId) {
+        return function() {
+            Friendships.deployed().then(function(instance) {
+                return instance.addFriend(myId, friendId);
+            });
+        };
+    };
+};
+
 exports.friendDebtImpl = function(callback) {
     return function(debtor) {
         return function(creditor) {
@@ -109,17 +129,6 @@ exports.cancelPendingImpl = function(creditor) {
         FriendInDebt.deployed().then(function(instance) {
             return instance.cancelPending(creditor);
         });
-    };
-};
-
-
-exports.createFriendshipImpl = function(myId) {
-    return function(friendId) {
-        return function() {
-            Friendships.deployed().then(function(instance) {
-                return instance.addFriend(myId, friendId);
-            });
-        };
     };
 };
 

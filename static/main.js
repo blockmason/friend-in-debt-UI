@@ -7784,6 +7784,18 @@ var PS = {};
       };
   };
 
+  exports.friendsImpl = function(callback) {
+      return function(foundationId) {
+          return function() {
+              Friendships.deployed().then(function(instance) {
+                  return instance.confirmedFriends.call(foundationId);
+              }).then(function(res) {
+                  callback(confirmedFriends2Js(res.valueOf()))();
+              });
+          };
+      };
+  };
+
   exports.pendingFriendshipsImpl = function(callback) {
       return function(foundationId) {
           return function() {
@@ -7791,6 +7803,16 @@ var PS = {};
                   return instance.pendingFriends.call(foundationId);
               }).then(function(res) {
                   callback(pendingFriends2Js(res.valueOf()))();
+              });
+          };
+      };
+  };
+
+  exports.createFriendshipImpl = function(myId) {
+      return function(friendId) {
+          return function() {
+              Friendships.deployed().then(function(instance) {
+                  return instance.addFriend(myId, friendId);
               });
           };
       };
@@ -7840,23 +7862,20 @@ var PS = {};
       };
   };
 
-
-  exports.createFriendshipImpl = function(myId) {
-      return function(friendId) {
-          return function() {
-              Friendships.deployed().then(function(instance) {
-                  return instance.addFriend(myId, friendId);
-              });
-          };
-      };
-  };
-
   exports.setNameImpl = function(newName) {
       return function() {
           FriendInDebtNS.deployed().then(function(instance) {
               return instance.setName(newName);
           });
       };
+  };
+
+  //helper functions
+  var confirmedFriends2Js = function(friends) {
+      for (var  i=0; i < friends.length; i++ ) {
+          friends[i] = b2s(friends[i]);
+      }
+      return friends;
   };
 
   var pendingFriends2Js = function(friends) {
@@ -8219,6 +8238,15 @@ var PS = {};
   var Network_Eth_Metamask = PS["Network.Eth.Metamask"];
   var Prelude = PS["Prelude"];        
   var runMonadF = Control_Monad_Except_Trans.runExceptT;
+  var friends = function (v) {
+      return Control_Bind.bind(Control_Monad_Aff.bindAff)(Control_Monad_Aff.makeAff(function (error) {
+          return function (success) {
+              return $foreign.friendsImpl(success)(v);
+          };
+      }))(function (v1) {
+          return Control_Applicative.pure(Control_Monad_Aff.applicativeAff)(Data_Functor.map(Data_Functor.functorArray)(Network_Eth_Foundation.FoundationId)(v1));
+      });
+  };
   var checkAndInit = Control_Bind.bind(Control_Monad_Except_Trans.bindExceptT(Control_Monad_Aff.monadAff))(Control_Monad_Eff_Class.liftEff(Control_Monad_Except_Trans.monadEffExceptT(Control_Monad_Aff.monadEffAff))(Data_Functor.map(Control_Monad_Eff.functorEff)(Network_Eth_Metamask.loggedIn)(Network_Eth_Metamask.checkStatus)))(function (v) {
       if (v) {
           return Control_Monad_Eff_Class.liftEff(Control_Monad_Except_Trans.monadEffExceptT(Control_Monad_Aff.monadEffAff))($foreign.initImpl(Data_Unit.unit));
@@ -8245,6 +8273,9 @@ var PS = {};
           };
       })));
   });
+  var confirmedFriends = Control_Bind.bind(Control_Monad_Except_Trans.bindExceptT(Control_Monad_Aff.monadAff))(foundationId)(function (v) {
+      return Control_Monad_Aff_Class.liftAff(Control_Monad_Aff_Class.monadAffExceptT(Control_Monad_Aff_Class.monadAffAff))(friends(v));
+  });
   var createFriendship = function (v) {
       return Control_Bind.bind(Control_Monad_Except_Trans.bindExceptT(Control_Monad_Aff.monadAff))(foundationId)(function (v1) {
           return Control_Monad_Eff_Class.liftEff(Control_Monad_Except_Trans.monadEffExceptT(Control_Monad_Aff.monadEffAff))($foreign.createFriendshipImpl(v1)(v));
@@ -8253,8 +8284,8 @@ var PS = {};
   var pendingFriends = function (compFn) {
       var g = function (myId) {
           return function (pending) {
-              var $50 = compFn(pending.confirmerId)(myId);
-              if ($50) {
+              var $54 = compFn(pending.confirmerId)(myId);
+              if ($54) {
                   return new Data_Maybe.Just(pending.friendId);
               };
               return Data_Maybe.Nothing.value;
@@ -8284,6 +8315,7 @@ var PS = {};
   };
   exports["cancelPending"] = cancelPending;
   exports["confirmPending"] = confirmPending;
+  exports["confirmedFriends"] = confirmedFriends;
   exports["createFriendship"] = createFriendship;
   exports["foundationId"] = foundationId;
   exports["newPending"] = newPending;
@@ -9129,7 +9161,11 @@ var PS = {};
   var runTests = function (dictBind) {
       return function (dictMonadAff) {
           return Control_Bind.discard(Control_Bind.discardUnit)(dictBind)(Control_Bind.bind(dictBind)(Control_Monad_Aff_Class.liftAff(dictMonadAff)(Network_Eth_FriendInDebt.runMonadF(Network_Eth_FriendInDebt.pendingFriendsSent)))(FriendInDebt_Prelude.hLog(dictMonadAff.MonadEff0())(Data_Either.showEither(Network_Eth_FriendInDebt_Types.showError)(Data_Show.showArray(Network_Eth_Foundation.showFoundationId)))))(function () {
-              return Control_Bind.bind(dictBind)(Control_Monad_Aff_Class.liftAff(dictMonadAff)(Network_Eth_FriendInDebt.runMonadF(Network_Eth_FriendInDebt.pendingFriendsTodo)))(FriendInDebt_Prelude.hLog(dictMonadAff.MonadEff0())(Data_Either.showEither(Network_Eth_FriendInDebt_Types.showError)(Data_Show.showArray(Network_Eth_Foundation.showFoundationId))));
+              return Control_Bind.discard(Control_Bind.discardUnit)(dictBind)(Control_Bind.bind(dictBind)(Control_Monad_Aff_Class.liftAff(dictMonadAff)(Network_Eth_FriendInDebt.runMonadF(Network_Eth_FriendInDebt.pendingFriendsTodo)))(FriendInDebt_Prelude.hLog(dictMonadAff.MonadEff0())(Data_Either.showEither(Network_Eth_FriendInDebt_Types.showError)(Data_Show.showArray(Network_Eth_Foundation.showFoundationId)))))(function () {
+                  return Control_Bind.discard(Control_Bind.discardUnit)(dictBind)(Control_Bind.bind(dictBind)(Control_Monad_Aff_Class.liftAff(dictMonadAff)(Network_Eth_FriendInDebt.runMonadF(Network_Eth_FriendInDebt.confirmedFriends)))(FriendInDebt_Prelude.hLog(dictMonadAff.MonadEff0())(Data_Either.showEither(Network_Eth_FriendInDebt_Types.showError)(Data_Show.showArray(Network_Eth_Foundation.showFoundationId)))))(function () {
+                      return Control_Applicative.pure(((dictMonadAff.MonadEff0()).Monad0()).Applicative0())(Data_Unit.unit);
+                  });
+              });
           });
       };
   };

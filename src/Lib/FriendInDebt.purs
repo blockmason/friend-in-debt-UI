@@ -4,6 +4,7 @@ module Network.Eth.FriendInDebt
        , foundationId
        , confirmedFriends
        , createFriendship
+       , confirmFriendship
        , currentUserDebts
        , currentUserPending
        , currentUserSentPendings
@@ -12,7 +13,6 @@ module Network.Eth.FriendInDebt
        , newPending
        , confirmPending
        , cancelPending
-       , createFriendship
        , allNames
        , getCurrentUserName
        , setCurrentUserName
@@ -71,6 +71,7 @@ foreign import newPendingImpl ∷ ∀ e. StringAddr → Number → Eff e Unit
 foreign import confirmPendingImpl ∷ ∀ e. StringAddr → Number → Eff e Unit
 foreign import cancelPendingImpl ∷ ∀ e. StringAddr → Eff e Unit
 foreign import createFriendshipImpl ∷ ∀ e. StringId → StringId → Eff e Unit
+foreign import confirmFriendshipImpl ∷ ∀ e. StringId → StringId → Eff e Unit
 foreign import getNameImpl ∷ NameLookupFn
 foreign import setNameImpl ∷ ∀ e. String → Eff e Unit
 
@@ -106,10 +107,15 @@ allDebtOrPending ∷ ∀ e. DebtLookupFn → EthAddress → Array EthAddress
 allDebtOrPending lookupFn debtor creditors =
   traverse (getDebtOrPending lookupFn debtor) creditors
 
-createFriendship ∷ ∀ e. FoundationId → MonadF Unit
+createFriendship ∷ FoundationId → MonadF Unit
 createFriendship (FoundationId newFriend) = do
-  (FoundationId fi) ← foundationId
-  liftEff $ createFriendshipImpl fi newFriend
+  (FoundationId myId) ← foundationId
+  liftEff $ createFriendshipImpl myId newFriend
+
+confirmFriendship ∷ FoundationId → MonadF Unit
+confirmFriendship (FoundationId newFriend) = do
+  (FoundationId myId) ← foundationId
+  liftEff $ confirmFriendshipImpl myId newFriend
 
 confirmedFriends ∷ MonadF (Array FoundationId)
 confirmedFriends = do
