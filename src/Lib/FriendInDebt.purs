@@ -36,11 +36,11 @@ module Network.Eth.FriendInDebt
        , StringAddr
        , FriendDebt (..)
        , DebtCompare(..)
-       , module FTypes
+       , module Network.Eth.FriendInDebt.Types
        ) where
 
 import Prelude
-import Network.Eth.FriendInDebt.Types                             as FTypes
+import Network.Eth.FriendInDebt.Types
 import Control.Monad.Eff           (Eff, kind Effect)
 import Math                        (abs)
 import Control.Monad.Eff.Class     (liftEff)
@@ -59,7 +59,7 @@ import Data.Array                                                  as A
 import Data.Tuple                  (Tuple(..))
 import Data.Foldable               (foldr)
 import Network.Eth.Metamask                                        as MM
-import Network.Eth.FoundationId    (FoundationId(..))
+import Network.Eth.Foundation      (FoundationId(..))
 
 infixr 9 compose as ∘
 
@@ -147,7 +147,7 @@ type DebtLookupFn = ∀ e. (Number → Eff e Unit)
                        → StringAddr → StringAddr
                        → Eff e Unit
 type NameLookupFn = ∀ e. (String → Eff e Unit) → StringAddr → Eff e Unit
-type FriendsLookupFn = ∀ e. ((Array String) → Eff e Unit) → StringAddr → Eff e Unit
+type FriendsLookupFn = ∀ e. ((Array StringId) → Eff e Unit) → StringId → Eff e Unit
 type PendingFriendsFn = ∀ e. ((Array PendingFriend) → Eff e Unit) → StringAddr → Eff e Unit
 
 foreign import initImpl ∷ ∀ e. Unit → Eff e Unit
@@ -181,10 +181,10 @@ foundationId = do
   checkAndInit
   liftAff $ FoundationId <$> (makeAff (\err succ → getMyFoundationIdImpl succ))
 
-friends ∷ ∀ e. EthAddress → Aff e (Array EthAddress)
-friends (EthAddress ua) = do
-  friendList ← makeAff (\error success → friendsImpl success ua)
-  pure $ EthAddress <$> friendList
+friends ∷ ∀ e. FoundationId → Aff e (Array EthAddress)
+friends (FoundationId fi) = do
+  friendList ← makeAff (\error success → friendsImpl success fi)
+  pure $ FoundationId <$> friendList
 
 getDebtOrPending ∷ ∀ e. DebtLookupFn → EthAddress → EthAddress → Aff e FriendDebt
 getDebtOrPending lookupFnImpl (EthAddress d) (EthAddress c) = do

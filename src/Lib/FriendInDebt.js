@@ -1,8 +1,9 @@
 "use strict";
-//requires web3, FriendInDebt, FriendInDebtNS configs
+//requires web3, FriendInDebt, FriendInDebtNS, Friendships configs
 
 var FriendInDebt;
 var FriendInDebtNS;
+var Friendships;
 
 exports.initImpl = function(dummyVal) {
     return function() {
@@ -10,11 +11,13 @@ exports.initImpl = function(dummyVal) {
         FriendInDebt.setProvider(web3.currentProvider);
         FriendInDebtNS = TruffleContract(friendInDebtNSConfig);
         FriendInDebtNS.setProvider(web3.currentProvider);
+        Friendships = TruffleContract(friendshipsConfig);
+        Friendships.setProvider(web3.currentProvider);
     };
 };
 
 exports.friendsImpl = function(callback) {
-    return function(userAddress) {
+    return function(foundationId) {
         return function() {
             FriendInDebt.deployed().then(function(instance) {
                 return instance.getFriends.call(userAddress);

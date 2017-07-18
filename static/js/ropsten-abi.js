@@ -13,3 +13,11 @@ var friendInDebtNSConfig = {
     "address": "0x909c83ad5512e54f000b786beee3cdb208dd8391",
     "network_id": 3
 };
+
+var frienshipsConfig = {
+    "contract_name": "Friendships",
+    "abi": [],
+    "unlinked_binary": "",
+    "address": "",
+    "network_id": 3
+};

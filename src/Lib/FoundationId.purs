@@ -1,4 +1,4 @@
-module Network.Eth.FoundationId
+module Network.Eth.Foundation
        (
          FoundationId(..)
        ) where
