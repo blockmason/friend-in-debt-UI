@@ -3,6 +3,7 @@ module Network.Eth.FriendInDebt
          FID
        , foundationId
        , confirmedFriends
+       , createFriendship
        , currentUserDebts
        , currentUserPending
        , currentUserSentPendings
@@ -17,6 +18,7 @@ module Network.Eth.FriendInDebt
        , setCurrentUserName
        , runMonadF
        , module Network.Eth.FriendInDebt.Types
+       , module Network.Eth.Foundation
        ) where
 
 import Prelude
@@ -39,7 +41,7 @@ import Data.Array                                                  as A
 import Data.Tuple                  (Tuple(..))
 import Data.Foldable               (foldr)
 import Network.Eth.Metamask                                        as MM
-import Network.Eth.Foundation      (FoundationId(..))
+import Network.Eth.Foundation
 
 infixr 9 compose as ∘
 
@@ -68,7 +70,7 @@ foreign import pendingFriendshipsImpl ∷ PendingFriendsFn
 foreign import newPendingImpl ∷ ∀ e. StringAddr → Number → Eff e Unit
 foreign import confirmPendingImpl ∷ ∀ e. StringAddr → Number → Eff e Unit
 foreign import cancelPendingImpl ∷ ∀ e. StringAddr → Eff e Unit
-foreign import createFriendshipImpl ∷ ∀ e. StringAddr → Eff e Unit
+foreign import createFriendshipImpl ∷ ∀ e. StringId → StringId → Eff e Unit
 foreign import getNameImpl ∷ NameLookupFn
 foreign import setNameImpl ∷ ∀ e. String → Eff e Unit
 
@@ -103,6 +105,11 @@ allDebtOrPending ∷ ∀ e. DebtLookupFn → EthAddress → Array EthAddress
                  → Aff e (Array FriendDebt)
 allDebtOrPending lookupFn debtor creditors =
   traverse (getDebtOrPending lookupFn debtor) creditors
+
+createFriendship ∷ ∀ e. FoundationId → MonadF Unit
+createFriendship (FoundationId newFriend) = do
+  (FoundationId fi) ← foundationId
+  liftEff $ createFriendshipImpl fi newFriend
 
 confirmedFriends ∷ MonadF (Array FoundationId)
 confirmedFriends = do
@@ -156,11 +163,6 @@ cancelPending ∷ ∀ e. EthAddress → MonadF Unit
 cancelPending (EthAddress user) = do
   checkAndInit
   liftEff $ cancelPendingImpl user
-
-createFriendship ∷ ∀ e. EthAddress → MonadF Unit
-createFriendship (EthAddress newFriend) = do
-   checkAndInit
-   liftEff $  createFriendshipImpl newFriend
 
 getName ∷ ∀ e. EthAddress → Aff e (Maybe UserName)
 getName (EthAddress ua) = do

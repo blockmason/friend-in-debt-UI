@@ -95,7 +95,7 @@ ui =
         H.liftAff $ delay (Milliseconds (toNumber 1500))
         H.modify (_ { loading = false })
         refreshMetamask
-        (H.liftAff $ F.runMonadF $ F.confirmedFriends) >>= hLog
+        runTests
         startCheckInterval (Just bus) 5000
         pure next
       HandleMsg msg next → do
@@ -156,3 +156,9 @@ startCheckInterval maybeBus ms = do
       where effToRun bus = do
               _ ← launchAff $ Bus.write CheckMetamask bus
               pure unit
+
+
+runTests = do
+  (H.liftAff $ F.runMonadF $ F.pendingFriendsSent) >>= hLog
+  (H.liftAff $ F.runMonadF $ F.pendingFriendsTodo) >>= hLog
+--        _ ← H.liftAff $ F.runMonadF $ F.createFriendship (F.FoundationId "timtime")

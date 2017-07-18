@@ -27,7 +27,7 @@ data Query a
   | SendDebt F.EthAddress a
   | ConfirmPending F.FriendDebt a
   | CancelPending F.FriendDebt a
-  | AddFriend (Either String F.EthAddress) a
+  | AddFriend (Either String F.FoundationId) a
   | InputFriend String a
   | InputName String a
   | UpdateName String a
@@ -38,7 +38,7 @@ type State = { friends     ∷ Array F.EthAddress
              , sentPending ∷ Array F.FriendDebt
              , creating    ∷ DebtMap
              , names       ∷ NameMap
-             , newFriend   ∷ Either String F.EthAddress
+             , newFriend   ∷ Either String F.FoundationId
              , userName    ∷ Either F.EthAddress F.UserName
              , inputName   ∷ String
              , loading     ∷ Boolean
@@ -125,16 +125,17 @@ component =
     HandleInput input next → do
       H.modify (_ { errorBus = input })
       pure next
-    AddFriend eitherFriend next → do
+    AddFriend eitherFriendId next → do
       s ← H.get
-      case eitherFriend of
-        Left str → pure next
-        Right ua → do H.modify (_ { newFriend = Left "" })
-                      handleFIDCall s.errorBus unit (F.createFriendship ua)
-                      pure next
+      case eitherFriendId of
+        Left  str → pure next
+        Right friendId → do
+          H.modify (_ { newFriend = Left "" })
+          handleFIDCall s.errorBus unit (F.createFriendship friendId)
+          pure next
     InputFriend friendStr next → do
-      if ((S.length friendStr) == 42)
-        then H.modify (_ { newFriend = Right $ F.EthAddress friendStr })
+      if ((S.length friendStr) > 3) --id should be longer than 3 characters
+        then H.modify (_ { newFriend = Right $ F.FoundationId friendStr })
         else H.modify (_ { newFriend = Left friendStr })
       pure next
     InputName inputName next → do
@@ -289,7 +290,7 @@ addFriendWidget state =
               , HP.class_ $ HH.ClassName "btn-info"]
     [ HH.text "Add Friend by Address" ]
   ]
-  where inputVal = either id F.getUa
+  where inputVal = either id show
 
 nameChangeWidget ∷ String → Either F.EthAddress F.UserName → H.ComponentHTML Query
 nameChangeWidget inputName userName =

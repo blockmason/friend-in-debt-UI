@@ -29,10 +29,10 @@ exports.friendsImpl = function(callback) {
 };
 
 exports.pendingFriendshipsImpl = function(callback) {
-    return function(userAddress) {
+    return function(foundationId) {
         return function() {
-            FriendInDebt.deployed().then(function(instance) {
-                return instance.pendingFriends.call(userAddress);
+            Friendships.deployed().then(function(instance) {
+                return instance.pendingFriends.call(foundationId);
             }).then(function(res) {
                 callback(pendingFriends2Js(res.valueOf()))();
             });
@@ -113,11 +113,13 @@ exports.cancelPendingImpl = function(creditor) {
 };
 
 
-exports.createFriendshipImpl = function(friend) {
-    return function() {
-        FriendInDebt.deployed().then(function(instance) {
-            return instance.createFriendship(friend);
-        });
+exports.createFriendshipImpl = function(myId) {
+    return function(friendId) {
+        return function() {
+            Friendships.deployed().then(function(instance) {
+                return instance.addFriend(myId, friendId);
+            });
+        };
     };
 };
 
