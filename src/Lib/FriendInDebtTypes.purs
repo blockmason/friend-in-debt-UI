@@ -33,22 +33,55 @@ instance showError ∷ Show Error where
   show NoMetamask = "NoMetamask: Metamask not logged in."
 
 -- money
-newtype Money = Money Number
-instance showMoney ∷ Show Money where
-  show (Money val) =
-    (if (val < (toNumber 0)) then "-" else "") <> (formatDollar $ abs val)
-instance eqMoney ∷ Eq Money where
-  eq (Money m1) (Money m2) = m1 == m2
-instance ordMoney ∷ Ord Money where
-  compare (Money m1) (Money m2) = compare m1 m2
+data Currency =
+    USD
+  | EUR
+  | Invalid
 
-amount ∷ Money → Number
-amount (Money m) = m
-currencyCode (Money m) = "USD"
-absMoney ∷ Money → Money
-absMoney (Money m) = Money $ abs m
-mkNegative ∷ Money → Money
-mkNegative (Money m) = Money $ m * (-1.0)
+fromString ∷ String → Currency
+fromString "USD" = USD
+fromString "EUR" = EUR
+fromString _     = Invalid
+
+instance showCurrency ∷ Show Currency where
+  show USD = "USD"
+  show EUR = "EUR"
+  show _   = "Invalid"
+instance eqCurrency ∷ Eq Currency where
+  eq c1 c2 = (show c1) == (show c2)
+
+newtype Money = Money { amount ∷ Number, currency ∷ Currency }
+
+instance showMoney ∷ Show Money where
+  show (Money m) =
+    (if (m.amount < (toNumber 0)) then "-" else "") <> (formatDollar $ abs m.amount)
+instance eqMoney ∷ Eq Money where
+  eq (Money m1) (Money m2) = (m1.amount == m2.amount) && (m1.currency == m2.currency)
+instance ordMoney ∷ Ord Money where
+  compare (Money m1) (Money m2) = compare m1.amount m2.amount
+  --TODO: make the above work with multiple currencies
+
+mkMoney ∷ Number → String → Money
+mkMoney val currencyCode = Money { amount: val, currency: fromString currencyCode }
+numAmount ∷ Money → Number
+numAmount (Money m) = m.amount
+strCurrency ∷ Money → String
+strCurrency (Money m) = show m.currency
+
+newtype Balance = Balance { debtor     ∷ FoundationId
+                          , creditor   ∷ FoundationId
+                          , amount     ∷ Money }
+instance showBalance ∷ Show Balance where
+  show (Balance b) = (show b.debtor) <> ", " <> (show b.creditor) <> ": " <> (show b.amount)
+
+rawToBalance ∷ FoundationId → RawBalance → Balance
+rawToBalance fi rb =
+  let (Tuple d c) = debtorCreditor fi rb.counterParty rb.amount
+  in Balance { amount: mkMoney (abs rb.amount) rb.currency
+             , debtor: d, creditor: c }
+  where debtorCreditor fi cpId val = if val >= (toNumber 0)
+                                     then Tuple fi (FoundationId cpId)
+                                     else Tuple (FoundationId cpId) fi
 
 -- FriendDebt
 newtype FriendDebt = FriendDebt { friend     ∷ EthAddress
@@ -63,31 +96,26 @@ instance eqFriendDebt ∷ Eq FriendDebt where
     (fd1.friend == fd2.friend) && (fd1.debt == fd2.debt)
 
 blankFriendDebt ∷ FriendDebt
-blankFriendDebt = FriendDebt { friend: EthAddress "0x0", debt: Money 0.0
+blankFriendDebt = FriendDebt { friend: EthAddress "0x0", debt: mkMoney 0.0 "USD"
                              , debtId: 0, desc: "", currency: "USDcents" }
 
 friendDebtZero ∷ EthAddress → FriendDebt
 friendDebtZero ua = changeDebtor ua blankFriendDebt
 getDebt ∷ FriendDebt → Money
 getDebt (FriendDebt fd) = fd.debt
-setDebt ∷ FriendDebt → Number → FriendDebt
-setDebt (FriendDebt fd) m = FriendDebt $ fd { debt = (Money m)}
+setDebt ∷ FriendDebt → Number → String → FriendDebt
+setDebt (FriendDebt fd) val currency = FriendDebt $ fd { debt = mkMoney val currency}
 getFriendAddr ∷ FriendDebt → EthAddress
 getFriendAddr (FriendDebt fd) = fd.friend
 changeDebtor ∷ EthAddress → FriendDebt → FriendDebt
 changeDebtor newDebtor (FriendDebt fd) = FriendDebt $ fd {friend = newDebtor}
-newDebt ∷ EthAddress → Number → FriendDebt
-newDebt f d = FriendDebt { friend: f, debt: Money d, debtId: 0, desc: "", currency: "USDcents" }
 addDebt :: FriendDebt -> Money -> FriendDebt
-addDebt fd money = setDebt fd $ (amount (getDebt fd)) + (amount money)
---make a debt value negative
-flipDebt ∷ FriendDebt → FriendDebt
-flipDebt (FriendDebt fd) = FriendDebt $ fd { debt = mkNegative fd.debt }
+addDebt fd money = setDebt fd ((numAmount (getDebt fd)) + (numAmount money)) $ strCurrency money
 
 data DebtCompare = Positive | Negative | Zero
 posNegZero ∷ FriendDebt → DebtCompare
-posNegZero (FriendDebt fd) | amount fd.debt > 0.0 = Positive
-                           | amount fd.debt < 0.0 = Negative
+posNegZero (FriendDebt fd) | numAmount fd.debt > 0.0 = Positive
+                           | numAmount fd.debt < 0.0 = Negative
                            | otherwise            = Zero
 
 -- ETH Address
@@ -97,14 +125,19 @@ instance showEthAddress ∷ Show EthAddress where
 instance eqEthAddress ∷ Eq EthAddress where
   eq (EthAddress ua1) (EthAddress ua2) = ua1 == ua2
 instance ordEthAddress ∷ Ord EthAddress where
+
   compare (EthAddress ua1) (EthAddress ua2) = localeCompare ua1 ua2
 getUa ∷ EthAddress → String
 getUa (EthAddress ua) = ua
 
 
 --raw JS Object types
-type RawDebt = { friend     ∷ StringAddr
-               , debt       ∷ Int
+type RawDebt = { friend     ∷ StringId
+               , amount     ∷ Int
                , debtId     ∷ Int
                , desc       ∷ String
                , currency   ∷ String }
+
+type RawBalance = { counterParty ∷ StringId
+                  , amount       ∷ Number
+                  , currency     ∷ String }

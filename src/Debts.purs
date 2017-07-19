@@ -260,15 +260,13 @@ moneySpan (F.FriendDebt fd) =
         F.Negative → "amount-receivable"
         F.Zero     → "amount-nothing"
     in  HH.span [ HP.class_ $ HH.ClassName $ compRes ]
-        [ HH.text $ show $ F.absMoney fd.debt ]
+        [ HH.text $ show $ fd.debt ]
 
 moneyClass ∷ F.FriendDebt → String
 moneyClass fd = case F.posNegZero fd of
   F.Positive → "oweMoney"
   F.Negative → "owedMoney"
   F.Zero     → "zeroMoney"
-
-reverseMoneyClass = moneyClass ∘ F.flipDebt
 
 confirmButton ∷ F.FriendDebt → H.ComponentHTML Query
 confirmButton fd = HH.button [ HP.class_ $ HH.ClassName "col-sm-6 btn-confirm"
@@ -310,7 +308,7 @@ nameChangeWidget inputName userName =
   ]
 
 nonZero ∷ F.FriendDebt → Boolean
-nonZero fd = (F.getDebt fd) /= (F.Money $ toNumber 0)
+nonZero fd = ((F.numAmount ∘ F.getDebt) fd) /= (toNumber 0)
 
 displayPending ∷ NameMap → Tuple F.FriendDebt F.FriendDebt → H.ComponentHTML Query
 displayPending nm (Tuple originalDebt pendingDebt) = HH.li
@@ -328,19 +326,16 @@ createDebt nm creating friend =
   in HH.div [ HP.class_ $ HH.ClassName "createDebt" ]
      [ HH.text "$"
      , HH.input [ HP.type_ HP.InputNumber
-                , HP.class_ $ HH.ClassName $ reverseMoneyClass $ fd
+--                , HP.class_ $ HH.ClassName $ reverseMoneyClass $ fd
                 , HP.value "0"
-                , HE.onValueInput
-                  (HE.input (\val → CreateDebt $ mkDebt friend val))
+--                , HE.onValueInput
+--                  (HE.input (\val → CreateDebt $ mkDebt friend val))
                 , HP.min $ toNumber (-1000000)
                 , HP.max $ toNumber 1000000]
      ,   HH.button [ HE.onClick $ HE.input_ $ SendDebt friend
                    , HP.class_ $ HH.ClassName "btn-info"]
-         $ append [HH.text "Debt: "] (displayDebt nm $ F.flipDebt fd)
+         $ append [HH.text "Debt: "] (displayDebt nm $ fd)
      ]
-
-mkDebt ∷ F.EthAddress → String → F.FriendDebt
-mkDebt friend debtStr = F.newDebt friend $ numberFromString debtStr
 
 numberFromString ∷ String → Number
 numberFromString s = fromMaybe (toNumber 0) (N.fromString s)

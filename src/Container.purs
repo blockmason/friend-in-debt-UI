@@ -165,6 +165,10 @@ runTests = do
   (H.liftAff $ F.runMonadF $ F.confirmedFriends)   >>= hLog
 --  _ ← H.liftAff $ F.runMonadF $ F.createFriendship (F.FoundationId "timtime")
 --  _ ← H.liftAff $ F.runMonadF $ F.confirmFriendship (F.FoundationId "timgalebach")
---  _ ← H.liftAff $ F.runMonadF $ F.newPendingDebt
---    (F.FoundationId "timtime") (F.FoundationId "timgalebach") (F.Money 1200.0) "blow"
+  (H.liftAff $ F.runMonadF $ F.debtBalances)   >>= hLog
+  pure unit
+
+mkDebts = do
+  _ ← H.liftAff $ F.runMonadF $ F.newPendingDebt (F.FoundationId "timtime") (F.FoundationId "timgalebach") (F.mkMoney 1200.0 "USD") "hookers"
+  _ ← H.liftAff $ F.runMonadF $ F.newPendingDebt (F.FoundationId "timgalebach") (F.FoundationId "timtime") (F.mkMoney 500.0 "USD") "blow"
   pure unit
