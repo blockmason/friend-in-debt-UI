@@ -2,6 +2,7 @@ module Network.Eth.FriendInDebt
        (
          FID
        , runMonadF
+       , PendingDebt
        , module Network.Eth.FriendInDebt.Types
        , module Network.Eth.Foundation
 
@@ -14,13 +15,14 @@ module Network.Eth.FriendInDebt
 
        , newPendingDebt
        , debtBalances
---       , pendingDebtsSent
---       , pendingDebtsTodo
+       , pendingDebts
 
        , allNames
        , getCurrentUserName
        , setCurrentUserName
        ) where
+
+--TODO: throw a different type of error if no FoundationId exists
 
 import Prelude
 import Network.Eth.FriendInDebt.Types
@@ -70,7 +72,6 @@ foreign import confirmFriendshipImpl ∷ ∀ e. StringId → StringId → Eff e 
 
 foreign import newPendingDebtImpl ∷ ∀ e. StringId → StringId → Number → String → Description → Eff e Unit
 foreign import debtBalancesImpl ∷ BalanceLookupFn
-
 
 foreign import getNameImpl ∷ NameLookupFn
 foreign import setNameImpl ∷ ∀ e. String → Eff e Unit
@@ -138,6 +139,21 @@ debtBalances = do
   (FoundationId myId) ← foundationId
   rawBalances ← liftAff $ makeAff (\err succ → debtBalancesImpl succ myId)
   pure $ (rawToBalance (FoundationId myId)) <$> rawBalances
+
+type PendingDebts = { sent ∷ Array Debt, todo ∷ ArrayDebt }
+pendingDebts ∷ MonadF PendingDebts
+pendingDebts = do
+  (FoundationId fi) ← foundationId
+  debtList ← liftAff $ makeAff (\err succ → pendingDebtsImpl succ fi)
+  let myId = FoundationId fi
+      todo = (A.filter (\d → myId == (debtToConfirm d))) ∘ (A.map rawToDebt)
+      sent = (A.filter (\d → myId /= (debtToConfirm d))) ∘ (A.map rawToDebt)
+  in pure { todo: todo, sent: sent }
+
+--pendingDebtsSent ∷ MonadF (Array Debt)
+
+--pendingDebtsTodo ∷ MonadF (Array Debt)
+
 
 {- FriendInDebtNS -}
 getName ∷ ∀ e. EthAddress → Aff e (Maybe UserName)

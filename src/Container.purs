@@ -33,7 +33,7 @@ data Query a
 type State = { loggedIn ∷ Boolean
              , loading  ∷ Boolean
              , errorBus ∷ ContainerMsgBus
-             , currentScreen :: String}
+             , currentScreen :: String }
 
 type ChildQuery = Coproduct1 D.Query
 type ChildSlot = Either1 Unit
@@ -160,6 +160,8 @@ startCheckInterval maybeBus ms = do
 
 runTests = do
   (H.liftAff $ F.runMonadF $ F.foundationId)       >>= hLog
+  v ← H.liftAff $ myComputation
+  hLog v
   (H.liftAff $ F.runMonadF $ F.pendingFriendsSent) >>= hLog
   (H.liftAff $ F.runMonadF $ F.pendingFriendsTodo) >>= hLog
   (H.liftAff $ F.runMonadF $ F.confirmedFriends)   >>= hLog

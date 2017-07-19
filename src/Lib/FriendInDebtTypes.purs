@@ -32,6 +32,10 @@ data Error = NoMetamask
 instance showError ∷ Show Error where
   show NoMetamask = "NoMetamask: Metamask not logged in."
 
+data DebtId =
+    DebtId Int
+  | NoDebtId
+
 -- money
 data Currency =
     USD
@@ -83,60 +87,69 @@ rawToBalance fi rb =
                                      then Tuple fi (FoundationId cpId)
                                      else Tuple (FoundationId cpId) fi
 
--- FriendDebt
-newtype FriendDebt = FriendDebt { friend     ∷ EthAddress
-                                , debt       ∷ Money
-                                , debtId     ∷ Int
-                                , desc       ∷ String
-                                , currency   ∷ String }
-instance showFriendDebt ∷ Show FriendDebt where
-  show (FriendDebt fd) = show fd.debt <> ": " <> show fd.friend
-instance eqFriendDebt ∷ Eq FriendDebt where
-  eq (FriendDebt fd1) (FriendDebt fd2) =
-    (fd1.friend == fd2.friend) && (fd1.debt == fd2.debt)
+fetch ∷ ∀ e. Aff e Json
 
-blankFriendDebt ∷ FriendDebt
-blankFriendDebt = FriendDebt { friend: EthAddress "0x0", debt: mkMoney 0.0 "USD"
-                             , debtId: 0, desc: "", currency: "USDcents" }
+bind ∷ ∀ m a b. Monad m => m a → (a → m b) → m b
 
-friendDebtZero ∷ EthAddress → FriendDebt
-friendDebtZero ua = changeDebtor ua blankFriendDebt
-getDebt ∷ FriendDebt → Money
-getDebt (FriendDebt fd) = fd.debt
-setDebt ∷ FriendDebt → Number → String → FriendDebt
-setDebt (FriendDebt fd) val currency = FriendDebt $ fd { debt = mkMoney val currency}
-getFriendAddr ∷ FriendDebt → EthAddress
-getFriendAddr (FriendDebt fd) = fd.friend
-changeDebtor ∷ EthAddress → FriendDebt → FriendDebt
-changeDebtor newDebtor (FriendDebt fd) = FriendDebt $ fd {friend = newDebtor}
-addDebt :: FriendDebt -> Money -> FriendDebt
-addDebt fd money = setDebt fd ((numAmount (getDebt fd)) + (numAmount money)) $ strCurrency money
+sumMoney ∷ ∀ e. Money → Money → Aff e Money
+sumMoney m1 m2 = pure $ mkMoney ((numAmount m1) + (numAmount m2)) (strCurrency m1)
 
-data DebtCompare = Positive | Negative | Zero
-posNegZero ∷ FriendDebt → DebtCompare
-posNegZero (FriendDebt fd) | numAmount fd.debt > 0.0 = Positive
-                           | numAmount fd.debt < 0.0 = Negative
-                           | otherwise            = Zero
+{- Debt -}
+newtype Debt = Debt { debtor     ∷ FoundationId
+                    , creditor   ∷ FoundationId
+                    , toConfirm  ∷ FoundationId
+                    , debt       ∷ Money
+                    , debtId     ∷ DebtId
+                    , desc       ∷ String }
+instance showDebt ∷ Show Debt where
+  show (Debt fd) = show fd.debt <> ": " <> show fd.debtor <> " " <> show fd.creditor
+instance eqDebt ∷ Eq Debt where
+  eq (Debt fd1) (Debt fd2) =
+    (fd1.debtor == fd2.debtor) && (fd1.creditor == fd2.creditor) && (fd1.debt == fd2.debt)
 
--- ETH Address
+rawToDebt ∷ RawDebt → Debt
+rawToDebt rd = Debt { debtId: DebtId rd.id
+                    , debtor: FoundationId rd.debtor
+                    , creditor: FoundationId rd.creditor
+                    , toConfirm: rd.confirmerId
+                    , debt: mkMoney rd.amount $ fromString rd.currency
+                    , desc: desc }
+
+mkDebt ∷ FoundationId → FoundationId → FoundationId → Money → DebtId → Description
+       → Debt
+mkDebt d c toC amount dId desc = Debt { debtor: d, creditor: c, debt: amount
+                                  , debtId: dId, desc: desc, toConfirm: toC}
+zeroDebt ∷ Currency → FoundationId → FoundationId → FoundationId → Debt
+zeroDebt cur debtor creditor toConfirm = mkDebt debtor creditor toConfirm (mkMoney 0.0 cur) NoDebtId ""
+fdDebt ∷ Debt → Money
+fdDebt (Debt fd) = fd.debt
+setDebt ∷ Debt → Number → String → Debt
+setDebt (Debt fd) val currency = Debt $ fd { debt = mkMoney val currency}
+debtToConfirm ∷ Debt → FoundationId
+debtToConfirm (Debt d) = d.toConfirm
+debtCounterparty ∷ FoundationId → Debt → FoundationId
+debtCounterparty myId (Debt fd) = if fd.debtor == myId
+                                 then fd.creditor else fd.debtor
+
+{- ETH Address -}
 newtype EthAddress = EthAddress StringAddr
 instance showEthAddress ∷ Show EthAddress where
   show (EthAddress ua) = ua
 instance eqEthAddress ∷ Eq EthAddress where
   eq (EthAddress ua1) (EthAddress ua2) = ua1 == ua2
 instance ordEthAddress ∷ Ord EthAddress where
-
   compare (EthAddress ua1) (EthAddress ua2) = localeCompare ua1 ua2
-getUa ∷ EthAddress → String
-getUa (EthAddress ua) = ua
-
+getAddr ∷ EthAddress → String
+getAddr (EthAddress ea) = ea
 
 --raw JS Object types
-type RawDebt = { friend     ∷ StringId
-               , amount     ∷ Int
-               , debtId     ∷ Int
-               , desc       ∷ String
-               , currency   ∷ String }
+type RawDebt = { id          ∷ Number
+               , confirmerId ∷ StringId
+               , currency    ∷ String
+               , amount      ∷ Number
+               , desc        ∷ String
+               , debtor      ∷ StringId
+               , creditor    ∷ StringId }
 
 type RawBalance = { counterParty ∷ StringId
                   , amount       ∷ Number
