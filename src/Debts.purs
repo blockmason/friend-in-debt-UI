@@ -152,22 +152,25 @@ component =
       pure next
     SendDebt creditor next → do
       s ← H.get
+      pure next
+      {-
       let key = creditor
       case M.lookup key s.creating of
         Nothing   → pure next
-        Just debt → do handleFIDCall s.errorBus unit (F.newPending debt)
+        Just debt → do handleFIDCall s.errorBus unit (F.newPendingDebt debt)
                        H.modify (_ { creating = M.delete key s.creating })
                        pure next
+-}
     ConfirmPending debt next → do
       s ← H.get
-      handleFIDCall s.errorBus unit (F.confirmPending debt)
-      H.modify (_ { pending =
-                      (filter (\fd → fd /= debt) s.pending)
-                      <> [ F.setDebt debt (toNumber 0) ] })
+  --    handleFIDCall s.errorBus unit (F.confirmPending debt)
+--      H.modify (_ { pending =
+--                      (filter (\fd → fd /= debt) s.pending)
+--                      <> [ F.setDebt debt (toNumber 0) ] })
       pure next
     CancelPending (F.FriendDebt debt) next → do
       s ← H.get
-      handleFIDCall s.errorBus unit (F.cancelPending debt.friend)
+--      handleFIDCall s.errorBus unit (F.cancelPending debt.friend)
       pure next
     RefreshDebts next → do
       errorBus ← H.gets _.errorBus

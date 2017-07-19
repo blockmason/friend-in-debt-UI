@@ -16,6 +16,24 @@ exports.initImpl = function(dummyVal) {
     };
 };
 
+
+exports.currentUserImpl = function(dummyVal) {
+    return function() {
+        return web3.eth.accounts[0];
+    };
+};
+
+exports.getMyFoundationIdImpl = function(callback) {
+    return function() {
+        FriendInDebt.deployed().then(function(instance) {
+            return instance.getMyFoundationId.call();
+        }).then(function(res) {
+            callback(b2s(res.valueOf()))();
+        });
+    };
+};
+
+/* Friend Functions */
 exports.friendsImpl = function(callback) {
     return function(foundationId) {
         return function() {
@@ -60,6 +78,26 @@ exports.confirmFriendshipImpl = function(myId) {
     };
 };
 
+/* Debt Functions */
+exports.newPendingDebtImpl = function(debtor) {
+    return function(creditor) {
+        return function(amount) {
+            return function(currencyCode) {
+                return function(desc) {
+                    return function() {
+                        FriendInDebt.deployed().then(function(instance) {
+                            return instance.newDebt(debtor, creditor, currencyCode, amount, desc);
+                        });
+                    };
+                };
+            };
+        };
+    };
+};
+
+/////////////////////////////////
+
+
 exports.friendDebtImpl = function(callback) {
     return function(debtor) {
         return function(creditor) {
@@ -84,32 +122,6 @@ exports.friendPendingImpl = function(callback) {
                     callback(res.toNumber())();
                 });
             };
-        };
-    };
-};
-
-exports.currentUserImpl = function(dummyVal) {
-    return function() {
-        return web3.eth.accounts[0];
-    };
-};
-
-exports.getMyFoundationIdImpl = function(callback) {
-    return function() {
-        FriendInDebt.deployed().then(function(instance) {
-            return instance.getMyFoundationId.call();
-        }).then(function(res) {
-            callback(b2s(res.valueOf()))();
-        });
-    };
-};
-
-exports.newPendingImpl = function(creditor) {
-    return function(amount) {
-        return function() {
-            FriendInDebt.deployed().then(function(instance) {
-                return instance.newPending(creditor, amount);
-            });
         };
     };
 };

@@ -1,24 +1,24 @@
 module Network.Eth.FriendInDebt
        (
          FID
+       , runMonadF
+       , module Network.Eth.FriendInDebt.Types
+       , module Network.Eth.Foundation
+
        , foundationId
        , confirmedFriends
        , createFriendship
        , confirmFriendship
-       , currentUserDebts
-       , currentUserPending
-       , currentUserSentPendings
        , pendingFriendsSent
        , pendingFriendsTodo
-       , newPending
-       , confirmPending
-       , cancelPending
+
+       , newPendingDebt
+--       , pendingDebtsSent
+--       , pendingDebtsTodo
+
        , allNames
        , getCurrentUserName
        , setCurrentUserName
-       , runMonadF
-       , module Network.Eth.FriendInDebt.Types
-       , module Network.Eth.Foundation
        ) where
 
 import Prelude
@@ -53,7 +53,7 @@ type PendingFriend = { friendId    ∷ StringId
                      , confirmerId ∷ StringId }
 
 type IdLookupFn   = ∀ e. (StringId → Eff e Unit) → Eff e Unit
-type DebtLookupFn = ∀ e. (Number → Eff e Unit)
+type DebtLookupFn = ∀ e. (RawDebt → Eff e Unit)
                        → StringAddr → StringAddr
                        → Eff e Unit
 type NameLookupFn = ∀ e. (String → Eff e Unit) → StringAddr → Eff e Unit
@@ -64,14 +64,14 @@ foreign import initImpl ∷ ∀ e. Unit → Eff e Unit
 foreign import currentUserImpl ∷ ∀ e. Unit → Eff e StringAddr
 foreign import getMyFoundationIdImpl ∷ IdLookupFn
 foreign import friendsImpl ∷ FriendsLookupFn
-foreign import friendDebtImpl ∷ DebtLookupFn
 foreign import friendPendingImpl ∷ DebtLookupFn
 foreign import pendingFriendshipsImpl ∷ PendingFriendsFn
-foreign import newPendingImpl ∷ ∀ e. StringAddr → Number → Eff e Unit
-foreign import confirmPendingImpl ∷ ∀ e. StringAddr → Number → Eff e Unit
-foreign import cancelPendingImpl ∷ ∀ e. StringAddr → Eff e Unit
 foreign import createFriendshipImpl ∷ ∀ e. StringId → StringId → Eff e Unit
 foreign import confirmFriendshipImpl ∷ ∀ e. StringId → StringId → Eff e Unit
+
+foreign import newPendingDebtImpl ∷ ∀ e. StringId → StringId → Number → String → Description → Eff e Unit
+--foreign import pendingDebts ∷ DebtLookupFn
+
 foreign import getNameImpl ∷ NameLookupFn
 foreign import setNameImpl ∷ ∀ e. String → Eff e Unit
 
@@ -97,16 +97,6 @@ friends (FoundationId fi) = do
   friendList ← makeAff (\error success → friendsImpl success fi)
   pure $ FoundationId <$> friendList
 
-getDebtOrPending ∷ ∀ e. DebtLookupFn → EthAddress → EthAddress → Aff e FriendDebt
-getDebtOrPending lookupFnImpl (EthAddress d) (EthAddress c) = do
-  m ← makeAff (\err succ → lookupFnImpl succ d c)
-  pure $ newDebt (EthAddress c) m
-
-allDebtOrPending ∷ ∀ e. DebtLookupFn → EthAddress → Array EthAddress
-                 → Aff e (Array FriendDebt)
-allDebtOrPending lookupFn debtor creditors =
-  traverse (getDebtOrPending lookupFn debtor) creditors
-
 createFriendship ∷ FoundationId → MonadF Unit
 createFriendship (FoundationId newFriend) = do
   (FoundationId myId) ← foundationId
@@ -117,35 +107,13 @@ confirmFriendship (FoundationId newFriend) = do
   (FoundationId myId) ← foundationId
   liftEff $ confirmFriendshipImpl myId newFriend
 
-confirmedFriends ∷ MonadF (Array FoundationId)
-confirmedFriends = do
-  fi ← foundationId
-  liftAff $ friends fi
-
-currentUserDebts ∷ Array EthAddress → MonadF (Array FriendDebt)
-currentUserDebts friendList = do
-  cu ← currentUser
-  liftAff $ allDebtOrPending friendDebtImpl cu friendList
-
-currentUserPending ∷ Array EthAddress → MonadF (Array FriendDebt)
-currentUserPending friendList = do
-  cu ← currentUser
-  liftAff $ allDebtOrPending friendPendingImpl cu friendList
-
-currentUserSentPendings ∷ Array EthAddress → MonadF (Array FriendDebt)
-currentUserSentPendings friendList = do
-  cu ← currentUser
-  liftAff $ traverse
-    (\f → (flipDebt ∘ (changeDebtor f)) <$> getDebtOrPending friendPendingImpl f cu)
-    friendList
-
 pendingFriends ∷ ∀ a. (FoundationId → FoundationId → Boolean)
                  → MonadF (Array FoundationId)
-pendingFriends compFn = do
+pendingFriends comparisonFn = do
   (FoundationId fi) ← foundationId
   friendList ← liftAff $ makeAff (\err succ → pendingFriendshipsImpl succ fi)
   pure $ A.catMaybes $ (g (FoundationId fi)) <$> friendList
-    where g myId pending = if compFn (FoundationId pending.confirmerId) myId
+    where g myId pending = if comparisonFn (FoundationId pending.confirmerId) myId
                            then Just (FoundationId pending.friendId)
                            else Nothing
 
@@ -155,21 +123,19 @@ pendingFriendsSent = pendingFriends (/=)
 pendingFriendsTodo ∷ MonadF (Array FoundationId)
 pendingFriendsTodo = pendingFriends (==)
 
-newPending ∷ FriendDebt → MonadF Unit
-newPending (FriendDebt debtor) = do
-  (EthAddress user) ← currentUser
-  liftEff $ newPendingImpl (getUa debtor.friend) (amount debtor.debt)
+confirmedFriends ∷ MonadF (Array FoundationId)
+confirmedFriends = do
+  fi ← foundationId
+  liftAff $ friends fi
 
-confirmPending ∷ FriendDebt → MonadF Unit
-confirmPending (FriendDebt fd) = do
-  cu ← currentUser
-  liftEff $ confirmPendingImpl (getUa fd.friend) (amount fd.debt)
+newPendingDebt ∷ FoundationId → FoundationId → Money → Description → MonadF Unit
+newPendingDebt (FoundationId debtor) (FoundationId creditor) m desc = do
+  fi ← foundationId
+  liftEff $ newPendingDebtImpl debtor creditor (amount m) (currencyCode m) desc
 
-cancelPending ∷ ∀ e. EthAddress → MonadF Unit
-cancelPending (EthAddress user) = do
-  checkAndInit
-  liftEff $ cancelPendingImpl user
+--REDO EVERYTHING BELOW HERE
 
+{- FriendInDebtNS -}
 getName ∷ ∀ e. EthAddress → Aff e (Maybe UserName)
 getName (EthAddress ua) = do
   userName ← makeAff (\err succ → getNameImpl succ ua)

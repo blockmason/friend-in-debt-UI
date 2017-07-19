@@ -24,8 +24,8 @@ import Network.Eth.Foundation      (FoundationId(..))
 
 type StringAddr = String
 type StringId   = String
-type DummyVal   = String
 type UserName   = String
+type Description = String
 
 -- error
 data Error = NoMetamask
@@ -44,6 +44,7 @@ instance ordMoney ∷ Ord Money where
 
 amount ∷ Money → Number
 amount (Money m) = m
+currencyCode (Money m) = "USD"
 absMoney ∷ Money → Money
 absMoney (Money m) = Money $ abs m
 mkNegative ∷ Money → Money
@@ -99,3 +100,11 @@ instance ordEthAddress ∷ Ord EthAddress where
   compare (EthAddress ua1) (EthAddress ua2) = localeCompare ua1 ua2
 getUa ∷ EthAddress → String
 getUa (EthAddress ua) = ua
+
+
+--raw JS Object types
+type RawDebt = { friend     ∷ StringAddr
+               , debt       ∷ Int
+               , debtId     ∷ Int
+               , desc       ∷ String
+               , currency   ∷ String }
