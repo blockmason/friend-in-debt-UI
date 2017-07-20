@@ -97,13 +97,13 @@ component =
       , HH.div
         [ HP.class_ $ HH.ClassName "all-balances-container" ]
         [
-          HH.ul_ $ displayBalanceLi <$> [mockBalance, mockBalance]
+          HH.ul_ $ (displayBalanceLi mockMe) <$> [mockBalance, mockBalance]
         ]
       , HH.div
         [ HP.class_ $ HH.ClassName "all-pending-debts-container" ]
         [
-          HH.ul_ $ displaySentDebtsList [fakeDebt, fakeDebt],
-          HH.ul_ $ displayTodoList [fakeDebt, fakeDebt]
+          HH.ul_ $ (displaySentDebtsList mockMe) [fakeDebt, fakeDebt],
+          HH.ul_ $ (displayTodoList mockMe) [fakeDebt, fakeDebt]
         ]
       , HH.div
         [ HP.class_ $ HH.ClassName "add-friend-name-change-container" ]
@@ -240,53 +240,53 @@ displayFriendLi n =
 
 -- Balance List
 
-displayBalanceLi :: F.Balance → H.ComponentHTML Query
-displayBalanceLi (F.Balance bal) =
+displayBalanceLi :: F.FoundationId → F.Balance → H.ComponentHTML Query
+displayBalanceLi (me)(F.Balance bal) =
   HH.li [HP.class_ $ HH.ClassName "balance-row"]
   [
-    HH.text $ show bal.debtor,
-    HH.a [HP.href "#", HE.onClick $ HE.input_ $ ShowItemizedDebtFor $ show bal.creditor] [HH.text $ show bal.creditor],
+    idSpan me bal.debtor,
+    idSpan me bal.creditor,
     verboseMoneySpan bal.amount
   ]
 
 -- Pending Debts List
-displaySentDebtsList :: Array F.Debt → Array (H.ComponentHTML Query)
-displaySentDebtsList debts = [HH.ul_ $ displaySentDebtLi <$> debts]
+displaySentDebtsList :: F.FoundationId → Array F.Debt → Array (H.ComponentHTML Query)
+displaySentDebtsList me debts = [HH.ul_ $ (displaySentDebtLi me) <$> debts]
 
-displaySentDebtLi ∷ F.Debt → H.ComponentHTML Query
-displaySentDebtLi fd =
+displaySentDebtLi ∷ F.FoundationId → F.Debt → H.ComponentHTML Query
+displaySentDebtLi me fd =
   HH.li [HP.class_ $ HH.ClassName "debt-row"] $
-  displaySentDebt fd
+  (displaySentDebt me) fd
 
-displaySentDebt :: F.Debt → Array (H.ComponentHTML Query)
-displaySentDebt fd =
+displaySentDebt :: F.FoundationId → F.Debt → Array (H.ComponentHTML Query)
+displaySentDebt me fd =
   let (F.Debt fd') = fd
   in [HH.div
       [HP.class_ $ HH.ClassName "debt-details"]
       [
-        HH.text $ show fd'.debtor,
-        HH.a [HP.href "#", HE.onClick $ HE.input_ $ ShowItemizedDebtFor $ show fd'.creditor] [HH.text $ show fd'.creditor],
+        idSpan me fd'.debtor,
+        idSpan me fd'.creditor,
         descSpan fd,
         debtAmountSpan fd
       ]
     ]
 
-displayTodoList :: Array F.Debt → Array (H.ComponentHTML Query)
-displayTodoList debts = [HH.ul_ $ displayTodoLi <$> debts]
+displayTodoList :: F.FoundationId → Array F.Debt → Array (H.ComponentHTML Query)
+displayTodoList me debts = [HH.ul_ $ (displayTodoLi me) <$> debts]
 
-displayTodoLi ∷ F.Debt → H.ComponentHTML Query
-displayTodoLi fd =
+displayTodoLi ∷  F.FoundationId → F.Debt → H.ComponentHTML Query
+displayTodoLi me fd =
   HH.li [HP.class_ $ HH.ClassName "debt-row"] $
-  displayTodo fd
+  (displayTodo me) fd
 
-displayTodo :: F.Debt → Array (H.ComponentHTML Query)
-displayTodo fd =
+displayTodo ::  F.FoundationId → F.Debt → Array (H.ComponentHTML Query)
+displayTodo me fd =
   let (F.Debt fd') = fd
   in [HH.div
       [HP.class_ $ HH.ClassName "debt-details"]
       [
-        HH.text $ show fd'.debtor,
-        HH.a [HP.href "#", HE.onClick $ HE.input_ $ ShowItemizedDebtFor $ show fd'.creditor] [HH.text $ show fd'.creditor],
+        idSpan me fd'.debtor,
+        idSpan me fd'.creditor,
         descSpan fd,
         debtAmountSpan fd,
         cancelButton fd,
@@ -296,6 +296,13 @@ displayTodo fd =
 
 
 -- Helper components
+idSpan :: F.FoundationId → F.FoundationId → H.ComponentHTML Query
+idSpan me idToDisplay =
+  let isItMe = me == idToDisplay
+  in case isItMe of
+    true → HH.text $ show "Me"
+    false → HH.a [HP.href "#", HE.onClick $ HE.input_ $ ShowItemizedDebtFor $ show idToDisplay] [HH.text $ show idToDisplay]
+
 descSpan ∷ F.Debt → H.ComponentHTML Query
 descSpan (F.Debt fd) =
   HH.span [] [ HH.text $ fd.desc ]
@@ -410,14 +417,17 @@ mockNameMap = M.insert (F.FoundationId "bob") "Bob Brown" $ M.empty
 fakeDebt :: F.Debt
 fakeDebt = F.mockDebt $ F.FoundationId "bob"
 
+mockMe :: F.FoundationId
+mockMe = (F.FoundationId "me")
+
 fakeFriend :: F.FoundationId
-fakeFriend = (F.FoundationId "me")
+fakeFriend = (F.FoundationId "TerribleFriend")
 
 mockDebtMap :: DebtMap
 mockDebtMap = M.insert (F.FoundationId "bob") fakeDebt $ M.empty
 
 mockBalance :: F.Balance
-mockBalance = F.Balance { debtor: fakeFriend, creditor: fakeFriend, amount: F.Money {amount: 5.0, currency: F.USD}}
+mockBalance = F.Balance { debtor: mockMe, creditor: fakeFriend, amount: F.Money {amount: 5.0, currency: F.USD}}
 
 mockPendingDebts :: F.PendingDebts
 mockPendingDebts = F.PD {sent: [fakeDebt], todo: [fakeDebt]}
