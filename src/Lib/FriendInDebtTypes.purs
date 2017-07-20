@@ -85,6 +85,10 @@ numAmount (Money m) = m.amount
 strCurrency ∷ Money → String
 strCurrency (Money m) = show m.currency
 
+-- rewrite this function using currency converter
+mockConvertCurrency :: Money → Currency → Money
+mockConvertCurrency (m) (c) = m
+
 newtype Balance = Balance { debtor     ∷ FoundationId
                           , creditor   ∷ FoundationId
                           , amount     ∷ Money }
@@ -130,10 +134,16 @@ mkDebt d c toC amount dId desc = Debt { debtor: d, creditor: c, debt: amount
                                   , debtId: dId, desc: desc, toConfirm: toC}
 zeroDebt ∷ Currency → FoundationId → FoundationId → FoundationId → Debt
 zeroDebt cur debtor creditor toConfirm = mkDebt debtor creditor toConfirm (mkMoney 0.0 (show cur)) NoDebtId ""
+mockFoundationId :: FoundationId
+mockFoundationId = FoundationId "0x0"
+mockDebt :: Debt
+mockDebt = mkDebt mockFoundationId mockFoundationId mockFoundationId (mkMoney 2.0 (show USD)) NoDebtId "mock debt"
 fdDebt ∷ Debt → Money
 fdDebt (Debt fd) = fd.debt
 setDebt ∷ Debt → Number → String → Debt
 setDebt (Debt fd) val currency = Debt $ fd { debt = mkMoney val currency}
+getDesc :: Debt -> String
+getDesc (Debt d) = d.desc
 debtToConfirm ∷ Debt → FoundationId
 debtToConfirm (Debt d) = d.toConfirm
 debtCounterparty ∷ FoundationId → Debt → FoundationId

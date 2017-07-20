@@ -6844,8 +6844,8 @@ var PS = {};
   });
   var showMoney = new Data_Show.Show(function (v) {
       return (function () {
-          var $32 = v.amount < Data_Int.toNumber(0);
-          if ($32) {
+          var $35 = v.amount < Data_Int.toNumber(0);
+          if ($35) {
               return "-";
           };
           return "";
@@ -6888,14 +6888,14 @@ var PS = {};
               currency: fromString(currencyCode)
           };
       };
-  };
+  };                                                                                                                                                              
   var rawToBalance = function (fi) {
       return function (rb) {
           var debtorCreditor = function (myId) {
               return function (cpId) {
                   return function (val) {
-                      var $46 = val >= Data_Int.toNumber(0);
-                      if ($46) {
+                      var $52 = val >= Data_Int.toNumber(0);
+                      if ($52) {
                           return new Data_Tuple.Tuple(myId, cpId);
                       };
                       return new Data_Tuple.Tuple(cpId, myId);
