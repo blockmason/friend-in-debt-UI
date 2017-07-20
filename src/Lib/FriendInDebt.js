@@ -119,40 +119,32 @@ exports.pendingDebtsImpl = function(callback) {
     };
 };
 
-/////////////////////////////////
-
-
-exports.friendDebtImpl = function(callback) {
-    return function(debtor) {
-        return function(creditor) {
+exports.confirmDebtImpl = function(myId) {
+    return function(friendId) {
+        return function(debtId) {
             return function() {
                 FriendInDebt.deployed().then(function(instance) {
-                    return instance.getBalance.call(debtor, creditor);
-                }).then(function(res) {
-                    callback(res.toNumber())();
+                    return instance.confirmDebt(myId, friendId, debtId);
                 });
             };
         };
     };
 };
 
-exports.confirmPendingImpl = function(creditor) {
-    return function(amount) {
-        return function() {
-            FriendInDebt.deployed().then(function(instance) {
-                return instance.confirmPending(creditor, amount);
-            });
+exports.rejectDebtImpl = function(myId) {
+    return function(friendId) {
+        return function(debtId) {
+            return function() {
+                FriendInDebt.deployed().then(function(instance) {
+                    return instance.rejectDebt(myId, friendId, debtId);
+                });
+            };
         };
     };
 };
 
-exports.cancelPendingImpl = function(creditor) {
-    return function() {
-        FriendInDebt.deployed().then(function(instance) {
-            return instance.cancelPending(creditor);
-        });
-    };
-};
+/* Name Space Functions */
+
 
 exports.getNameImpl = function(callback) {
     return function(user) {

@@ -28,13 +28,26 @@ type UserName   = String
 type Description = String
 
 -- error
-data Error = NoMetamask
+data Error =
+    NoMetamask
+  | InvalidDebtId
+  | NoFoundationId
+
 instance showError ∷ Show Error where
-  show NoMetamask = "NoMetamask: Metamask not logged in."
+  show NoMetamask     = "FriendInDebtError: Metamask not logged in."
+  show InvalidDebtId  = "FriendInDebtError: InvalidDebtId"
+  show NoFoundationId = "FriendInDebtError: NoFoundationId"
 
 data DebtId =
     DebtId Number
   | NoDebtId
+isValidDebtId ∷ DebtId → Boolean
+isValidDebtId NoDebtId = false
+isValidDebtId _        = true
+
+getDebtId ∷ DebtId → Number
+getDebtId (DebtId id) = id
+getDebtId _           = -1.0
 
 -- money
 data Currency =

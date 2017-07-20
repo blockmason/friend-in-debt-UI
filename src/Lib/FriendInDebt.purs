@@ -12,6 +12,8 @@ module Network.Eth.FriendInDebt
        , pendingFriendships
 
        , newPendingDebt
+       , confirmPendingDebt
+       , rejectPendingDebt
        , debtBalances
        , pendingDebts
 
@@ -55,6 +57,7 @@ type PendingFriend = { friendId    ∷ StringId
 
 type IdLookupFn   = ∀ e. (StringId → Eff e Unit) → Eff e Unit
 type BalanceLookupFn = ∀ e. (Array RawBalance → Eff e Unit) → StringId → Eff e Unit
+type HandleDebtFn = ∀ e. StringId → StringId → Number → Eff e Unit
 type DebtLookupFn = ∀ e. (Array RawDebt → Eff e Unit) → StringId → Eff e Unit
 type NameLookupFn = ∀ e. (String → Eff e Unit) → StringAddr → Eff e Unit
 type FriendsLookupFn = ∀ e. ((Array StringId) → Eff e Unit) → StringId → Eff e Unit
@@ -69,7 +72,10 @@ foreign import pendingFriendshipsImpl ∷ PendingFriendsFn
 foreign import createFriendshipImpl ∷ ∀ e. StringId → StringId → Eff e Unit
 foreign import confirmFriendshipImpl ∷ ∀ e. StringId → StringId → Eff e Unit
 
-foreign import newPendingDebtImpl ∷ ∀ e. StringId → StringId → Number → String → Description → Eff e Unit
+foreign import newPendingDebtImpl ∷ ∀ e. StringId → StringId → Number → String
+                                  → Description → Eff e Unit
+foreign import confirmDebtImpl  ∷ HandleDebtFn
+foreign import rejectDebtImpl   ∷ HandleDebtFn
 foreign import debtBalancesImpl ∷ BalanceLookupFn
 foreign import pendingDebtsImpl ∷ DebtLookupFn
 
@@ -127,8 +133,20 @@ confirmedFriends = do
 
 newPendingDebt ∷ FoundationId → FoundationId → Money → Description → MonadF Unit
 newPendingDebt (FoundationId debtor) (FoundationId creditor) m desc = do
-  fi ← foundationId
   liftEff $ newPendingDebtImpl debtor creditor (numAmount m) (strCurrency m) desc
+
+handleDebt ∷ HandleDebtFn → FoundationId → DebtId → MonadF Unit
+handleDebt handleDebtFn (FoundationId friendId) debtId = do
+  (FoundationId myId) ← foundationId
+  if isValidDebtId debtId
+    then liftEff $ handleDebtFn myId friendId (getDebtId debtId)
+    else throwError InvalidDebtId
+
+confirmPendingDebt ∷ FoundationId → DebtId → MonadF Unit
+confirmPendingDebt = handleDebt confirmDebtImpl
+
+rejectPendingDebt  ∷ FoundationId → DebtId → MonadF Unit
+rejectPendingDebt  = handleDebt rejectDebtImpl
 
 debtBalances ∷ MonadF (Array Balance)
 debtBalances = do

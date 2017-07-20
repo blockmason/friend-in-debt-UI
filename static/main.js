@@ -6777,6 +6777,7 @@ var PS = {};
   var Data_Map = PS["Data.Map"];
   var Data_Maybe = PS["Data.Maybe"];
   var Data_Ord = PS["Data.Ord"];
+  var Data_Ring = PS["Data.Ring"];
   var Data_Semigroup = PS["Data.Semigroup"];
   var Data_Semiring = PS["Data.Semiring"];
   var Data_Show = PS["Data.Show"];
@@ -6793,6 +6794,20 @@ var PS = {};
       };
       NoMetamask.value = new NoMetamask();
       return NoMetamask;
+  })();
+  var InvalidDebtId = (function () {
+      function InvalidDebtId() {
+
+      };
+      InvalidDebtId.value = new InvalidDebtId();
+      return InvalidDebtId;
+  })();
+  var NoFoundationId = (function () {
+      function NoFoundationId() {
+
+      };
+      NoFoundationId.value = new NoFoundationId();
+      return NoFoundationId;
   })();
   var DebtId = (function () {
       function DebtId(value0) {
@@ -6829,15 +6844,24 @@ var PS = {};
   });
   var showMoney = new Data_Show.Show(function (v) {
       return (function () {
-          var $30 = v.amount < Data_Int.toNumber(0);
-          if ($30) {
+          var $32 = v.amount < Data_Int.toNumber(0);
+          if ($32) {
               return "-";
           };
           return "";
       })() + Data_Format_Money.formatDollar($$Math.abs(v.amount));
   });
   var showError = new Data_Show.Show(function (v) {
-      return "NoMetamask: Metamask not logged in.";
+      if (v instanceof NoMetamask) {
+          return "FriendInDebtError: Metamask not logged in.";
+      };
+      if (v instanceof InvalidDebtId) {
+          return "FriendInDebtError: InvalidDebtId";
+      };
+      if (v instanceof NoFoundationId) {
+          return "FriendInDebtError: NoFoundationId";
+      };
+      throw new Error("Failed pattern match at Network.Eth.FriendInDebt.Types line 37, column 3 - line 38, column 3: " + [ v.constructor.name ]);
   });
   var showDebt = new Data_Show.Show(function (v) {
       return Data_Show.show(showMoney)(v.debt) + (": " + (Data_Show.show(Network_Eth_Foundation.showFoundationId)(v.debtor) + (" " + Data_Show.show(Network_Eth_Foundation.showFoundationId)(v.creditor))));
@@ -6870,8 +6894,8 @@ var PS = {};
           var debtorCreditor = function (myId) {
               return function (cpId) {
                   return function (val) {
-                      var $41 = val >= Data_Int.toNumber(0);
-                      if ($41) {
+                      var $46 = val >= Data_Int.toNumber(0);
+                      if ($46) {
                           return new Data_Tuple.Tuple(myId, cpId);
                       };
                       return new Data_Tuple.Tuple(cpId, myId);
@@ -6904,6 +6928,8 @@ var PS = {};
   exports["Invalid"] = Invalid;
   exports["DebtId"] = DebtId;
   exports["NoMetamask"] = NoMetamask;
+  exports["InvalidDebtId"] = InvalidDebtId;
+  exports["NoFoundationId"] = NoFoundationId;
   exports["debtToConfirm"] = debtToConfirm;
   exports["fromString"] = fromString;
   exports["mkMoney"] = mkMoney;
@@ -6983,22 +7009,22 @@ var PS = {};
       })))(function (v1) {
           return Control_Applicative.pure(Control_Monad_Except_Trans.applicativeExceptT(Control_Monad_Aff.monadAff))(Data_Functor.map(Data_Functor.functorArray)(Network_Eth_FriendInDebt_Types.rawToBalance(v))(v1));
       });
-  });
+  });                                                         
   var pendingDebts = Control_Bind.bind(Control_Monad_Except_Trans.bindExceptT(Control_Monad_Aff.monadAff))(foundationId)(function (v) {
       return Control_Bind.bind(Control_Monad_Except_Trans.bindExceptT(Control_Monad_Aff.monadAff))(Control_Monad_Aff_Class.liftAff(Control_Monad_Aff_Class.monadAffExceptT(Control_Monad_Aff_Class.monadAffAff))(Control_Monad_Aff.makeAff(function (err) {
           return function (succ) {
               return $foreign.pendingDebtsImpl(succ)(v);
           };
       })))(function (v1) {
-          var sent = function ($78) {
+          var sent = function ($83) {
               return Data_Array.filter(function (d) {
                   return Data_Eq.notEq(Network_Eth_Foundation.eqFoundationId)(v)(Network_Eth_FriendInDebt_Types.debtToConfirm(d));
-              })(Data_Functor.map(Data_Functor.functorArray)(Network_Eth_FriendInDebt_Types.rawToDebt)($78));
+              })(Data_Functor.map(Data_Functor.functorArray)(Network_Eth_FriendInDebt_Types.rawToDebt)($83));
           };
-          var todo = function ($79) {
+          var todo = function ($84) {
               return Data_Array.filter(function (d) {
                   return Data_Eq.eq(Network_Eth_Foundation.eqFoundationId)(v)(Network_Eth_FriendInDebt_Types.debtToConfirm(d));
-              })(Data_Functor.map(Data_Functor.functorArray)(Network_Eth_FriendInDebt_Types.rawToDebt)($79));
+              })(Data_Functor.map(Data_Functor.functorArray)(Network_Eth_FriendInDebt_Types.rawToDebt)($84));
           };
           return Control_Applicative.pure(Control_Monad_Except_Trans.applicativeExceptT(Control_Monad_Aff.monadAff))({
               todo: todo(v1), 
