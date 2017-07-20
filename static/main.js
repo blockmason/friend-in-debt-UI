@@ -6992,11 +6992,17 @@ var PS = {};
       return Control_Monad_Error_Class.throwError(Control_Monad_Except_Trans.monadThrowExceptT(Control_Monad_Aff.monadAff))(Network_Eth_FriendInDebt_Types.NoMetamask.value);
   });
   var foundationId = Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_Except_Trans.bindExceptT(Control_Monad_Aff.monadAff))(checkAndInit)(function () {
-      return Control_Monad_Aff_Class.liftAff(Control_Monad_Aff_Class.monadAffExceptT(Control_Monad_Aff_Class.monadAffAff))(Data_Functor.map(Control_Monad_Aff.functorAff)(Network_Eth_Foundation.FoundationId)(Control_Monad_Aff.makeAff(function (err) {
+      return Control_Bind.bind(Control_Monad_Except_Trans.bindExceptT(Control_Monad_Aff.monadAff))(Control_Monad_Aff_Class.liftAff(Control_Monad_Aff_Class.monadAffExceptT(Control_Monad_Aff_Class.monadAffAff))(Control_Monad_Aff.makeAff(function (err) {
           return function (succ) {
               return $foreign.getMyFoundationIdImpl(succ);
           };
-      })));
+      })))(function (v) {
+          var $47 = v === "";
+          if ($47) {
+              return Control_Monad_Error_Class.throwError(Control_Monad_Except_Trans.monadThrowExceptT(Control_Monad_Aff.monadAff))(Network_Eth_FriendInDebt_Types.NoFoundationId.value);
+          };
+          return Control_Applicative.pure(Control_Monad_Except_Trans.applicativeExceptT(Control_Monad_Aff.monadAff))(v);
+      });
   });
   var confirmedFriends = Control_Bind.bind(Control_Monad_Except_Trans.bindExceptT(Control_Monad_Aff.monadAff))(foundationId)(function (v) {
       return Control_Monad_Aff_Class.liftAff(Control_Monad_Aff_Class.monadAffExceptT(Control_Monad_Aff_Class.monadAffAff))(friends(v));
@@ -7016,15 +7022,15 @@ var PS = {};
               return $foreign.pendingDebtsImpl(succ)(v);
           };
       })))(function (v1) {
-          var sent = function ($83) {
+          var sent = function ($86) {
               return Data_Array.filter(function (d) {
                   return Data_Eq.notEq(Network_Eth_Foundation.eqFoundationId)(v)(Network_Eth_FriendInDebt_Types.debtToConfirm(d));
-              })(Data_Functor.map(Data_Functor.functorArray)(Network_Eth_FriendInDebt_Types.rawToDebt)($83));
+              })(Data_Functor.map(Data_Functor.functorArray)(Network_Eth_FriendInDebt_Types.rawToDebt)($86));
           };
-          var todo = function ($84) {
+          var todo = function ($87) {
               return Data_Array.filter(function (d) {
                   return Data_Eq.eq(Network_Eth_Foundation.eqFoundationId)(v)(Network_Eth_FriendInDebt_Types.debtToConfirm(d));
-              })(Data_Functor.map(Data_Functor.functorArray)(Network_Eth_FriendInDebt_Types.rawToDebt)($84));
+              })(Data_Functor.map(Data_Functor.functorArray)(Network_Eth_FriendInDebt_Types.rawToDebt)($87));
           };
           return Control_Applicative.pure(Control_Monad_Except_Trans.applicativeExceptT(Control_Monad_Aff.monadAff))({
               todo: todo(v1), 

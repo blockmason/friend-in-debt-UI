@@ -97,7 +97,8 @@ currentUser = do
 foundationId ∷ MonadF FoundationId
 foundationId = do
   checkAndInit
-  liftAff $ FoundationId <$> (makeAff (\err succ → getMyFoundationIdImpl succ))
+  fid ← liftAff $ makeAff (\err succ → getMyFoundationIdImpl succ)
+  if fid == "" then throwError NoFoundationId else pure $ FoundationId fid
 
 friends ∷ ∀ e. FoundationId → Aff e (Array FoundationId)
 friends (FoundationId fi) = do
