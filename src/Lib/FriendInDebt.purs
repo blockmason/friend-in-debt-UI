@@ -2,7 +2,6 @@ module Network.Eth.FriendInDebt
        (
          FID
        , runMonadF
-       , PendingDebt
        , module Network.Eth.FriendInDebt.Types
        , module Network.Eth.Foundation
 
@@ -10,8 +9,7 @@ module Network.Eth.FriendInDebt
        , confirmedFriends
        , createFriendship
        , confirmFriendship
-       , pendingFriendsSent
-       , pendingFriendsTodo
+       , pendingFriendships
 
        , newPendingDebt
        , debtBalances
@@ -57,6 +55,7 @@ type PendingFriend = { friendId    ∷ StringId
 
 type IdLookupFn   = ∀ e. (StringId → Eff e Unit) → Eff e Unit
 type BalanceLookupFn = ∀ e. (Array RawBalance → Eff e Unit) → StringId → Eff e Unit
+type DebtLookupFn = ∀ e. (Array RawDebt → Eff e Unit) → StringId → Eff e Unit
 type NameLookupFn = ∀ e. (String → Eff e Unit) → StringAddr → Eff e Unit
 type FriendsLookupFn = ∀ e. ((Array StringId) → Eff e Unit) → StringId → Eff e Unit
 type PendingFriendsFn = ∀ e. ((Array PendingFriend) → Eff e Unit) → StringAddr → Eff e Unit
@@ -72,6 +71,7 @@ foreign import confirmFriendshipImpl ∷ ∀ e. StringId → StringId → Eff e 
 
 foreign import newPendingDebtImpl ∷ ∀ e. StringId → StringId → Number → String → Description → Eff e Unit
 foreign import debtBalancesImpl ∷ BalanceLookupFn
+foreign import pendingDebtsImpl ∷ DebtLookupFn
 
 foreign import getNameImpl ∷ NameLookupFn
 foreign import setNameImpl ∷ ∀ e. String → Eff e Unit
@@ -108,21 +108,17 @@ confirmFriendship (FoundationId newFriend) = do
   (FoundationId myId) ← foundationId
   liftEff $ confirmFriendshipImpl myId newFriend
 
-pendingFriends ∷ ∀ a. (FoundationId → FoundationId → Boolean)
-                 → MonadF (Array FoundationId)
-pendingFriends comparisonFn = do
+pendingFriendships ∷ MonadF PendingFriendships
+pendingFriendships = do
   (FoundationId fi) ← foundationId
   friendList ← liftAff $ makeAff (\err succ → pendingFriendshipsImpl succ fi)
-  pure $ A.catMaybes $ (g (FoundationId fi)) <$> friendList
-    where g myId pending = if comparisonFn (FoundationId pending.confirmerId) myId
-                           then Just (FoundationId pending.friendId)
-                           else Nothing
-
-pendingFriendsSent ∷ MonadF (Array FoundationId)
-pendingFriendsSent = pendingFriends (/=)
-
-pendingFriendsTodo ∷ MonadF (Array FoundationId)
-pendingFriendsTodo = pendingFriends (==)
+  let myId = FoundationId fi
+      friendList' = (\f → Tuple (FoundationId f.confirmerId) (FoundationId f.friendId))
+        <$> friendList
+      todo = A.filter (\(Tuple cid _) → myId == cid) friendList'
+      sent = A.filter (\(Tuple cid _) → myId /= cid) friendList'
+  pure $ PF { todo: (\(Tuple _ fid) → fid) <$> todo
+            , sent: (\(Tuple _ fid) → fid) <$> sent }
 
 confirmedFriends ∷ MonadF (Array FoundationId)
 confirmedFriends = do
@@ -140,15 +136,14 @@ debtBalances = do
   rawBalances ← liftAff $ makeAff (\err succ → debtBalancesImpl succ myId)
   pure $ (rawToBalance (FoundationId myId)) <$> rawBalances
 
-type PendingDebts = { sent ∷ Array Debt, todo ∷ ArrayDebt }
 pendingDebts ∷ MonadF PendingDebts
 pendingDebts = do
   (FoundationId fi) ← foundationId
   debtList ← liftAff $ makeAff (\err succ → pendingDebtsImpl succ fi)
   let myId = FoundationId fi
-      todo = (A.filter (\d → myId == (debtToConfirm d))) ∘ (A.map rawToDebt)
-      sent = (A.filter (\d → myId /= (debtToConfirm d))) ∘ (A.map rawToDebt)
-  in pure { todo: todo, sent: sent }
+      todo = (A.filter (\d → myId == (debtToConfirm d)) ∘ (map rawToDebt))
+      sent = (A.filter (\d → myId /= (debtToConfirm d)) ∘ (map rawToDebt))
+  pure $ PD { todo: todo debtList, sent: sent debtList }
 
 --pendingDebtsSent ∷ MonadF (Array Debt)
 

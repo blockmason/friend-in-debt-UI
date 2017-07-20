@@ -72,7 +72,8 @@ ui =
         [
           HH.div [ HP.class_ (HH.ClassName "col") ]
           [
-            HH.slot' CP.cp1 unit D.component state.errorBus absurd
+            HH.text "timtime"
+--            HH.slot' CP.cp1 unit D.component state.errorBus absurd
           ]
         ]
       , HH.div [ HP.class_ (HH.ClassName "row toolbar") ]
@@ -137,7 +138,7 @@ refreshMetamask ∷ ∀ e. H.ParentDSL State Query ChildQuery ChildSlot Void (FI
 refreshMetamask = do
   mmStatus ← MM.loggedIn <$> (H.liftEff MM.checkStatus)
   if mmStatus
-    then do _ ← H.query' CP.cp1 unit (D.RefreshDebts unit)
+    then do -- _ ← H.query' CP.cp1 unit (D.RefreshDebts unit)
             newmmStatus ← MM.loggedIn <$> (H.liftEff MM.checkStatus)
             H.modify (_ { loggedIn = newmmStatus })
     else do H.modify (_ { loggedIn = mmStatus })
@@ -160,15 +161,17 @@ startCheckInterval maybeBus ms = do
 
 runTests = do
   (H.liftAff $ F.runMonadF $ F.foundationId)       >>= hLog
-  v ← H.liftAff $ myComputation
-  hLog v
-  (H.liftAff $ F.runMonadF $ F.pendingFriendsSent) >>= hLog
-  (H.liftAff $ F.runMonadF $ F.pendingFriendsTodo) >>= hLog
+  (H.liftAff $ F.runMonadF $ F.pendingFriendships) >>= hLog
   (H.liftAff $ F.runMonadF $ F.confirmedFriends)   >>= hLog
---  _ ← H.liftAff $ F.runMonadF $ F.createFriendship (F.FoundationId "timtime")
---  _ ← H.liftAff $ F.runMonadF $ F.confirmFriendship (F.FoundationId "timgalebach")
-  (H.liftAff $ F.runMonadF $ F.debtBalances)   >>= hLog
+  (H.liftAff $ F.runMonadF $ F.pendingDebts)       >>= hLog
+  (H.liftAff $ F.runMonadF $ F.debtBalances)       >>= hLog
   pure unit
+
+mkFriends = do
+  _ ← H.liftAff $ F.runMonadF $ F.createFriendship (F.FoundationId "timtime")
+  _ ← H.liftAff $ F.runMonadF $ F.confirmFriendship (F.FoundationId "timgalebach")
+  pure unit
+
 
 mkDebts = do
   _ ← H.liftAff $ F.runMonadF $ F.newPendingDebt (F.FoundationId "timtime") (F.FoundationId "timgalebach") (F.mkMoney 1200.0 "USD") "hookers"

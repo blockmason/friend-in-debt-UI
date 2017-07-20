@@ -33,7 +33,7 @@ instance showError ∷ Show Error where
   show NoMetamask = "NoMetamask: Metamask not logged in."
 
 data DebtId =
-    DebtId Int
+    DebtId Number
   | NoDebtId
 
 -- money
@@ -83,13 +83,9 @@ rawToBalance fi rb =
   let (Tuple d c) = debtorCreditor fi rb.counterParty rb.amount
   in Balance { amount: mkMoney (abs rb.amount) rb.currency
              , debtor: d, creditor: c }
-  where debtorCreditor fi cpId val = if val >= (toNumber 0)
-                                     then Tuple fi (FoundationId cpId)
-                                     else Tuple (FoundationId cpId) fi
-
-fetch ∷ ∀ e. Aff e Json
-
-bind ∷ ∀ m a b. Monad m => m a → (a → m b) → m b
+  where debtorCreditor myId cpId val = if val >= (toNumber 0)
+                                     then Tuple myId (FoundationId cpId)
+                                     else Tuple (FoundationId cpId) myId
 
 sumMoney ∷ ∀ e. Money → Money → Aff e Money
 sumMoney m1 m2 = pure $ mkMoney ((numAmount m1) + (numAmount m2)) (strCurrency m1)
@@ -111,16 +107,16 @@ rawToDebt ∷ RawDebt → Debt
 rawToDebt rd = Debt { debtId: DebtId rd.id
                     , debtor: FoundationId rd.debtor
                     , creditor: FoundationId rd.creditor
-                    , toConfirm: rd.confirmerId
-                    , debt: mkMoney rd.amount $ fromString rd.currency
-                    , desc: desc }
+                    , toConfirm: FoundationId rd.confirmerId
+                    , debt: mkMoney rd.amount rd.currency
+                    , desc: rd.desc }
 
 mkDebt ∷ FoundationId → FoundationId → FoundationId → Money → DebtId → Description
        → Debt
 mkDebt d c toC amount dId desc = Debt { debtor: d, creditor: c, debt: amount
                                   , debtId: dId, desc: desc, toConfirm: toC}
 zeroDebt ∷ Currency → FoundationId → FoundationId → FoundationId → Debt
-zeroDebt cur debtor creditor toConfirm = mkDebt debtor creditor toConfirm (mkMoney 0.0 cur) NoDebtId ""
+zeroDebt cur debtor creditor toConfirm = mkDebt debtor creditor toConfirm (mkMoney 0.0 (show cur)) NoDebtId ""
 fdDebt ∷ Debt → Money
 fdDebt (Debt fd) = fd.debt
 setDebt ∷ Debt → Number → String → Debt
@@ -154,3 +150,15 @@ type RawDebt = { id          ∷ Number
 type RawBalance = { counterParty ∷ StringId
                   , amount       ∷ Number
                   , currency     ∷ String }
+
+type RawFriendship = { friendId     ∷ StringId
+                     , confirmerId  ∷ StringId }
+
+{- Return Types -}
+newtype PendingFriendships = PF {todo ∷ Array FoundationId, sent ∷ Array FoundationId}
+instance showPendingFriendships ∷ Show PendingFriendships where
+  show (PF pf) = "{todo: " <> show pf.todo <> ", sent: " <> show pf.sent <> "}"
+
+newtype PendingDebts = PD { sent ∷ Array Debt, todo ∷ Array Debt }
+instance showPendingDebts ∷ Show PendingDebts where
+  show (PD pd) = "{todo: " <> show pd.todo <> ", sent: " <> show pd.sent <> "}"

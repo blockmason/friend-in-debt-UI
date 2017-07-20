@@ -1,5 +1,6 @@
 module Debts where
 
+
 import FriendInDebt.Prelude
 import Utils
 import Types (FIDMonad, ContainerMsgBus, ContainerMsg(..), NameMap(..), DebtMap(..))
@@ -23,20 +24,23 @@ import Network.Eth.FriendInDebt as F
 data Query a
   = RefreshDebts a
   | HandleInput Input a
-  | CreateDebt F.FriendDebt a
-  | SendDebt F.EthAddress a
-  | ConfirmPending F.FriendDebt a
-  | CancelPending F.FriendDebt a
+  | CreateDebt F.Debt a
+  | SendDebt F.FoundationId a
+  | ConfirmPending F.Debt a
+  | CancelPending F.Debt a
   | AddFriend (Either String F.FoundationId) a
   | InputFriend String a
   | InputName String a
   | UpdateName String a
 
+type Input = ContainerMsgBus
+
+{-
 type State = { friends     ∷ Array F.FoundationId
              , myId        ∷ F.FoundationId
-             , debts       ∷ Array F.FriendDebt
-             , pending     ∷ Array F.FriendDebt
-             , sentPending ∷ Array F.FriendDebt
+             , debts       ∷ Array F.Debt
+             , pending     ∷ Array F.Debt
+             , sentPending ∷ Array F.Debt
              , creating    ∷ DebtMap
              , names       ∷ NameMap
              , newFriend   ∷ Either String F.FoundationId
@@ -45,7 +49,6 @@ type State = { friends     ∷ Array F.FoundationId
              , loading     ∷ Boolean
              , errorBus    ∷ ContainerMsgBus }
 
-type Input = ContainerMsgBus
 
 component ∷ ∀ eff. H.Component HH.HTML Query Input Void (FIDMonad eff)
 component =
@@ -127,6 +130,7 @@ component =
     HandleInput input next → do
       H.modify (_ { errorBus = input })
       pure next
+
     AddFriend eitherFriendId next → do
       s ← H.get
       case eitherFriendId of
@@ -155,14 +159,14 @@ component =
     SendDebt creditor next → do
       s ← H.get
       pure next
-      {-
+
       let key = creditor
       case M.lookup key s.creating of
         Nothing   → pure next
         Just debt → do handleFIDCall s.errorBus unit (F.newPendingDebt debt)
                        H.modify (_ { creating = M.delete key s.creating })
                        pure next
--}
+
     ConfirmPending debt next → do
       s ← H.get
   --    handleFIDCall s.errorBus unit (F.confirmPending debt)
@@ -174,10 +178,12 @@ component =
       s ← H.get
 --      handleFIDCall s.errorBus unit (F.cancelPending debt.friend)
       pure next
+
     RefreshDebts next → do
       errorBus ← H.gets _.errorBus
 --      loadFriendsAndDebts errorBus
       pure next
+
 
 refreshButton =
   HH.button [ HE.onClick $ HE.input_ $ RefreshDebts
@@ -351,3 +357,5 @@ handleFIDCall errorBus blankVal fidAffCall = do
         Left error → do _ ← H.liftAff $ Bus.write (FIDError error) b
                         pure blankVal
         Right val  → pure val
+
+-}

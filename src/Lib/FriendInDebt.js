@@ -107,6 +107,18 @@ exports.debtBalancesImpl = function(callback) {
     };
 };
 
+exports.pendingDebtsImpl = function(callback) {
+    return function(foundationId) {
+        return function() {
+            FriendInDebt.deployed().then(function(instance) {
+                return instance.pendingDebts.call(foundationId);
+            }).then(function(res) {
+                callback(pendingDebts2Js(res.valueOf()))();
+            });
+        };
+    };
+};
+
 /////////////////////////////////
 
 
@@ -116,20 +128,6 @@ exports.friendDebtImpl = function(callback) {
             return function() {
                 FriendInDebt.deployed().then(function(instance) {
                     return instance.getBalance.call(debtor, creditor);
-                }).then(function(res) {
-                    callback(res.toNumber())();
-                });
-            };
-        };
-    };
-};
-
-exports.friendPendingImpl = function(callback) {
-    return function(debtor) {
-        return function(creditor) {
-            return function() {
-                FriendInDebt.deployed().then(function(instance) {
-                    return instance.getPendingAmount.call(debtor, creditor);
                 }).then(function(res) {
                     callback(res.toNumber())();
                 });

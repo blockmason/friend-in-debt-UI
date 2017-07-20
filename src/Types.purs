@@ -16,8 +16,8 @@ import Control.Monad.Eff.Exception (EXCEPTION)
 import Network.Eth.Metamask (MetamaskStatus(..), METAMASK)
 import Network.Eth.FriendInDebt as F
 
-type NameMap = M.Map F.EthAddress String
-type DebtMap = M.Map F.EthAddress F.FriendDebt
+type NameMap = M.Map F.FoundationId String
+type DebtMap = M.Map F.FoundationId F.Debt
 
 ------------------- App Monad(s) ---------------------------
 type FIDMonad eff = (Aff (exception ∷ EXCEPTION, timer ∷ TIMER, random ∷ RANDOM, avar ∷ AVAR, console ∷ CONSOLE, ajax ∷ AJAX, fid ∷ F.FID, metamask ∷ METAMASK | eff))
