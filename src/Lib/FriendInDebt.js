@@ -143,14 +143,12 @@ exports.rejectDebtImpl = function(myId) {
     };
 };
 
-/* Name Space Functions */
-
-
+/* FriendInDebtNS Functions */
 exports.getNameImpl = function(callback) {
-    return function(user) {
+    return function(foundationId) {
         return function() {
             FriendInDebtNS.deployed().then(function(instance) {
-                return instance.getName.call(user);
+                return instance.getName.call(foundationId);
             }).then(function(res) {
                 callback(res.valueOf())();
             });
@@ -159,10 +157,12 @@ exports.getNameImpl = function(callback) {
 };
 
 exports.setNameImpl = function(newName) {
-    return function() {
-        FriendInDebtNS.deployed().then(function(instance) {
-            return instance.setName(newName);
-        });
+    return function(foundationId) {
+        return function() {
+            FriendInDebtNS.deployed().then(function(instance) {
+                return instance.setName(newName, foundationId);
+            });
+        };
     };
 };
 

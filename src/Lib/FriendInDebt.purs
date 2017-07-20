@@ -33,7 +33,7 @@ import Control.Monad.Aff.Class     (liftAff)
 import Control.Monad.Aff           (Aff, makeAff)
 import Control.Monad.Except.Trans  (ExceptT, throwError, runExceptT, lift)
 import Data.Either                 (Either(Left, Right))
-import Data.Maybe                  (Maybe(..), fromMaybe)
+import Data.Maybe                  (Maybe(..), maybe)
 import Data.Traversable            (traverse)
 import Data.Format.Money           (formatDollar)
 import Data.Int                    (toNumber)
@@ -59,7 +59,7 @@ type IdLookupFn   = ∀ e. (StringId → Eff e Unit) → Eff e Unit
 type BalanceLookupFn = ∀ e. (Array RawBalance → Eff e Unit) → StringId → Eff e Unit
 type HandleDebtFn = ∀ e. StringId → StringId → Number → Eff e Unit
 type DebtLookupFn = ∀ e. (Array RawDebt → Eff e Unit) → StringId → Eff e Unit
-type NameLookupFn = ∀ e. (String → Eff e Unit) → StringAddr → Eff e Unit
+type NameLookupFn = ∀ e. (String → Eff e Unit) → StringId → Eff e Unit
 type FriendsLookupFn = ∀ e. ((Array StringId) → Eff e Unit) → StringId → Eff e Unit
 type PendingFriendsFn = ∀ e. ((Array PendingFriend) → Eff e Unit) → StringAddr → Eff e Unit
 
@@ -164,56 +164,28 @@ pendingDebts = do
       sent = (A.filter (\d → myId /= (debtToConfirm d)) ∘ (map rawToDebt))
   pure $ PD { todo: todo debtList, sent: sent debtList }
 
---pendingDebtsSent ∷ MonadF (Array Debt)
-
---pendingDebtsTodo ∷ MonadF (Array Debt)
-
-
 {- FriendInDebtNS -}
-getName ∷ ∀ e. EthAddress → Aff e (Maybe UserName)
-getName (EthAddress ua) = do
-  userName ← makeAff (\err succ → getNameImpl succ ua)
+getName ∷ ∀ e. FoundationId → Aff e (Maybe UserName)
+getName (FoundationId fi) = do
+  userName ← makeAff (\err succ → getNameImpl succ fi)
   if userName == "" then pure Nothing else pure $ Just userName
 
-getCurrentUserName ∷ ∀ e. MonadF (Either EthAddress UserName)
+getCurrentUserName ∷ ∀ e. MonadF (Either FoundationId UserName)
 getCurrentUserName = do
-  cu ← currentUser
-  maybeName ← liftAff $ getName cu
-  case maybeName of
-    Nothing → pure $ Left cu
-    Just n  → pure $ Right n
+  myId ← foundationId
+  (liftAff $ getName myId) >>= (pure ∘ (maybe (Left myId) Right))
 
 setCurrentUserName ∷ ∀ e. UserName → MonadF Unit
 setCurrentUserName userNameStr = do
   checkAndInit
   liftEff $ setNameImpl userNameStr
 
-allNames ∷ ∀ e. Array EthAddress → MonadF (M.Map EthAddress UserName)
+allNames ∷ ∀ e. Array FoundationId → MonadF (M.Map FoundationId UserName)
 allNames friendList = do
-  cu ← currentUser
-  let allUsers = friendList <> [cu]
+  myId ← foundationId
+  let allUsers = friendList <> [myId]
   names ← liftAff $ traverse getName $ allUsers
   pure $ foldr f M.empty $ A.zip allUsers names
   where f (Tuple address userName) map = insertMap map address userName
         insertMap map address Nothing         = map
         insertMap map address (Just userName) = M.insert address userName map
-
-
-{-
-to modify:
-currentUserDebts
--
-currentUserPending
-currentUserSentPendings
-currentUserFriends
-get/set UserName
-
-newPending
-confirmPending
-cancelPending
-
-to add:
--description fetching
--confirm debts by debtId
-
--}

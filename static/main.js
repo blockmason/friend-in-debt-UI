@@ -6997,8 +6997,8 @@ var PS = {};
               return $foreign.getMyFoundationIdImpl(succ);
           };
       })))(function (v) {
-          var $47 = v === "";
-          if ($47) {
+          var $42 = v === "";
+          if ($42) {
               return Control_Monad_Error_Class.throwError(Control_Monad_Except_Trans.monadThrowExceptT(Control_Monad_Aff.monadAff))(Network_Eth_FriendInDebt_Types.NoFoundationId.value);
           };
           return Control_Applicative.pure(Control_Monad_Except_Trans.applicativeExceptT(Control_Monad_Aff.monadAff))(v);
@@ -7022,15 +7022,15 @@ var PS = {};
               return $foreign.pendingDebtsImpl(succ)(v);
           };
       })))(function (v1) {
-          var sent = function ($86) {
+          var sent = function ($83) {
               return Data_Array.filter(function (d) {
                   return Data_Eq.notEq(Network_Eth_Foundation.eqFoundationId)(v)(Network_Eth_FriendInDebt_Types.debtToConfirm(d));
-              })(Data_Functor.map(Data_Functor.functorArray)(Network_Eth_FriendInDebt_Types.rawToDebt)($86));
+              })(Data_Functor.map(Data_Functor.functorArray)(Network_Eth_FriendInDebt_Types.rawToDebt)($83));
           };
-          var todo = function ($87) {
+          var todo = function ($84) {
               return Data_Array.filter(function (d) {
                   return Data_Eq.eq(Network_Eth_Foundation.eqFoundationId)(v)(Network_Eth_FriendInDebt_Types.debtToConfirm(d));
-              })(Data_Functor.map(Data_Functor.functorArray)(Network_Eth_FriendInDebt_Types.rawToDebt)($87));
+              })(Data_Functor.map(Data_Functor.functorArray)(Network_Eth_FriendInDebt_Types.rawToDebt)($84));
           };
           return Control_Applicative.pure(Control_Monad_Except_Trans.applicativeExceptT(Control_Monad_Aff.monadAff))({
               todo: todo(v1), 
