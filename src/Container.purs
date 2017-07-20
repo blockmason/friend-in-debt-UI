@@ -75,8 +75,7 @@ ui =
         [
           HH.div [ HP.class_ (HH.ClassName "col") ]
           [
-            -- HH.text "timtime"
-           HH.slot' CP.cp1 unit D.component state.errorBus SetScreen
+           HH.slot' CP.cp1 unit D.component state.errorBus $ HE.input SetScreen
           ]
         ]
       , HH.div [ HP.class_ (HH.ClassName "row toolbar") ]
