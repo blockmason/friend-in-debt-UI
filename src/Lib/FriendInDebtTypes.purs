@@ -136,8 +136,8 @@ zeroDebt ∷ Currency → FoundationId → FoundationId → FoundationId → Deb
 zeroDebt cur debtor creditor toConfirm = mkDebt debtor creditor toConfirm (mkMoney 0.0 (show cur)) NoDebtId ""
 mockFoundationId :: FoundationId
 mockFoundationId = FoundationId "0x0"
-mockDebt :: Debt
-mockDebt = mkDebt mockFoundationId mockFoundationId mockFoundationId (mkMoney 2.0 (show USD)) NoDebtId "mock debt"
+mockDebt :: FoundationId -> Debt
+mockDebt fid = mkDebt mockFoundationId fid fid (mkMoney 2.0 (show USD)) NoDebtId "Fictional Cat Poop"
 fdDebt ∷ Debt → Money
 fdDebt (Debt fd) = fd.debt
 setDebt ∷ Debt → Number → String → Debt

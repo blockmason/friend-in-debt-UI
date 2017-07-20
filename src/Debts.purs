@@ -87,9 +87,6 @@ component =
     else
       HH.div_
       $ append [
-        -- HH.div
-        -- [ HP.class_ $ HH.ClassName "refresh-button-container" ]
-        -- [ refreshButton ],
       HH.div
         [ HP.class_ $ HH.ClassName "confirm-debts-container" ]
         [ HH.ul_ $ (displayPending state.names) <$> pending]
@@ -103,7 +100,7 @@ component =
       , HH.div
         [ HP.class_ $ HH.ClassName "all-friends-container" ]
         [
-          HH.ul_ $ displayFriendLi <$> friendNames
+          HH.ul_ $ displayFriendLi <$> mockFriendNames
         ]
       , HH.div
         [ HP.class_ $ HH.ClassName "add-friend-name-change-container" ]
@@ -125,7 +122,7 @@ component =
           HH.h5_ [ HH.text "Create Debt" ]
         , HH.ul_ $ (\friend → HH.li_ [ createDebt state.names state.creating state.myId friend]) <$> state.friends
         ]
-      ] $ (itemizedDebtsForFriendContainer state.showItemizedDebtFor) <$> friendNames
+      ] $ (itemizedDebtsForFriendContainer state.showItemizedDebtFor) <$> mockFriendNames
     where pending = filter (\(Tuple _ fd2) -> nonZero fd2) $ zip state.debts state.pending
           friendNames = fromFoldable $ M.values state.names
 
@@ -214,16 +211,31 @@ loadFriendsAndDebts errorBus = do
   H.modify (_ { friends = friends, debts = debts, pending = pending, loading = false
               , sentPending = sentPending, names = names, userName = userName  })
 
+-- Itemized Debts for Friend Page
 itemizedDebtsForFriendContainer :: String → String → H.ComponentHTML Query
 itemizedDebtsForFriendContainer friendToShow nm =
   HH.div
     [ HP.class_ $ HH.ClassName $ "itemized-debts-for-friend", HP.attr (HH.AttrName "style") $ if (nm == friendToShow) then "display: initial" else "display: none" ]
-    [ HH.ul_ $ itemizedDebtLi <$> [F.mockDebt, F.mockDebt]]
+    [ HH.h5_ [ HH.text $ "History with " <> friendToShow <> ":" ],
+      HH.ul_ $ itemizedDebtLi <$> [fakeDebt, fakeDebt]]
+
+itemizedDebtLi ∷ F.Debt → H.ComponentHTML Query
+itemizedDebtLi fd =
+  HH.li [HP.class_ $ HH.ClassName $ moneyClass fd] $
+  itemizedDebt fd
+
+itemizedDebt :: F.Debt → Array (H.ComponentHTML Query)
+itemizedDebt fd =
+  [HH.div [HP.class_ $ HH.ClassName "itemized-debt-amount"][descSpan fd, verboseMoneySpan fd]]
+
+-- Friends List
 
 displayFriendLi ∷ String → H.ComponentHTML Query
 displayFriendLi n =
   HH.li [HP.class_ $ HH.ClassName "friend-row"]
   [HH.a [HP.href "#", HE.onClick $ HE.input_ $ ShowItemizedDebtFor n] [HH.text n]]
+
+
 
 displayFriendDebtLi ∷ NameMap → F.Debt → H.ComponentHTML Query
 displayFriendDebtLi nm fd =
@@ -246,14 +258,6 @@ displayDebt nm (F.Debt fd) =
       fd' = F.Debt fd
   in [HH.div [HP.class_ $ HH.ClassName "confirmation-amount"][nameSpan fd.creditor, moneySpan fd']]
 
-itemizedDebtLi ∷ F.Debt → H.ComponentHTML Query
-itemizedDebtLi fd =
-  HH.li [HP.class_ $ HH.ClassName $ moneyClass fd] $
-  itemizedDebt fd
-
-itemizedDebt :: F.Debt → Array (H.ComponentHTML Query)
-itemizedDebt fd =
-  [HH.div [HP.class_ $ HH.ClassName "confirmation-amount"][descSpan fd, moneySpan fd]]
 
 displayDebtChanges ∷ NameMap → Tuple F.Debt F.Debt → Array (H.ComponentHTML Query)
 displayDebtChanges nm (Tuple originalDebt pendingDebt) =
@@ -276,6 +280,11 @@ currencySpan (F.Debt fd) =
 moneySpan ∷ F.Debt → H.ComponentHTML Query
 moneySpan (F.Debt fd) =
   HH.span [] [ HH.text $ show $ fd.debt ]
+
+verboseMoneySpan ∷ F.Debt → H.ComponentHTML Query
+verboseMoneySpan (F.Debt fd) =
+  let (F.Money d) = fd.debt
+  in HH.span [] [ HH.text $ show d.currency <> " " <> show d.amount]
 
 moneyClass ∷ F.Debt → String
 moneyClass fd = "debt-amount"
@@ -366,3 +375,19 @@ handleFIDCall errorBus blankVal fidAffCall = do
         Left error → do _ ← H.liftAff $ Bus.write (FIDError error) b
                         pure blankVal
         Right val  → pure val
+
+-- Mocks for Testing purposes
+mockFriendNames :: Array String
+mockFriendNames = ["Bob", "Tim", "Kevin"]
+
+mockFriends :: Array F.FoundationId
+mockFriends = [F.FoundationId "bob", F.FoundationId "Tim", F.FoundationId "Kevin"]
+
+mockNameMap :: NameMap
+mockNameMap = M.insert (F.FoundationId "bob") "Bob Brown" $ M.empty
+
+fakeDebt :: F.Debt
+fakeDebt = F.mockDebt $ F.FoundationId "bob"
+
+mockDebtMap :: DebtMap
+mockDebtMap = M.insert (F.FoundationId "bob") fakeDebt $ M.empty

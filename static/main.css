@@ -481,4 +481,18 @@ h1 {
   display: block;
   background: rgba(255,255,255, 0.1);
   margin-bottom: 1px;
+  width: 100%;
+}
+
+.itemized-debts-for-friend li span:last-child {
+  float: right;
+}
+
+.itemized-debts-for-friend ul {
+ width: 100%;
+ padding: 0;
+}
+
+.itemized-debt-amount {
+  width: 100%;
 }
