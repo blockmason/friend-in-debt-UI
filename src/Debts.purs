@@ -38,6 +38,7 @@ type Input = ContainerMsgBus
 type Message = String
 
 type State = { friends     ∷ Array F.FoundationId
+             , balances    ∷ Array F.Balance
              , myId        ∷ F.FoundationId
              , debts       ∷ Array F.Debt
              , pending     ∷ Array F.Debt
@@ -64,6 +65,7 @@ component =
 
   initialState ∷ Input → State
   initialState input = { friends: []
+                       , balances: []
                        , debts: []
                        , myId: (F.FoundationId "")
                        , pending: []
@@ -101,6 +103,11 @@ component =
         [ HP.class_ $ HH.ClassName "all-friends-container" ]
         [
           HH.ul_ $ displayFriendLi <$> mockFriendNames
+        ]
+      , HH.div
+        [ HP.class_ $ HH.ClassName "all-balances-container" ]
+        [
+          HH.ul_ $ displayBalanceLi <$> [mockBalance, mockBalance]
         ]
       , HH.div
         [ HP.class_ $ HH.ClassName "add-friend-name-change-container" ]
@@ -226,7 +233,7 @@ itemizedDebtLi fd =
 
 itemizedDebt :: F.Debt → Array (H.ComponentHTML Query)
 itemizedDebt fd =
-  [HH.div [HP.class_ $ HH.ClassName "itemized-debt-amount"][descSpan fd, verboseMoneySpan fd]]
+  [HH.div [HP.class_ $ HH.ClassName "itemized-debt-amount"][descSpan fd, debtAmountSpan fd]]
 
 -- Friends List
 
@@ -235,7 +242,16 @@ displayFriendLi n =
   HH.li [HP.class_ $ HH.ClassName "friend-row"]
   [HH.a [HP.href "#", HE.onClick $ HE.input_ $ ShowItemizedDebtFor n] [HH.text n]]
 
+-- Balance List
 
+displayBalanceLi :: F.Balance → H.ComponentHTML Query
+displayBalanceLi (F.Balance bal) =
+  HH.li [HP.class_ $ HH.ClassName "balance-row"]
+  [
+    HH.text $ show bal.debtor,
+    HH.a [HP.href "#", HE.onClick $ HE.input_ $ ShowItemizedDebtFor $ show bal.creditor] [HH.text $ show bal.creditor],
+    verboseMoneySpan bal.amount
+  ]
 
 displayFriendDebtLi ∷ NameMap → F.Debt → H.ComponentHTML Query
 displayFriendDebtLi nm fd =
@@ -281,10 +297,13 @@ moneySpan ∷ F.Debt → H.ComponentHTML Query
 moneySpan (F.Debt fd) =
   HH.span [] [ HH.text $ show $ fd.debt ]
 
-verboseMoneySpan ∷ F.Debt → H.ComponentHTML Query
-verboseMoneySpan (F.Debt fd) =
-  let (F.Money d) = fd.debt
-  in HH.span [] [ HH.text $ show d.currency <> " " <> show d.amount]
+debtAmountSpan ∷ F.Debt → H.ComponentHTML Query
+debtAmountSpan (F.Debt fd) =
+  verboseMoneySpan fd.debt
+
+verboseMoneySpan :: F.Money → H.ComponentHTML Query
+verboseMoneySpan (F.Money d) =
+  HH.span [] [ HH.text $ show d.currency <> " " <> show d.amount]
 
 moneyClass ∷ F.Debt → String
 moneyClass fd = "debt-amount"
@@ -389,5 +408,11 @@ mockNameMap = M.insert (F.FoundationId "bob") "Bob Brown" $ M.empty
 fakeDebt :: F.Debt
 fakeDebt = F.mockDebt $ F.FoundationId "bob"
 
+fakeFriend :: F.FoundationId
+fakeFriend = (F.FoundationId "me")
+
 mockDebtMap :: DebtMap
 mockDebtMap = M.insert (F.FoundationId "bob") fakeDebt $ M.empty
+
+mockBalance :: F.Balance
+mockBalance = F.Balance { debtor: fakeFriend, creditor: fakeFriend, amount: F.Money {amount: 5.0, currency: F.USD}}

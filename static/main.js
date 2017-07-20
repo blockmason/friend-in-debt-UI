@@ -8452,7 +8452,7 @@ var PS = {};
       return ShowItemizedDebtFor;
   })();
   var verboseMoneySpan = function (v) {
-      return Halogen_HTML_Elements.span([  ])([ Halogen_HTML_Core.text(Data_Show.show(Network_Eth_FriendInDebt_Types.showCurrency)(v.debt.currency) + (" " + Data_Show.show(Data_Show.showNumber)(v.debt.amount))) ]);
+      return Halogen_HTML_Elements.span([  ])([ Halogen_HTML_Core.text(Data_Show.show(Network_Eth_FriendInDebt_Types.showCurrency)(v.currency) + (" " + Data_Show.show(Data_Show.showNumber)(v.amount))) ]);
   };
   var nonZero = function (fd) {
       return Network_Eth_FriendInDebt_Types.numAmount(Network_Eth_FriendInDebt_Types.fdDebt(fd)) !== Data_Int.toNumber(0);
@@ -8485,15 +8485,24 @@ var PS = {};
                                   if (v instanceof Data_Either.Right) {
                                       return Control_Applicative.pure((dictMonadEff.Monad0()).Applicative0())(v.value0);
                                   };
-                                  throw new Error("Failed pattern match at Debts line 372, column 7 - line 375, column 30: " + [ v.constructor.name ]);
+                                  throw new Error("Failed pattern match at Debts line 393, column 7 - line 396, column 30: " + [ v.constructor.name ]);
                               });
                           };
-                          throw new Error("Failed pattern match at Debts line 366, column 3 - line 375, column 30: " + [ errorBus.constructor.name ]);
+                          throw new Error("Failed pattern match at Debts line 387, column 3 - line 396, column 30: " + [ errorBus.constructor.name ]);
                       };
                   };
               };
           };
       };
+  };
+  var fakeFriend = "me";
+  var mockBalance = {
+      debtor: fakeFriend, 
+      creditor: fakeFriend, 
+      amount: {
+          amount: 5.0, 
+          currency: Network_Eth_FriendInDebt_Types.USD.value
+      }
   };
   var fakeDebt = Network_Eth_FriendInDebt_Types.mockDebt("bob");                                             
   var displayFriendLi = function (n) {
@@ -8517,11 +8526,17 @@ var PS = {};
           return Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_(Halogen_HTML_Core.ClassName(moneyClass(v.value1) + " confirmation-body row")) ])(Data_Semigroup.append(Data_Semigroup.semigroupArray)(displayDebt(nm)(v.value1))(displayDebtChanges(nm)(new Data_Tuple.Tuple(v.value0, v.value1))));
       };
   };
+  var displayBalanceLi = function (v) {
+      return Halogen_HTML_Elements.li([ Halogen_HTML_Properties.class_("balance-row") ])([ Halogen_HTML_Core.text(Data_Show.show(Network_Eth_Foundation.showFoundationId)(v.debtor)), Halogen_HTML_Elements.a([ Halogen_HTML_Properties.href("#"), Halogen_HTML_Events.onClick(Halogen_HTML_Events.input_(ShowItemizedDebtFor.create(Data_Show.show(Network_Eth_Foundation.showFoundationId)(v.creditor)))) ])([ Halogen_HTML_Core.text(Data_Show.show(Network_Eth_Foundation.showFoundationId)(v.creditor)) ]), verboseMoneySpan(v.amount) ]);
+  };
   var descSpan = function (v) {
       return Halogen_HTML_Elements.span([  ])([ Halogen_HTML_Core.text(v.desc) ]);
   };
+  var debtAmountSpan = function (v) {
+      return verboseMoneySpan(v.debt);
+  };
   var itemizedDebt = function (fd) {
-      return [ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("itemized-debt-amount") ])([ descSpan(fd), verboseMoneySpan(fd) ]) ];
+      return [ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("itemized-debt-amount") ])([ descSpan(fd), debtAmountSpan(fd) ]) ];
   };
   var itemizedDebtLi = function (fd) {
       return Halogen_HTML_Elements.li([ Halogen_HTML_Properties.class_(Halogen_HTML_Core.ClassName(moneyClass(fd))) ])(itemizedDebt(fd));
@@ -8529,8 +8544,8 @@ var PS = {};
   var itemizedDebtsForFriendContainer = function (friendToShow) {
       return function (nm) {
           return Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_(Halogen_HTML_Core.ClassName("itemized-debts-for-friend")), Halogen_HTML_Properties.attr("style")((function () {
-              var $66 = nm === friendToShow;
-              if ($66) {
+              var $69 = nm === friendToShow;
+              if ($69) {
                   return "display: initial";
               };
               return "display: none";
@@ -8573,13 +8588,14 @@ var PS = {};
           if (state.loading) {
               return Halogen_HTML_Elements.span_([ Halogen_HTML_Elements.h6_([ Halogen_HTML_Core.text("Loading debt info...") ]), Halogen_HTML_Elements.img([ Halogen_HTML_Properties.src("loading.gif"), Halogen_HTML_Properties.width(25) ]) ]);
           };
-          return Halogen_HTML_Elements.div_(Data_Semigroup.append(Data_Semigroup.semigroupArray)([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("confirm-debts-container") ])([ Halogen_HTML_Elements.ul_(Data_Functor.map(Data_Functor.functorArray)(displayPending(state.names))(pending)) ]), Halogen_HTML_Elements.h1_([ Halogen_HTML_Core.text("Current Debts") ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("all-friends-container") ])([ Halogen_HTML_Elements.ul_(Data_Functor.map(Data_Functor.functorArray)(displayFriendLi)(mockFriendNames)) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("add-friend-name-change-container") ])([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("add-friend-container") ])([ addFriendWidget(state) ]) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("create-debt-container") ])([ Halogen_HTML_Elements.h5_([ Halogen_HTML_Core.text("Create Debt") ]), Halogen_HTML_Elements.ul_(Data_Functor.map(Data_Functor.functorArray)(function (friend) {
+          return Halogen_HTML_Elements.div_(Data_Semigroup.append(Data_Semigroup.semigroupArray)([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("confirm-debts-container") ])([ Halogen_HTML_Elements.ul_(Data_Functor.map(Data_Functor.functorArray)(displayPending(state.names))(pending)) ]), Halogen_HTML_Elements.h1_([ Halogen_HTML_Core.text("Current Debts") ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("all-friends-container") ])([ Halogen_HTML_Elements.ul_(Data_Functor.map(Data_Functor.functorArray)(displayFriendLi)(mockFriendNames)) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("all-balances-container") ])([ Halogen_HTML_Elements.ul_(Data_Functor.map(Data_Functor.functorArray)(displayBalanceLi)([ mockBalance, mockBalance ])) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("add-friend-name-change-container") ])([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("add-friend-container") ])([ addFriendWidget(state) ]) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("create-debt-container") ])([ Halogen_HTML_Elements.h5_([ Halogen_HTML_Core.text("Create Debt") ]), Halogen_HTML_Elements.ul_(Data_Functor.map(Data_Functor.functorArray)(function (friend) {
               return Halogen_HTML_Elements.li_([ createDebt(state.names)(state.creating)(state.myId)(friend) ]);
           })(state.friends)) ]) ])(Data_Functor.map(Data_Functor.functorArray)(itemizedDebtsForFriendContainer(state.showItemizedDebtFor))(mockFriendNames)));
       };
       var initialState = function (input) {
           return {
               friends: [  ], 
+              balances: [  ], 
               debts: [  ], 
               myId: "", 
               pending: [  ], 
@@ -8598,14 +8614,14 @@ var PS = {};
       var $$eval = function (v) {
           if (v instanceof ShowItemizedDebtFor) {
               return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.modify(Halogen_Query_HalogenM.monadStateHalogenM)(function (v1) {
-                  var $78 = {};
-                  for (var $79 in v1) {
-                      if ({}.hasOwnProperty.call(v1, $79)) {
-                          $78[$79] = v1[$79];
+                  var $81 = {};
+                  for (var $82 in v1) {
+                      if ({}.hasOwnProperty.call(v1, $82)) {
+                          $81[$82] = v1[$82];
                       };
                   };
-                  $78.showItemizedDebtFor = v.value0;
-                  return $78;
+                  $81.showItemizedDebtFor = v.value0;
+                  return $81;
               }))(function () {
                   return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(Halogen_Query_HalogenM.raise("show-itemized-debt"))(function () {
                       return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value1);
@@ -8614,14 +8630,14 @@ var PS = {};
           };
           if (v instanceof HandleInput) {
               return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.modify(Halogen_Query_HalogenM.monadStateHalogenM)(function (v1) {
-                  var $83 = {};
-                  for (var $84 in v1) {
-                      if ({}.hasOwnProperty.call(v1, $84)) {
-                          $83[$84] = v1[$84];
+                  var $86 = {};
+                  for (var $87 in v1) {
+                      if ({}.hasOwnProperty.call(v1, $87)) {
+                          $86[$87] = v1[$87];
                       };
                   };
-                  $83.errorBus = v.value0;
-                  return $83;
+                  $86.errorBus = v.value0;
+                  return $86;
               }))(function () {
                   return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value1);
               });
@@ -8633,47 +8649,47 @@ var PS = {};
                   };
                   if (v.value0 instanceof Data_Either.Right) {
                       return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.modify(Halogen_Query_HalogenM.monadStateHalogenM)(function (v2) {
-                          var $91 = {};
-                          for (var $92 in v2) {
-                              if ({}.hasOwnProperty.call(v2, $92)) {
-                                  $91[$92] = v2[$92];
+                          var $94 = {};
+                          for (var $95 in v2) {
+                              if ({}.hasOwnProperty.call(v2, $95)) {
+                                  $94[$95] = v2[$95];
                               };
                           };
-                          $91.newFriend = new Data_Either.Left("");
-                          return $91;
+                          $94.newFriend = new Data_Either.Left("");
+                          return $94;
                       }))(function () {
                           return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(handleFIDCall(Halogen_Query_HalogenM.bindHalogenM)(Halogen_Query_HalogenM.monadEffHalogenM(Control_Monad_Aff.monadEffAff))(Halogen_Query_HalogenM.monadAffHalogenM(Control_Monad_Aff_Class.monadAffAff))(v1.errorBus)(Data_Unit.unit)(Network_Eth_FriendInDebt.createFriendship(v.value0.value0)))(function () {
                               return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value1);
                           });
                       });
                   };
-                  throw new Error("Failed pattern match at Debts line 141, column 7 - line 146, column 20: " + [ v.value0.constructor.name ]);
+                  throw new Error("Failed pattern match at Debts line 148, column 7 - line 153, column 20: " + [ v.value0.constructor.name ]);
               });
           };
           if (v instanceof InputFriend) {
               return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)((function () {
-                  var $97 = Data_String.length(v.value0) > 3;
-                  if ($97) {
+                  var $100 = Data_String.length(v.value0) > 3;
+                  if ($100) {
                       return Control_Monad_State_Class.modify(Halogen_Query_HalogenM.monadStateHalogenM)(function (v1) {
-                          var $98 = {};
-                          for (var $99 in v1) {
-                              if ({}.hasOwnProperty.call(v1, $99)) {
-                                  $98[$99] = v1[$99];
+                          var $101 = {};
+                          for (var $102 in v1) {
+                              if ({}.hasOwnProperty.call(v1, $102)) {
+                                  $101[$102] = v1[$102];
                               };
                           };
-                          $98.newFriend = Data_Either.Right.create(v.value0);
-                          return $98;
+                          $101.newFriend = Data_Either.Right.create(v.value0);
+                          return $101;
                       });
                   };
                   return Control_Monad_State_Class.modify(Halogen_Query_HalogenM.monadStateHalogenM)(function (v1) {
-                      var $101 = {};
-                      for (var $102 in v1) {
-                          if ({}.hasOwnProperty.call(v1, $102)) {
-                              $101[$102] = v1[$102];
+                      var $104 = {};
+                      for (var $105 in v1) {
+                          if ({}.hasOwnProperty.call(v1, $105)) {
+                              $104[$105] = v1[$105];
                           };
                       };
-                      $101.newFriend = new Data_Either.Left(v.value0);
-                      return $101;
+                      $104.newFriend = new Data_Either.Left(v.value0);
+                      return $104;
                   });
               })())(function () {
                   return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value1);
@@ -8681,14 +8697,14 @@ var PS = {};
           };
           if (v instanceof InputName) {
               return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.modify(Halogen_Query_HalogenM.monadStateHalogenM)(function (v1) {
-                  var $106 = {};
-                  for (var $107 in v1) {
-                      if ({}.hasOwnProperty.call(v1, $107)) {
-                          $106[$107] = v1[$107];
+                  var $109 = {};
+                  for (var $110 in v1) {
+                      if ({}.hasOwnProperty.call(v1, $110)) {
+                          $109[$110] = v1[$110];
                       };
                   };
-                  $106.inputName = v.value0;
-                  return $106;
+                  $109.inputName = v.value0;
+                  return $109;
               }))(function () {
                   return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value1);
               });
@@ -8697,14 +8713,14 @@ var PS = {};
               return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.get(Halogen_Query_HalogenM.monadStateHalogenM))(function (v1) {
                   return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(handleFIDCall(Halogen_Query_HalogenM.bindHalogenM)(Halogen_Query_HalogenM.monadEffHalogenM(Control_Monad_Aff.monadEffAff))(Halogen_Query_HalogenM.monadAffHalogenM(Control_Monad_Aff_Class.monadAffAff))(v1.errorBus)(Data_Unit.unit)(Network_Eth_FriendInDebt.setCurrentUserName(v1.inputName)))(function () {
                       return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.modify(Halogen_Query_HalogenM.monadStateHalogenM)(function (v2) {
-                          var $112 = {};
-                          for (var $113 in v2) {
-                              if ({}.hasOwnProperty.call(v2, $113)) {
-                                  $112[$113] = v2[$113];
+                          var $115 = {};
+                          for (var $116 in v2) {
+                              if ({}.hasOwnProperty.call(v2, $116)) {
+                                  $115[$116] = v2[$116];
                               };
                           };
-                          $112.inputName = "";
-                          return $112;
+                          $115.inputName = "";
+                          return $115;
                       }))(function () {
                           return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value1);
                       });
@@ -8740,7 +8756,7 @@ var PS = {};
                   return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value0);
               });
           };
-          throw new Error("Failed pattern match at Debts line 130, column 10 - line 190, column 16: " + [ v.constructor.name ]);
+          throw new Error("Failed pattern match at Debts line 137, column 10 - line 197, column 16: " + [ v.constructor.name ]);
       };
       return Halogen_Component.component(Halogen_HTML_Core.bifunctorHTML)({
           initialState: initialState, 
@@ -8765,17 +8781,21 @@ var PS = {};
   exports["component"] = component;
   exports["confirmButton"] = confirmButton;
   exports["createDebt"] = createDebt;
+  exports["debtAmountSpan"] = debtAmountSpan;
   exports["descSpan"] = descSpan;
+  exports["displayBalanceLi"] = displayBalanceLi;
   exports["displayDebt"] = displayDebt;
   exports["displayDebtChanges"] = displayDebtChanges;
   exports["displayFriendDebtSpan"] = displayFriendDebtSpan;
   exports["displayFriendLi"] = displayFriendLi;
   exports["displayPending"] = displayPending;
   exports["fakeDebt"] = fakeDebt;
+  exports["fakeFriend"] = fakeFriend;
   exports["handleFIDCall"] = handleFIDCall;
   exports["itemizedDebt"] = itemizedDebt;
   exports["itemizedDebtLi"] = itemizedDebtLi;
   exports["itemizedDebtsForFriendContainer"] = itemizedDebtsForFriendContainer;
+  exports["mockBalance"] = mockBalance;
   exports["mockFriendNames"] = mockFriendNames;
   exports["moneyClass"] = moneyClass;
   exports["moneySpan"] = moneySpan;
