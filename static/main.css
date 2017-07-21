@@ -138,7 +138,6 @@ html {
   display: none !important;
 }
 
-
 .show-balances .create-debt-container,
 .show-balances .add-friend-name-change-container,
 .show-balances .all-settings-container,
@@ -197,23 +196,27 @@ html {
   display: none  !important;
 }
 
-.show-create-debt .confirm-debts-container,
-.show-create-debt .current-debts-container,
-.show-create-debt .add-friend-container,
-.show-create-debt .name-change-container,
-.show-create-debt .itemized-debts-for-friend,
-.show-create-debt #header,
 .show-create-debt .all-friends-container,
-.show-create-debt .add-friend-name-change-container {
+.show-create-debt .all-balances-container,
+.show-create-debt .all-settings-container,
+.show-create-debt .all-pending-debts-container,
+.show-create-debt .itemized-debts-for-friend,
+.show-create-debt .add-friend-name-change-container,
+.show-create-debt .add-friend-bar,
+.show-create-debt #header,
+.show-create-debt .create-debt-bar  {
   display: none !important;
 }
 
-.show-add-friend .confirm-debts-container,
-.show-add-friend .current-debts-container,
-.show-add-friend .create-debt-container,
+.show-add-friend .all-friends-container,
+.show-add-friend .all-balances-container,
+.show-add-friend .all-settings-container,
+.show-add-friend .all-pending-debts-container,
 .show-add-friend .itemized-debts-for-friend,
+.show-add-friend .create-debt-container,
+.show-add-friend .add-friend-bar,
 .show-add-friend #header,
-.show-add-friend .all-friends-container {
+.show-add-friend .create-debt-bar  {
   display: none !important;
 }
 
@@ -360,4 +363,44 @@ html {
 .default-currency-container span, .foundation-id-container span {
   float: right;
   opacity: 0.8;
+}
+
+/*create debt*/
+
+.create-debt-container ul {
+  padding: 0;
+  list-style: none;
+}
+
+.createDebt input, .add-friend-container input,
+.name-change-container input{
+  background: transparent;
+  border: 1px dotted white;
+  border-radius: 5px;
+  margin: 0 5px 0 0;
+}
+
+.createDebt button, .add-friend-container button,
+.name-change-container button{
+  background: rgba(255,255,255, 0.1);
+  border: 0;
+  border-radius: 5px;
+  margin: 0 5px 0 0;
+  box-shadow: 0 1px 1px 1px rgba(0,0,0,0.1);
+}
+
+.createDebt button .confirmation-amount {
+  display: inline-block;
+}
+
+.create-debt-card, .addFriend {
+  margin: 10px;
+  background: rgba(0,0,0,0.1);
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.create-debt-card input, .addFriend input {
+  color: black;
+  background: white;
 }

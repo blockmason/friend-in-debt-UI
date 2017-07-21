@@ -139,7 +139,7 @@ component =
         [ HP.class_ $ HH.ClassName "create-debt-container" ]
         [
           HH.h5_ [ HH.text "Create Debt" ]
-        , HH.ul_ $ (\friend → HH.li_ [ createDebt state.names state.creating state.myId friend]) <$> state.friends
+        , HH.ul_ $ (\friend → HH.li [ HP.class_ $ HH.ClassName "row create-debt-card" ] [ createDebt state.names state.creating state.myId friend]) <$> [fakeFriend, fakeFriend]
         ]
       ] $ (itemizedDebtsForFriendContainer state.showItemizedDebtFor) <$> mockFriendNames
     where pending = filter (\(Tuple _ fd2) -> nonZero fd2) $ zip state.debts state.pending
@@ -371,15 +371,16 @@ cancelButton fd = HH.button [ HP.class_ $ HH.ClassName "btn-cancel"
 
 addFriendWidget ∷ State → H.ComponentHTML Query
 addFriendWidget state =
-  HH.div [ HP.class_ $ HH.ClassName "addFriend" ]
+  HH.div [ HP.class_ $ HH.ClassName "addFriend row col" ]
   [
     HH.input [ HP.type_ HP.InputText
              , HP.value $ inputVal state.newFriend
+             , HP.class_ $ HH.ClassName "col"
              , HE.onValueInput
                (HE.input (\val → InputFriend val))
              ]
   , HH.button [ HE.onClick $ HE.input_ $ AddFriend state.newFriend
-              , HP.class_ $ HH.ClassName "btn-info"]
+              , HP.class_ $ HH.ClassName "col-2"]
     [ HH.text "Add Friend by Address" ]
   ]
   where inputVal = either id show
@@ -404,18 +405,22 @@ nonZero fd = ((F.numAmount ∘ F.fdDebt) fd) /= (toNumber 0)
 createDebt ∷ NameMap → DebtMap → F.FoundationId → F.FoundationId → H.ComponentHTML Query
 createDebt nm creating myId friend =
   let fd = fromMaybe (F.zeroDebt F.USD myId friend friend) $ M.lookup friend creating
-  in HH.div [ HP.class_ $ HH.ClassName "createDebt" ]
-     [ HH.text "$"
-     , HH.input [ HP.type_ HP.InputNumber
---                , HP.class_ $ HH.ClassName $ reverseMoneyClass $ fd
+  in HH.div [ HP.class_ $ HH.ClassName "createDebt col row" ]
+     [
+      HH.input [  HP.type_ HP.InputNumber
+                , HP.class_ $ HH.ClassName "debt-amount col-2"
                 , HP.value "0"
 --                , HE.onValueInput
 --                  (HE.input (\val → CreateDebt $ mkDebt friend val))
                 , HP.min $ toNumber (-1000000)
                 , HP.max $ toNumber 1000000]
-     ,   HH.button [ HE.onClick $ HE.input_ $ SendDebt friend
-                   , HP.class_ $ HH.ClassName "btn-info"]
-         [HH.text "Debt: "]
+     , HH.input [ HP.type_ HP.InputText
+                , HP.class_ $ HH.ClassName "debt-description col "
+                , HP.placeholder $ "debt description"
+                , HP.value ""]
+     , HH.button [ HE.onClick $ HE.input_ $ SendDebt friend
+                , HP.class_ $ HH.ClassName "create-debt-button col-2"]
+       [HH.text $ "Debt " <> show friend]
      ]
 
 numberFromString ∷ String → Number
@@ -438,7 +443,7 @@ handleFIDCall errorBus blankVal fidAffCall = do
 
 -- Mocks for Testing purposes
 mockFriendNames :: Array String
-mockFriendNames = ["Bob", "Tim", "Kevin"]
+mockFriendNames = ["bob", "tim", "kevin"]
 
 mockFriends :: Array F.FoundationId
 mockFriends = [F.FoundationId "bob", F.FoundationId "Tim", F.FoundationId "Kevin"]
@@ -453,7 +458,7 @@ mockMe :: F.FoundationId
 mockMe = (F.FoundationId "me")
 
 fakeFriend :: F.FoundationId
-fakeFriend = (F.FoundationId "TerribleFriend")
+fakeFriend = (F.FoundationId "bob")
 
 mockDebtMap :: DebtMap
 mockDebtMap = M.insert (F.FoundationId "bob") fakeDebt $ M.empty
