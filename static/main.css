@@ -184,13 +184,16 @@ html {
 .show-settings .create-debt-container,
 .show-settings .add-friend-container,
 .show-settings .itemized-debts-for-friend,
+.show-settings .all-balances-container,
+.show-settings .all-pending-debts-container,
+.show-settings .all-friends-container,
 .show-settings .name-change-container,
 .show-settings .confirm-debts-container,
 .show-settings .current-debts-container,
 .show-settings .add-friend-name-change-container,
 .show-settings .back-nav-bar,
-.show-settings .add-friend-bar,
-.show-settings .create-debt-bar {
+.show-settings .create-debt-bar,
+.show-settings .add-friend-bar {
   display: none  !important;
 }
 
@@ -344,4 +347,17 @@ html {
 
 .debt-details {
   margin: 0;
+}
+
+/* settings page */
+.default-currency-container, .foundation-id-container {
+  height: 30px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 5px;
+  margin: 10px;
+}
+
+.default-currency-container span, .foundation-id-container span {
+  float: right;
+  opacity: 0.8;
 }

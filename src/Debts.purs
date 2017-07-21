@@ -114,11 +114,17 @@ component =
         [ HP.class_ $ HH.ClassName "all-settings-container" ]
         [
           HH.div
-            [HP.class_ $ HH.ClassName "default-currency-container"]
-            [HH.text  $ "Default Currency: " <> show state.defaultCurrency],
-          HH.div
-            [HP.class_ $ HH.ClassName "foundation-id-container"]
-            [HH.text $  "My Foundation Id: " <> show state.myId]
+            [HP.class_ $ HH.ClassName "col default-currency-container"]
+            [
+              (HH.text  $ "Default Currency: "),
+              HH.span [] [ HH.text $ show state.defaultCurrency ]
+            ]
+          , HH.div
+            [HP.class_ $ HH.ClassName "col foundation-id-container"]
+            [
+              (HH.text  $ "My Foundation ID: "),
+              HH.span [] [ HH.text $ show mockMe ]
+            ]
         ]
       , HH.div
         [ HP.class_ $ HH.ClassName "add-friend-name-change-container" ]

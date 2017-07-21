@@ -8471,7 +8471,7 @@ var PS = {};
           if (!isItMe) {
               return Halogen_HTML_Elements.a([ Halogen_HTML_Properties.href("#"), Halogen_HTML_Events.onClick(Halogen_HTML_Events.input_(ShowItemizedDebtFor.create(Data_Show.show(Network_Eth_Foundation.showFoundationId)(idToDisplay)))) ])([ Halogen_HTML_Core.text(Data_Show.show(Network_Eth_Foundation.showFoundationId)(idToDisplay)) ]);
           };
-          throw new Error("Failed pattern match at Debts line 328, column 6 - line 330, column 125: " + [ isItMe.constructor.name ]);
+          throw new Error("Failed pattern match at Debts line 334, column 6 - line 336, column 125: " + [ isItMe.constructor.name ]);
       };
   };
   var handleFIDCall = function (dictBind) {
@@ -8495,10 +8495,10 @@ var PS = {};
                                   if (v instanceof Data_Either.Right) {
                                       return Control_Applicative.pure((dictMonadEff.Monad0()).Applicative0())(v.value0);
                                   };
-                                  throw new Error("Failed pattern match at Debts line 428, column 7 - line 431, column 30: " + [ v.constructor.name ]);
+                                  throw new Error("Failed pattern match at Debts line 434, column 7 - line 437, column 30: " + [ v.constructor.name ]);
                               });
                           };
-                          throw new Error("Failed pattern match at Debts line 422, column 3 - line 431, column 30: " + [ errorBus.constructor.name ]);
+                          throw new Error("Failed pattern match at Debts line 428, column 3 - line 437, column 30: " + [ errorBus.constructor.name ]);
                       };
                   };
               };
@@ -8610,7 +8610,7 @@ var PS = {};
           if (state.loading) {
               return Halogen_HTML_Elements.span_([ Halogen_HTML_Elements.h6_([ Halogen_HTML_Core.text("Loading debt info...") ]), Halogen_HTML_Elements.img([ Halogen_HTML_Properties.src("loading.gif"), Halogen_HTML_Properties.width(25) ]) ]);
           };
-          return Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("page-container col-12") ])(Data_Semigroup.append(Data_Semigroup.semigroupArray)([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("all-friends-container") ])([ Halogen_HTML_Elements.ul([ Halogen_HTML_Properties.class_("col") ])(Data_Functor.map(Data_Functor.functorArray)(displayFriendLi)(mockFriendNames)) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("all-balances-container") ])([ Halogen_HTML_Elements.ul([ Halogen_HTML_Properties.class_("col-12") ])(Data_Functor.map(Data_Functor.functorArray)(displayBalanceLi(mockMe))([ mockBalance, mockBalance ])) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("all-pending-debts-container") ])([ displaySentDebtsList(mockMe)([ fakeDebt, fakeDebt ]), displayTodoList(mockMe)([ fakeDebt, fakeDebt ]) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("all-settings-container") ])([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("default-currency-container") ])([ Halogen_HTML_Core.text("Default Currency: " + Data_Show.show(Network_Eth_FriendInDebt_Types.showCurrency)(state.defaultCurrency)) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("foundation-id-container") ])([ Halogen_HTML_Core.text("My Foundation Id: " + Data_Show.show(Network_Eth_Foundation.showFoundationId)(state.myId)) ]) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("add-friend-name-change-container") ])([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("add-friend-container") ])([ addFriendWidget(state) ]) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("create-debt-container") ])([ Halogen_HTML_Elements.h5_([ Halogen_HTML_Core.text("Create Debt") ]), Halogen_HTML_Elements.ul_(Data_Functor.map(Data_Functor.functorArray)(function (friend) {
+          return Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("page-container col-12") ])(Data_Semigroup.append(Data_Semigroup.semigroupArray)([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("all-friends-container") ])([ Halogen_HTML_Elements.ul([ Halogen_HTML_Properties.class_("col") ])(Data_Functor.map(Data_Functor.functorArray)(displayFriendLi)(mockFriendNames)) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("all-balances-container") ])([ Halogen_HTML_Elements.ul([ Halogen_HTML_Properties.class_("col-12") ])(Data_Functor.map(Data_Functor.functorArray)(displayBalanceLi(mockMe))([ mockBalance, mockBalance ])) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("all-pending-debts-container") ])([ displaySentDebtsList(mockMe)([ fakeDebt, fakeDebt ]), displayTodoList(mockMe)([ fakeDebt, fakeDebt ]) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("all-settings-container") ])([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col default-currency-container") ])([ Halogen_HTML_Core.text("Default Currency: "), Halogen_HTML_Elements.span([  ])([ Halogen_HTML_Core.text(Data_Show.show(Network_Eth_FriendInDebt_Types.showCurrency)(state.defaultCurrency)) ]) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col foundation-id-container") ])([ Halogen_HTML_Core.text("My Foundation ID: "), Halogen_HTML_Elements.span([  ])([ Halogen_HTML_Core.text(Data_Show.show(Network_Eth_Foundation.showFoundationId)(mockMe)) ]) ]) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("add-friend-name-change-container") ])([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("add-friend-container") ])([ addFriendWidget(state) ]) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("create-debt-container") ])([ Halogen_HTML_Elements.h5_([ Halogen_HTML_Core.text("Create Debt") ]), Halogen_HTML_Elements.ul_(Data_Functor.map(Data_Functor.functorArray)(function (friend) {
               return Halogen_HTML_Elements.li_([ createDebt(state.names)(state.creating)(state.myId)(friend) ]);
           })(state.friends)) ]) ])(Data_Functor.map(Data_Functor.functorArray)(itemizedDebtsForFriendContainer(state.showItemizedDebtFor))(mockFriendNames)));
       };
@@ -8685,7 +8685,7 @@ var PS = {};
                           });
                       });
                   };
-                  throw new Error("Failed pattern match at Debts line 154, column 7 - line 159, column 20: " + [ v.value0.constructor.name ]);
+                  throw new Error("Failed pattern match at Debts line 160, column 7 - line 165, column 20: " + [ v.value0.constructor.name ]);
               });
           };
           if (v instanceof InputFriend) {
@@ -8778,7 +8778,7 @@ var PS = {};
                   return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value0);
               });
           };
-          throw new Error("Failed pattern match at Debts line 143, column 10 - line 203, column 16: " + [ v.constructor.name ]);
+          throw new Error("Failed pattern match at Debts line 149, column 10 - line 209, column 16: " + [ v.constructor.name ]);
       };
       return Halogen_Component.component(Halogen_HTML_Core.bifunctorHTML)({
           initialState: initialState, 
