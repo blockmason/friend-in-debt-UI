@@ -32,11 +32,13 @@ data Query a
   | InputFriend String a
   | InputName String a
   | UpdateName String a
+  | ShowItemizedDebtFor String a
 
 type Input = ContainerMsgBus
+type Message = String
 
-{-
 type State = { friends     ∷ Array F.FoundationId
+             , balances    ∷ Array F.Balance
              , myId        ∷ F.FoundationId
              , debts       ∷ Array F.Debt
              , pending     ∷ Array F.Debt
@@ -46,11 +48,12 @@ type State = { friends     ∷ Array F.FoundationId
              , newFriend   ∷ Either String F.FoundationId
              , userName    ∷ Either F.FoundationId F.UserName
              , inputName   ∷ String
+             , showItemizedDebtFor :: String
+             , defaultCurrency :: F.Currency
              , loading     ∷ Boolean
              , errorBus    ∷ ContainerMsgBus }
 
-
-component ∷ ∀ eff. H.Component HH.HTML Query Input Void (FIDMonad eff)
+component ∷ ∀ eff. H.Component HH.HTML Query Input Message (FIDMonad eff)
 component =
   H.component
   { initialState: initialState
@@ -62,6 +65,7 @@ component =
 
   initialState ∷ Input → State
   initialState input = { friends: []
+                       , balances: []
                        , debts: []
                        , myId: (F.FoundationId "")
                        , pending: []
@@ -71,6 +75,8 @@ component =
                        , newFriend: Left ""
                        , userName: (Right "")
                        , inputName: ""
+                       , showItemizedDebtFor: ""
+                       , defaultCurrency: F.USD
                        , loading: false
                        , errorBus: input }
 
@@ -82,24 +88,32 @@ component =
                            , HP.width 25 ] ]
     else
       HH.div_
-      [
-        -- HH.div
-        -- [ HP.class_ $ HH.ClassName "refresh-button-container" ]
-        -- [ refreshButton ],
+      $ append [
       HH.div
-        [ HP.class_ $ HH.ClassName "confirm-debts-container" ]
-        [ HH.ul_ $ (displayPending state.names) <$> pending]
-      , HH.h1_ [ HH.text "Current Debts"]
-      , HH.div
-        [ HP.class_ $ HH.ClassName "current-debts-container" ]
-        [
-          HH.ul_ $ (displayAllDebtLi state.names) <$>
-          (zip state.debts state.sentPending)
-        ]
-      , HH.div
         [ HP.class_ $ HH.ClassName "all-friends-container" ]
         [
-          HH.ul_ $ displayFriendLi <$> friendNames
+          HH.ul_ $ displayFriendLi <$> mockFriendNames
+        ]
+      , HH.div
+        [ HP.class_ $ HH.ClassName "all-balances-container " ]
+        [
+          HH.ul_ $ (displayBalanceLi mockMe) <$> [mockBalance, mockBalance]
+        ]
+      , HH.div
+        [ HP.class_ $ HH.ClassName "all-pending-debts-container" ]
+        [
+          HH.ul_ $ (displaySentDebtsList mockMe) [fakeDebt, fakeDebt],
+          HH.ul_ $ (displayTodoList mockMe) [fakeDebt, fakeDebt]
+        ]
+      , HH.div
+        [ HP.class_ $ HH.ClassName "all-settings-container" ]
+        [
+          HH.div
+            [HP.class_ $ HH.ClassName "default-currency-container"]
+            [HH.text  $ "Default Currency: " <> show state.defaultCurrency],
+          HH.div
+            [HP.class_ $ HH.ClassName "foundation-id-container"]
+            [HH.text $  "My Foundation Id: " <> show state.myId]
         ]
       , HH.div
         [ HP.class_ $ HH.ClassName "add-friend-name-change-container" ]
@@ -109,11 +123,6 @@ component =
             [
               addFriendWidget state
             ]
-          , HH.div
-            [ HP.class_ $ HH.ClassName "name-change-container" ]
-            [
-              nameChangeWidget state.inputName state.userName
-            ]
         ]
       , HH.div
         [ HP.class_ $ HH.ClassName "create-debt-container" ]
@@ -121,12 +130,16 @@ component =
           HH.h5_ [ HH.text "Create Debt" ]
         , HH.ul_ $ (\friend → HH.li_ [ createDebt state.names state.creating state.myId friend]) <$> state.friends
         ]
-      ]
+      ] $ (itemizedDebtsForFriendContainer state.showItemizedDebtFor) <$> mockFriendNames
     where pending = filter (\(Tuple _ fd2) -> nonZero fd2) $ zip state.debts state.pending
           friendNames = fromFoldable $ M.values state.names
 
-  eval ∷ Query ~> H.ComponentDSL State Query Void (FIDMonad eff)
+  eval ∷ Query ~> H.ComponentDSL State Query Message (FIDMonad eff)
   eval = case _ of
+    ShowItemizedDebtFor name next → do
+      H.modify (_ {showItemizedDebtFor = name})
+      H.raise "show-itemized-debt"
+      pure next
     HandleInput input next → do
       H.modify (_ { errorBus = input })
       pure next
@@ -160,12 +173,12 @@ component =
       s ← H.get
       pure next
 
-      let key = creditor
-      case M.lookup key s.creating of
-        Nothing   → pure next
-        Just debt → do handleFIDCall s.errorBus unit (F.newPendingDebt debt)
-                       H.modify (_ { creating = M.delete key s.creating })
-                       pure next
+      -- let key = creditor
+      -- case M.lookup key s.creating of
+      --   Nothing   → pure next
+      --   Just debt → do handleFIDCall s.errorBus unit (F.newPendingDebt debt)
+      --                  H.modify (_ { creating = M.delete key s.creating })
+      --                 pure next
 
     ConfirmPending debt next → do
       s ← H.get
@@ -174,7 +187,7 @@ component =
 --                      (filter (\fd → fd /= debt) s.pending)
 --                      <> [ F.setDebt debt (toNumber 0) ] })
       pure next
-    CancelPending (F.FriendDebt debt) next → do
+    CancelPending (F.Debt debt) next → do
       s ← H.get
 --      handleFIDCall s.errorBus unit (F.cancelPending debt.friend)
       pure next
@@ -206,77 +219,125 @@ loadFriendsAndDebts errorBus = do
   H.modify (_ { friends = friends, debts = debts, pending = pending, loading = false
               , sentPending = sentPending, names = names, userName = userName  })
 
+-- Itemized Debts for Friend Page
+itemizedDebtsForFriendContainer :: String → String → H.ComponentHTML Query
+itemizedDebtsForFriendContainer friendToShow nm =
+  HH.div
+    [ HP.class_ $ HH.ClassName $ "itemized-debts-for-friend", HP.attr (HH.AttrName "style") $ if (nm == friendToShow) then "display: initial" else "display: none" ]
+    [ HH.h5_ [ HH.text $ "History with " <> friendToShow <> ":" ],
+      HH.ul_ $ itemizedDebtLi <$> [fakeDebt, fakeDebt]]
+
+itemizedDebtLi ∷ F.Debt → H.ComponentHTML Query
+itemizedDebtLi fd =
+  HH.li [HP.class_ $ HH.ClassName $ moneyClass fd] $
+  itemizedDebt fd
+
+itemizedDebt :: F.Debt → Array (H.ComponentHTML Query)
+itemizedDebt fd =
+  [HH.div [HP.class_ $ HH.ClassName "itemized-debt-amount"][descSpan fd, debtAmountSpan fd]]
+
+-- Friends List
+
 displayFriendLi ∷ String → H.ComponentHTML Query
 displayFriendLi n =
   HH.li [HP.class_ $ HH.ClassName "friend-row"]
-  [HH.text n]
+  [HH.a [HP.href "#", HE.onClick $ HE.input_ $ ShowItemizedDebtFor n] [HH.text n]]
 
-displayFriendDebtLi ∷ NameMap → F.FriendDebt → H.ComponentHTML Query
-displayFriendDebtLi nm fd =
-  HH.li [HP.class_ $ HH.ClassName $ moneyClass fd] $
-  displayDebt nm fd
+-- Balance List
 
-displayAllDebtLi ∷ NameMap → Tuple F.FriendDebt F.FriendDebt → H.ComponentHTML Query
-displayAllDebtLi nm (Tuple fd1 fd2) =
-  HH.li [HP.class_ $ HH.ClassName $ moneyClass fd1] $
-  displayAllDebt nm (Tuple fd1 fd2)
+displayBalanceLi :: F.FoundationId → F.Balance → H.ComponentHTML Query
+displayBalanceLi (me)(F.Balance bal) =
+  HH.li [HP.class_ $ HH.ClassName "balance-row"]
+  [
+    idSpan me bal.debtor,
+    idSpan me bal.creditor,
+    verboseMoneySpan bal.amount
+  ]
 
-displayFriendDebtSpan ∷ NameMap → Tuple F.FriendDebt F.FriendDebt → H.ComponentHTML Query
-displayFriendDebtSpan nm  (Tuple originalDebt pendingDebt) =
-  HH.div [HP.class_ $ HH.ClassName $ (moneyClass pendingDebt) <> " confirmation-body row"] $
-  append (displayDebt nm pendingDebt) (displayDebtChanges nm (Tuple originalDebt pendingDebt))
+-- Pending Debts List
+displaySentDebtsList :: F.FoundationId → Array F.Debt → Array (H.ComponentHTML Query)
+displaySentDebtsList me debts = [HH.ul_ $ (displaySentDebtLi me) <$> debts]
 
-displayAllDebt ∷ NameMap → Tuple F.FriendDebt F.FriendDebt → Array (H.ComponentHTML Query)
-displayAllDebt nm (Tuple fd1 fd2) =
-  let (Tuple (F.FriendDebt fdRec1) (F.FriendDebt fdRec2)) = Tuple fd1 fd2
-      fName friend = fromMaybe (S.take 10 $ F.getAddr fdRec1.friend) (M.lookup friend nm)
-      combinedDebt = fd1
-      nameSpan n = HH.span [HP.class_ $ HH.ClassName "user-name user-id col-sm-8"] [HH.text n]
-  in [HH.div [HP.class_ $ HH.ClassName "confirmation-amount"][nameSpan $ (fName fdRec1.friend)]]
---    F.Negative → [HH.div [HP.class_ $ HH.ClassName "confirmation-amount"][nameSpan $ fName fdRec1.friend,
---      HH.div [HP.class_ $ HH.ClassName "current-debt-amount"] [moneySpan combinedDebt, moneySpan fd2]]]
---    F.Zero     → [HH.div [HP.class_ $ HH.ClassName "confirmation-amount"][nameSpan $ fName fdRec1.friend ]]
+displaySentDebtLi ∷ F.FoundationId → F.Debt → H.ComponentHTML Query
+displaySentDebtLi me fd =
+  HH.li [HP.class_ $ HH.ClassName "debt-row"] $
+  (displaySentDebt me) fd
 
-displayDebt ∷ NameMap → F.FriendDebt → Array (H.ComponentHTML Query)
-displayDebt nm (F.FriendDebt fd) =
-  let fName friend = fromMaybe (S.take 10 $ F.getAddr fd.friend) (M.lookup friend nm)
-      nameSpan n = HH.span [HP.class_ $ HH.ClassName "user-name user-id"] [HH.text n]
-      fd' = F.FriendDebt fd
-  in [HH.div [HP.class_ $ HH.ClassName "confirmation-amount"][nameSpan $ (fName fd.friend) <> " ", moneySpan fd']]
---    F.Negative → [HH.div [HP.class_ $ HH.ClassName "confirmation-amount"][nameSpan $ fName fd.friend <> " ", moneySpan fd' ]]
---    F.Zero     → [HH.div [HP.class_ $ HH.ClassName "confirmation-amount"][nameSpan $ fName fd.friend <> " ", moneySpan fd' ]]
+displaySentDebt :: F.FoundationId → F.Debt → Array (H.ComponentHTML Query)
+displaySentDebt me fd =
+  let (F.Debt fd') = fd
+  in [HH.div
+      [HP.class_ $ HH.ClassName "debt-details"]
+      [
+        idSpan me fd'.debtor,
+        idSpan me fd'.creditor,
+        descSpan fd,
+        debtAmountSpan fd
+      ]
+    ]
 
-displayDebtChanges ∷ NameMap → Tuple F.FriendDebt F.FriendDebt → Array (H.ComponentHTML Query)
-displayDebtChanges nm (Tuple originalDebt pendingDebt) =
-   [HH.div
-   [HP.class_ $ HH.ClassName "debt-changes"]
-   [
-     HH.span [HP.class_ $ HH.ClassName "originalDebt"] [moneySpan originalDebt],
-     HH.span [HP.class_ $ HH.ClassName "changedDebt"] [moneySpan originalDebt]
-   ]]
+displayTodoList :: F.FoundationId → Array F.Debt → Array (H.ComponentHTML Query)
+displayTodoList me debts = [HH.ul_ $ (displayTodoLi me) <$> debts]
 
-moneySpan ∷ F.FriendDebt → H.ComponentHTML Query
-moneySpan (F.FriendDebt fd) =
-  let debtCompare = F.posNegZero (F.FriendDebt fd)
-      compRes = case debtCompare of
-        F.Positive → "amount-payable"
-        F.Negative → "amount-receivable"
-        F.Zero     → "amount-nothing"
-    in  HH.span [ HP.class_ $ HH.ClassName $ compRes ]
-        [ HH.text $ show $ fd.debt ]
+displayTodoLi ∷  F.FoundationId → F.Debt → H.ComponentHTML Query
+displayTodoLi me fd =
+  HH.li [HP.class_ $ HH.ClassName "debt-row"] $
+  (displayTodo me) fd
 
-moneyClass ∷ F.FriendDebt → String
-moneyClass fd = case F.posNegZero fd of
-  F.Positive → "oweMoney"
-  F.Negative → "owedMoney"
-  F.Zero     → "zeroMoney"
+displayTodo ::  F.FoundationId → F.Debt → Array (H.ComponentHTML Query)
+displayTodo me fd =
+  let (F.Debt fd') = fd
+  in [HH.div
+      [HP.class_ $ HH.ClassName "debt-details"]
+      [
+        idSpan me fd'.debtor,
+        idSpan me fd'.creditor,
+        descSpan fd,
+        debtAmountSpan fd,
+        cancelButton fd,
+        confirmButton fd
+      ]
+    ]
 
-confirmButton ∷ F.FriendDebt → H.ComponentHTML Query
+
+-- Helper components
+idSpan :: F.FoundationId → F.FoundationId → H.ComponentHTML Query
+idSpan me idToDisplay =
+  let isItMe = me == idToDisplay
+  in case isItMe of
+    true → HH.text $ show "Me"
+    false → HH.a [HP.href "#", HE.onClick $ HE.input_ $ ShowItemizedDebtFor $ show idToDisplay] [HH.text $ show idToDisplay]
+
+descSpan ∷ F.Debt → H.ComponentHTML Query
+descSpan (F.Debt fd) =
+  HH.span [] [ HH.text $ fd.desc ]
+
+currencySpan ∷ F.Debt → H.ComponentHTML Query
+currencySpan (F.Debt fd) =
+  let (F.Money d) = fd.debt
+  in HH.span [] [ HH.text $ show d.currency ]
+
+moneySpan ∷ F.Debt → H.ComponentHTML Query
+moneySpan (F.Debt fd) =
+  HH.span [] [ HH.text $ show $ fd.debt ]
+
+debtAmountSpan ∷ F.Debt → H.ComponentHTML Query
+debtAmountSpan (F.Debt fd) =
+  verboseMoneySpan fd.debt
+
+verboseMoneySpan :: F.Money → H.ComponentHTML Query
+verboseMoneySpan (F.Money d) =
+  HH.span [] [ HH.text $ show d.currency <> " " <> show d.amount]
+
+moneyClass ∷ F.Debt → String
+moneyClass fd = "debt-amount"
+
+confirmButton ∷ F.Debt → H.ComponentHTML Query
 confirmButton fd = HH.button [ HP.class_ $ HH.ClassName "col-sm-6 btn-confirm"
                              , HE.onClick $ HE.input_ $ ConfirmPending fd]
   [ HH.text "Confirm" ]
 
-cancelButton ∷ F.FriendDebt → H.ComponentHTML Query
+cancelButton ∷ F.Debt → H.ComponentHTML Query
 cancelButton fd = HH.button [ HP.class_ $ HH.ClassName "col-sm-6 btn-cancel"
                              , HE.onClick $ HE.input_ $ CancelPending fd]
   [ HH.text "Cancel" ]
@@ -310,22 +371,12 @@ nameChangeWidget inputName userName =
       if (S.length inputName) > 0 then " to " <> inputName else "" ]
   ]
 
-nonZero ∷ F.FriendDebt → Boolean
+nonZero ∷ F.Debt → Boolean
 nonZero fd = ((F.numAmount ∘ F.fdDebt) fd) /= (toNumber 0)
-
-displayPending ∷ NameMap → Tuple F.FriendDebt F.FriendDebt → H.ComponentHTML Query
-displayPending nm (Tuple originalDebt pendingDebt) = HH.li
-  [ HP.class_ $ HH.ClassName "confirmation-row flipInX" ]
-  [ HH.div [ HP.class_ $ HH.ClassName "confirmation-header row" ]
-    [
-      cancelButton pendingDebt,
-      confirmButton pendingDebt
-    ], displayFriendDebtSpan nm (Tuple originalDebt pendingDebt)
-   ]
 
 createDebt ∷ NameMap → DebtMap → F.FoundationId → F.FoundationId → H.ComponentHTML Query
 createDebt nm creating myId friend =
-  let fd = fromMaybe (F.zeroDebt F.USD myId friend) $ M.lookup friend creating
+  let fd = fromMaybe (F.zeroDebt F.USD myId friend friend) $ M.lookup friend creating
   in HH.div [ HP.class_ $ HH.ClassName "createDebt" ]
      [ HH.text "$"
      , HH.input [ HP.type_ HP.InputNumber
@@ -337,7 +388,7 @@ createDebt nm creating myId friend =
                 , HP.max $ toNumber 1000000]
      ,   HH.button [ HE.onClick $ HE.input_ $ SendDebt friend
                    , HP.class_ $ HH.ClassName "btn-info"]
-         $ append [HH.text "Debt: "] (displayDebt nm $ fd)
+         [HH.text "Debt: "]
      ]
 
 numberFromString ∷ String → Number
@@ -358,4 +409,30 @@ handleFIDCall errorBus blankVal fidAffCall = do
                         pure blankVal
         Right val  → pure val
 
--}
+-- Mocks for Testing purposes
+mockFriendNames :: Array String
+mockFriendNames = ["Bob", "Tim", "Kevin"]
+
+mockFriends :: Array F.FoundationId
+mockFriends = [F.FoundationId "bob", F.FoundationId "Tim", F.FoundationId "Kevin"]
+
+mockNameMap :: NameMap
+mockNameMap = M.insert (F.FoundationId "bob") "Bob Brown" $ M.empty
+
+fakeDebt :: F.Debt
+fakeDebt = F.mockDebt $ F.FoundationId "bob"
+
+mockMe :: F.FoundationId
+mockMe = (F.FoundationId "me")
+
+fakeFriend :: F.FoundationId
+fakeFriend = (F.FoundationId "TerribleFriend")
+
+mockDebtMap :: DebtMap
+mockDebtMap = M.insert (F.FoundationId "bob") fakeDebt $ M.empty
+
+mockBalance :: F.Balance
+mockBalance = F.Balance { debtor: mockMe, creditor: fakeFriend, amount: F.Money {amount: 5.0, currency: F.USD}}
+
+mockPendingDebts :: F.PendingDebts
+mockPendingDebts = F.PD {sent: [fakeDebt], todo: [fakeDebt]}
