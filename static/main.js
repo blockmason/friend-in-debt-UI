@@ -7984,7 +7984,7 @@ var PS = {};
   var numAmount = function (v) {
       return v.amount;
   };
-  var mockFoundationId = "0x0";
+  var mockFoundationId = "snoopy";
   var mkDebt = function (d) {
       return function (c) {
           return function (toC) {

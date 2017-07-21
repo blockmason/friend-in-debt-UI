@@ -135,7 +135,7 @@ mkDebt d c toC amount dId desc = Debt { debtor: d, creditor: c, debt: amount
 zeroDebt ∷ Currency → FoundationId → FoundationId → FoundationId → Debt
 zeroDebt cur debtor creditor toConfirm = mkDebt debtor creditor toConfirm (mkMoney 0.0 (show cur)) NoDebtId ""
 mockFoundationId :: FoundationId
-mockFoundationId = FoundationId "0x0"
+mockFoundationId = FoundationId "snoopy"
 mockDebt :: FoundationId -> Debt
 mockDebt fid = mkDebt mockFoundationId fid fid (mkMoney 2.0 (show USD)) NoDebtId "Fictional Cat Poop"
 fdDebt ∷ Debt → Money
