@@ -140,11 +140,11 @@ html {
 
 
 .show-balances .create-debt-container,
-.show-balances .add-friend-container,
-.show-balances .name-change-container,
+.show-balances .add-friend-name-change-container,
+.show-balances .all-settings-container,
+.show-balances .all-pending-debts-container,
 .show-balances .all-friends-container,
 .show-balances .itemized-debts-for-friend,
-.show-balances .add-friend-name-change-container,
 .show-balances .back-nav-bar,
 .show-balances .add-friend-bar {
   display: none  !important;
@@ -258,4 +258,37 @@ html {
 
 .itemized-debt-amount span:last-child {
   float: right;
+}
+
+/* balance page */
+.all-balances-container ul {
+  list-style: none;
+  padding: 0;
+}
+
+.balance-row {
+  height: 50px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 5px;
+  margin: 10px;
+}
+
+.balance-row .creditor:after {
+  content: '↝';
+  color: #b10303;
+  right: -20px;
+  position: relative;
+}
+
+/*generic debt display*/
+.creditor a, .debtor a {
+  color: white;
+}
+
+.creditor a:hover, .debtor a:hover {
+  text-decoration: none;
+}
+
+.amount {
+    text-align: right;
 }

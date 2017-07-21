@@ -252,11 +252,11 @@ displayFriendLi n =
 
 displayBalanceLi :: F.FoundationId → F.Balance → H.ComponentHTML Query
 displayBalanceLi (me)(F.Balance bal) =
-  HH.li [HP.class_ $ HH.ClassName "balance-row"]
+  HH.li [HP.class_ $ HH.ClassName "balance-row row align-items-center"]
   [
-    idSpan me bal.debtor,
-    idSpan me bal.creditor,
-    verboseMoneySpan bal.amount
+    HH.div [HP.class_ $ HH.ClassName "col creditor"][idSpan me bal.creditor],
+    HH.div [HP.class_ $ HH.ClassName "col debtor"][idSpan me bal.debtor],
+    HH.div [HP.class_ $ HH.ClassName "col amount"][verboseMoneySpan bal.amount]
   ]
 
 -- Pending Debts List
@@ -310,7 +310,7 @@ idSpan :: F.FoundationId → F.FoundationId → H.ComponentHTML Query
 idSpan me idToDisplay =
   let isItMe = me == idToDisplay
   in case isItMe of
-    true → HH.text $ show "Me"
+    true → HH.text $ "Me"
     false → HH.a [HP.href "#", HE.onClick $ HE.input_ $ ShowItemizedDebtFor $ show idToDisplay] [HH.text $ show idToDisplay]
 
 descSpan ∷ F.Debt → H.ComponentHTML Query

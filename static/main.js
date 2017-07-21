@@ -8464,7 +8464,7 @@ var PS = {};
       return function (idToDisplay) {
           var isItMe = Data_Eq.eq(Network_Eth_Foundation.eqFoundationId)(me)(idToDisplay);
           if (isItMe) {
-              return Halogen_HTML_Core.text(Data_Show.show(Data_Show.showString)("Me"));
+              return Halogen_HTML_Core.text("Me");
           };
           if (!isItMe) {
               return Halogen_HTML_Elements.a([ Halogen_HTML_Properties.href("#"), Halogen_HTML_Events.onClick(Halogen_HTML_Events.input_(ShowItemizedDebtFor.create(Data_Show.show(Network_Eth_Foundation.showFoundationId)(idToDisplay)))) ])([ Halogen_HTML_Core.text(Data_Show.show(Network_Eth_Foundation.showFoundationId)(idToDisplay)) ]);
@@ -8518,7 +8518,7 @@ var PS = {};
   };
   var displayBalanceLi = function (v) {
       return function (v1) {
-          return Halogen_HTML_Elements.li([ Halogen_HTML_Properties.class_("balance-row") ])([ idSpan(v)(v1.debtor), idSpan(v)(v1.creditor), verboseMoneySpan(v1.amount) ]);
+          return Halogen_HTML_Elements.li([ Halogen_HTML_Properties.class_("balance-row row align-items-center") ])([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col creditor") ])([ idSpan(v)(v1.creditor) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col debtor") ])([ idSpan(v)(v1.debtor) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col amount") ])([ verboseMoneySpan(v1.amount) ]) ]);
       };
   };
   var descSpan = function (v) {
