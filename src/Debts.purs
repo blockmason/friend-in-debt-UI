@@ -87,17 +87,22 @@ component =
                   , HH.img [ HP.src "loading.gif"
                            , HP.width 25 ] ]
     else
-      HH.div_
+      HH.div
+      [ HP.class_ $ HH.ClassName "page-container col-12" ]
       $ append [
       HH.div
         [ HP.class_ $ HH.ClassName "all-friends-container" ]
         [
-          HH.ul_ $ displayFriendLi <$> mockFriendNames
+          HH.ul
+          [ HP.class_ $ HH.ClassName "col" ]
+          $ displayFriendLi <$> mockFriendNames
         ]
       , HH.div
-        [ HP.class_ $ HH.ClassName "all-balances-container " ]
+        [ HP.class_ $ HH.ClassName "all-balances-container" ]
         [
-          HH.ul_ $ (displayBalanceLi mockMe) <$> [mockBalance, mockBalance]
+          HH.ul
+          [ HP.class_ $ HH.ClassName "col-12" ]
+          $ (displayBalanceLi mockMe) <$> [mockBalance, mockBalance]
         ]
       , HH.div
         [ HP.class_ $ HH.ClassName "all-pending-debts-container" ]
@@ -223,7 +228,7 @@ loadFriendsAndDebts errorBus = do
 itemizedDebtsForFriendContainer :: String → String → H.ComponentHTML Query
 itemizedDebtsForFriendContainer friendToShow nm =
   HH.div
-    [ HP.class_ $ HH.ClassName $ "itemized-debts-for-friend", HP.attr (HH.AttrName "style") $ if (nm == friendToShow) then "display: initial" else "display: none" ]
+    [ HP.class_ $ HH.ClassName $ "itemized-debts-for-friend", HP.attr (HH.AttrName "style") $ if (nm == friendToShow) then "display: block" else "display: none" ]
     [ HH.h5_ [ HH.text $ "History with " <> friendToShow <> ":" ],
       HH.ul_ $ itemizedDebtLi <$> [fakeDebt, fakeDebt]]
 
@@ -240,7 +245,7 @@ itemizedDebt fd =
 
 displayFriendLi ∷ String → H.ComponentHTML Query
 displayFriendLi n =
-  HH.li [HP.class_ $ HH.ClassName "friend-row"]
+  HH.li [HP.class_ $ HH.ClassName "friend-row row"]
   [HH.a [HP.href "#", HE.onClick $ HE.input_ $ ShowItemizedDebtFor n] [HH.text n]]
 
 -- Balance List
