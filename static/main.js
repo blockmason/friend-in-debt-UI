@@ -7295,6 +7295,7 @@ var PS = {};
   var Prelude = PS["Prelude"];
   var Unsafe_Coerce = PS["Unsafe.Coerce"];
   var element = Unsafe_Coerce.unsafeCoerce(Halogen_HTML_Core.element(Data_Maybe.Nothing.value));
+  var h3 = element("h3");
   var h5 = element("h5");
   var h5_ = h5([  ]);
   var h6 = element("h6");
@@ -7321,6 +7322,7 @@ var PS = {};
   exports["div"] = div;
   exports["div_"] = div_;
   exports["element"] = element;
+  exports["h3"] = h3;
   exports["h5"] = h5;
   exports["h5_"] = h5_;
   exports["h6"] = h6;
@@ -8469,7 +8471,7 @@ var PS = {};
           if (!isItMe) {
               return Halogen_HTML_Elements.a([ Halogen_HTML_Properties.href("#"), Halogen_HTML_Events.onClick(Halogen_HTML_Events.input_(ShowItemizedDebtFor.create(Data_Show.show(Network_Eth_Foundation.showFoundationId)(idToDisplay)))) ])([ Halogen_HTML_Core.text(Data_Show.show(Network_Eth_Foundation.showFoundationId)(idToDisplay)) ]);
           };
-          throw new Error("Failed pattern match at Debts line 312, column 6 - line 314, column 125: " + [ isItMe.constructor.name ]);
+          throw new Error("Failed pattern match at Debts line 328, column 6 - line 330, column 125: " + [ isItMe.constructor.name ]);
       };
   };
   var handleFIDCall = function (dictBind) {
@@ -8493,10 +8495,10 @@ var PS = {};
                                   if (v instanceof Data_Either.Right) {
                                       return Control_Applicative.pure((dictMonadEff.Monad0()).Applicative0())(v.value0);
                                   };
-                                  throw new Error("Failed pattern match at Debts line 412, column 7 - line 415, column 30: " + [ v.constructor.name ]);
+                                  throw new Error("Failed pattern match at Debts line 428, column 7 - line 431, column 30: " + [ v.constructor.name ]);
                               });
                           };
-                          throw new Error("Failed pattern match at Debts line 406, column 3 - line 415, column 30: " + [ errorBus.constructor.name ]);
+                          throw new Error("Failed pattern match at Debts line 422, column 3 - line 431, column 30: " + [ errorBus.constructor.name ]);
                       };
                   };
               };
@@ -8529,17 +8531,12 @@ var PS = {};
   };
   var displaySentDebt = function (me) {
       return function (fd) {
-          return [ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("debt-details") ])([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col creditor") ])([ idSpan(me)(fd.creditor) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col debtor") ])([ idSpan(me)(fd.debtor) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col desc") ])([ descSpan(fd) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col amount") ])([ debtAmountSpan(fd) ]) ]) ];
+          return [ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("row debt-details align-items-center") ])([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col creditor") ])([ idSpan(me)(fd.creditor) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col debtor") ])([ idSpan(me)(fd.debtor) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col desc") ])([ descSpan(fd) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col amount") ])([ debtAmountSpan(fd) ]) ]) ];
       };
   };
-  var displaySentDebtLi = function (me) {
+  var displayTodo = function (me) {
       return function (fd) {
-          return Halogen_HTML_Elements.li([ Halogen_HTML_Properties.class_("sent-debt-row row") ])(displaySentDebt(me)(fd));
-      };
-  };
-  var displaySentDebtsList = function (me) {
-      return function (debts) {
-          return Halogen_HTML_Elements.ul_(Data_Functor.map(Data_Functor.functorArray)(displaySentDebtLi(me))(debts));
+          return [ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("row debt-details row align-items-center") ])([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col-2 creditor") ])([ idSpan(me)(fd.creditor) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col-2 debtor") ])([ idSpan(me)(fd.debtor) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col-6 desc") ])([ descSpan(fd) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col-2 amount") ])([ debtAmountSpan(fd) ]) ]) ];
       };
   };
   var itemizedDebt = function (fd) {
@@ -8551,8 +8548,8 @@ var PS = {};
   var itemizedDebtsForFriendContainer = function (friendToShow) {
       return function (nm) {
           return Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_(Halogen_HTML_Core.ClassName("itemized-debts-for-friend")), Halogen_HTML_Properties.attr("style")((function () {
-              var $59 = nm === friendToShow;
-              if ($59) {
+              var $60 = nm === friendToShow;
+              if ($60) {
                   return "display: block";
               };
               return "display: none";
@@ -8570,19 +8567,27 @@ var PS = {};
       };
   };
   var confirmButton = function (fd) {
-      return Halogen_HTML_Elements.button([ Halogen_HTML_Properties.class_("col-sm-6 btn-confirm"), Halogen_HTML_Events.onClick(Halogen_HTML_Events.input_(ConfirmPending.create(fd))) ])([ Halogen_HTML_Core.text("Confirm") ]);
+      return Halogen_HTML_Elements.button([ Halogen_HTML_Properties.class_("btn-confirm"), Halogen_HTML_Events.onClick(Halogen_HTML_Events.input_(ConfirmPending.create(fd))) ])([ Halogen_HTML_Core.text("Confirm") ]);
+  };
+  var cardHeader = function (title) {
+      return [ Halogen_HTML_Elements.h3([ Halogen_HTML_Properties.class_("row card-title") ])([ Halogen_HTML_Core.text(title) ]) ];
+  };
+  var displaySentDebtLi = function (me) {
+      return function (fd) {
+          return Halogen_HTML_Elements.li([ Halogen_HTML_Properties.class_("sent-debt-row row align-items-center") ])(Data_Semigroup.append(Data_Semigroup.semigroupArray)(cardHeader("Waiting for Confirmation:"))(displaySentDebt(me)(fd)));
+      };
+  };
+  var displaySentDebtsList = function (me) {
+      return function (debts) {
+          return Halogen_HTML_Elements.ul_(Data_Functor.map(Data_Functor.functorArray)(displaySentDebtLi(me))(debts));
+      };
   };
   var cancelButton = function (fd) {
-      return Halogen_HTML_Elements.button([ Halogen_HTML_Properties.class_("col-sm-6 btn-cancel"), Halogen_HTML_Events.onClick(Halogen_HTML_Events.input_(CancelPending.create(fd))) ])([ Halogen_HTML_Core.text("Cancel") ]);
-  };
-  var displayTodo = function (me) {
-      return function (fd) {
-          return [ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("debt-details") ])([ idSpan(me)(fd.debtor), idSpan(me)(fd.creditor), descSpan(fd), debtAmountSpan(fd), cancelButton(fd), confirmButton(fd) ]) ];
-      };
+      return Halogen_HTML_Elements.button([ Halogen_HTML_Properties.class_("btn-cancel"), Halogen_HTML_Events.onClick(Halogen_HTML_Events.input_(CancelPending.create(fd))) ])([ Halogen_HTML_Core.text("Cancel") ]);
   };
   var displayTodoLi = function (me) {
       return function (fd) {
-          return Halogen_HTML_Elements.li([ Halogen_HTML_Properties.class_("todo-debt-row row") ])(displayTodo(me)(fd));
+          return Halogen_HTML_Elements.li([ Halogen_HTML_Properties.class_("todo-debt-row row align-items-center") ])(Data_Semigroup.append(Data_Semigroup.semigroupArray)(Data_Semigroup.append(Data_Semigroup.semigroupArray)(cardHeader("To Confirm:"))(displayTodo(me)(fd)))([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("row action-buttons row align-items-center") ])([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col") ])([ cancelButton(fd) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col") ])([ confirmButton(fd) ]) ]) ]));
       };
   };
   var displayTodoList = function (me) {
@@ -8795,6 +8800,7 @@ var PS = {};
   exports["ShowItemizedDebtFor"] = ShowItemizedDebtFor;
   exports["addFriendWidget"] = addFriendWidget;
   exports["cancelButton"] = cancelButton;
+  exports["cardHeader"] = cardHeader;
   exports["component"] = component;
   exports["confirmButton"] = confirmButton;
   exports["createDebt"] = createDebt;

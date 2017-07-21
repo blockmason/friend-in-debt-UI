@@ -265,14 +265,17 @@ displaySentDebtsList me debts = HH.ul_ $ (displaySentDebtLi me) <$> debts
 
 displaySentDebtLi ∷ F.FoundationId → F.Debt → H.ComponentHTML Query
 displaySentDebtLi me fd =
-  HH.li [HP.class_ $ HH.ClassName "sent-debt-row row"] $
-  (displaySentDebt me) fd
+  HH.li [HP.class_ $ HH.ClassName "sent-debt-row row align-items-center"] $
+    append
+      (cardHeader "Waiting for Confirmation:")
+      ((displaySentDebt me) fd)
 
 displaySentDebt :: F.FoundationId → F.Debt → Array (H.ComponentHTML Query)
 displaySentDebt me fd =
   let (F.Debt fd') = fd
-  in [HH.div
-      [HP.class_ $ HH.ClassName "debt-details"]
+  in
+    [
+      HH.div [HP.class_ $ HH.ClassName "row debt-details align-items-center"]
       [
         HH.div [HP.class_ $ HH.ClassName "col creditor"][idSpan me fd'.creditor],
         HH.div [HP.class_ $ HH.ClassName "col debtor"][idSpan me fd'.debtor],
@@ -286,26 +289,39 @@ displayTodoList me debts = HH.ul_ $ (displayTodoLi me) <$> debts
 
 displayTodoLi ∷  F.FoundationId → F.Debt → H.ComponentHTML Query
 displayTodoLi me fd =
-  HH.li [HP.class_ $ HH.ClassName "todo-debt-row row"] $
-  (displayTodo me) fd
+  HH.li [HP.class_ $ HH.ClassName "todo-debt-row row align-items-center"]
+  $ append
+    (append
+      (cardHeader "To Confirm:")
+      ((displayTodo me) fd))
+  [
+    HH.div [HP.class_ $ HH.ClassName "row action-buttons row align-items-center"][
+      HH.div [HP.class_ $ HH.ClassName "col"][cancelButton fd],
+      HH.div [HP.class_ $ HH.ClassName "col"][confirmButton fd]
+    ]
+  ]
 
 displayTodo ::  F.FoundationId → F.Debt → Array (H.ComponentHTML Query)
 displayTodo me fd =
   let (F.Debt fd') = fd
-  in [HH.div
-      [HP.class_ $ HH.ClassName "debt-details"]
+  in
+    [
+      HH.div [HP.class_ $ HH.ClassName "row debt-details row align-items-center"]
       [
-        idSpan me fd'.debtor,
-        idSpan me fd'.creditor,
-        descSpan fd,
-        debtAmountSpan fd,
-        cancelButton fd,
-        confirmButton fd
+        HH.div [HP.class_ $ HH.ClassName "col-2 creditor"][idSpan me fd'.creditor],
+        HH.div [HP.class_ $ HH.ClassName "col-2 debtor"][idSpan me fd'.debtor],
+        HH.div [HP.class_ $ HH.ClassName "col-6 desc"][descSpan fd],
+        HH.div [HP.class_ $ HH.ClassName "col-2 amount"][debtAmountSpan fd]
       ]
     ]
 
-
 -- Helper components
+cardHeader :: String -> Array (H.ComponentHTML Query)
+cardHeader title =
+  [
+    HH.h3 [HP.class_ $ HH.ClassName "row card-title"][HH.text title]
+  ]
+
 idSpan :: F.FoundationId → F.FoundationId → H.ComponentHTML Query
 idSpan me idToDisplay =
   let isItMe = me == idToDisplay
@@ -338,12 +354,12 @@ moneyClass ∷ F.Debt → String
 moneyClass fd = "debt-amount"
 
 confirmButton ∷ F.Debt → H.ComponentHTML Query
-confirmButton fd = HH.button [ HP.class_ $ HH.ClassName "col-sm-6 btn-confirm"
+confirmButton fd = HH.button [ HP.class_ $ HH.ClassName "btn-confirm"
                              , HE.onClick $ HE.input_ $ ConfirmPending fd]
   [ HH.text "Confirm" ]
 
 cancelButton ∷ F.Debt → H.ComponentHTML Query
-cancelButton fd = HH.button [ HP.class_ $ HH.ClassName "col-sm-6 btn-cancel"
+cancelButton fd = HH.button [ HP.class_ $ HH.ClassName "btn-cancel"
                              , HE.onClick $ HE.input_ $ CancelPending fd]
   [ HH.text "Cancel" ]
 
