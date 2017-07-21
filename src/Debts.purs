@@ -95,7 +95,7 @@ component =
           HH.ul_ $ displayFriendLi <$> mockFriendNames
         ]
       , HH.div
-        [ HP.class_ $ HH.ClassName "all-balances-container" ]
+        [ HP.class_ $ HH.ClassName "all-balances-container " ]
         [
           HH.ul_ $ (displayBalanceLi mockMe) <$> [mockBalance, mockBalance]
         ]
