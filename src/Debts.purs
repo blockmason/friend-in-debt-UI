@@ -106,6 +106,16 @@ component =
           HH.ul_ $ (displayTodoList mockMe) [fakeDebt, fakeDebt]
         ]
       , HH.div
+        [ HP.class_ $ HH.ClassName "all-settings-container" ]
+        [
+          HH.div
+            [HP.class_ $ HH.ClassName "default-currency-container"]
+            [HH.text  $ "Default Currency: " <> show state.defaultCurrency],
+          HH.div
+            [HP.class_ $ HH.ClassName "foundation-id-container"]
+            [HH.text $  "My Foundation Id: " <> show state.myId]
+        ]
+      , HH.div
         [ HP.class_ $ HH.ClassName "add-friend-name-change-container" ]
         [
           HH.div
@@ -113,11 +123,6 @@ component =
             [
               addFriendWidget state
             ]
-          -- , HH.div
-          --   [ HP.class_ $ HH.ClassName "name-change-container" ]
-          --   [
-          --     nameChangeWidget state.inputName state.userName
-          --   ]
         ]
       , HH.div
         [ HP.class_ $ HH.ClassName "create-debt-container" ]

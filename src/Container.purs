@@ -67,21 +67,17 @@ ui =
       , HH.a [HP.href "#", HP.class_ (HH.ClassName "close-pop-button"), HE.onClick $ HE.input_ $ ShowPreviousScreen][HH.text "╳"]
       , HH.div [ HP.id_ "header", HP.class_ (HH.ClassName "row")]
         [
-          HH.a [HP.href "#", HP.class_ (HH.ClassName $ "col-3 " <> if state.currentScreen == "show-friends" then "active" else "" ), HE.onClick $ HE.input_ $ SetScreen "show-friends"] [ HH.text "Friend"],
-          HH.a [HP.href "#", HP.class_ (HH.ClassName $ "col-3 " <> if state.currentScreen == "show-debts" then "active" else ""), HE.onClick $ HE.input_ $ SetScreen "show-debts"] [ HH.text "Debt"]
+          HH.a [HP.href "#", HP.class_ (HH.ClassName $ "col" <> if state.currentScreen == "show-balances" then "active" else ""), HE.onClick $ HE.input_ $ SetScreen "show-balances"] [ HH.text "Balances"],
+          HH.a [HP.href "#", HP.class_ (HH.ClassName $ "col" <> if state.currentScreen == "show-friends" then "active" else "" ), HE.onClick $ HE.input_ $ SetScreen "show-friends"] [ HH.text "Friends"],
+          HH.a [HP.href "#", HP.class_ (HH.ClassName $ "col" <> if state.currentScreen == "show-pending" then "active" else ""), HE.onClick $ HE.input_ $ SetScreen "show-pending"] [ HH.text "Pending"],
+          HH.a [HP.href "#", HP.class_ (HH.ClassName $ "col" <> if state.currentScreen == "show-settings" then "active" else ""), HE.onClick $ HE.input_ $ SetScreen "show-settings"] [ HH.text "Settings"]
         ]
-      , HH.div [ HP.class_ (HH.ClassName "row")
-               , HP.id_ "container" ]
+      , HH.div [ HP.class_ (HH.ClassName "row")]
         [
-          HH.div [ HP.class_ (HH.ClassName "col") ]
-          [
-           HH.slot' CP.cp1 unit D.component state.errorBus $ HE.input SetScreen
-          ]
+          HH.slot' CP.cp1 unit D.component state.errorBus $ HE.input SetScreen
         ]
       , HH.div [ HP.class_ (HH.ClassName "row toolbar") ]
       [
-        HH.a [HP.href "#", HP.class_ (HH.ClassName "col home"), HE.onClick $ HE.input_ $ SetScreen "show-debts"] [
-        HH.img [HP.src "http://lunarhash.com/assets/img/friends_in_debt_logo.svg"], HH.text "Home"],
         HH.a [HP.href "#", HP.class_ (HH.ClassName "col create-debt-button"), HE.onClick $ HE.input_ $ SetScreen "show-create-debt"] [
         HH.img [HP.src "create_debt_icon.svg"], HH.text "Create Debt"],
         HH.a [HP.href "#", HP.class_ (HH.ClassName "col add-friend-button"), HE.onClick $ HE.input_ $ SetScreen "show-add-friend"] [
