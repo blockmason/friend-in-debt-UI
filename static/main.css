@@ -1,18 +1,16 @@
 @import url("http://fonts.googleapis.com/css?family=Lato:100,300,400,700,900");
 
+/* general */
 body {
   background-image: linear-gradient(-180deg, #a7759e 0%, #F76B1C 100%);
   height: 100%;
   color: white;
+  font-family: "Lato", Arial, sans-serif;
+  background-color: #a20846;
 }
 
 html {
   height: 100%;
-}
-
-body {
-  font-family: "Lato", Arial, sans-serif;
-  background-color: #a20846;
 }
 
 /* loading overlays */
@@ -58,4 +56,352 @@ body {
 
 .inActive {
     display: none;
+}
+
+/* header */
+
+#header {
+  font-weight: 100;
+  border-bottom: 1px solid white;
+}
+
+#header a {
+  padding-top: 20px;
+  text-transform: uppercase;
+  background: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.7);
+  border-right: 1px solid rgba(255,255,255,0.2);
+}
+
+#header a:hover {
+  text-decoration: none;
+  background: rgba(0,0,0,0.1)
+}
+
+#header a.active {
+  color: white;
+  text-decoration: none;
+  background: rgba(0,0,0,0.7);
+  box-shadow:  9px 1px 5px -1px rgba(0,0,0,0.2);
+}
+
+/* back navigation */
+
+#back-nav-bar {
+  background: rgba(255,255,255,0.1);
+}
+
+#back-nav-bar:hover {
+  background: none;
+}
+
+.close-pop-button {
+  color: white;
+  width: 100%;
+  padding: 10px;
+}
+
+.close-pop-button:hover {
+  color: white;
+  text-decoration: none;
+}
+
+.create-debt-bar, .add-friend-bar {
+  background: #505050;
+  padding: 10px;
+  box-shadow: 0 7px 9px -3px rgba(0,0,0,0.2);
+  position: relative;
+  top: -1px;
+}
+
+.create-debt-bar a, .add-friend-bar a {
+  color: white;
+  width: 100%;
+}
+
+.create-debt-bar a:hover, .add-friend-bar a:hover {
+  color: white;
+  text-decoration: none;
+}
+
+/*navigation*/
+
+.show-itemized-debt .all-friends-container,
+.show-itemized-debt .all-balances-container,
+.show-itemized-debt .all-settings-container,
+.show-itemized-debt .all-pending-debts-container,
+.show-itemized-debt .create-debt-container,
+.show-itemized-debt .add-friend-name-change-container,
+.show-itemized-debt .add-friend-bar,
+.show-itemized-debt #header,
+.show-itemized-debt .create-debt-bar  {
+  display: none !important;
+}
+
+.show-balances .create-debt-container,
+.show-balances .add-friend-name-change-container,
+.show-balances .all-settings-container,
+.show-balances .all-pending-debts-container,
+.show-balances .all-friends-container,
+.show-balances .itemized-debts-for-friend,
+.show-balances .back-nav-bar,
+.show-balances .add-friend-bar {
+  display: none  !important;
+}
+
+.show-friends .create-debt-container,
+.show-friends .add-friend-container,
+.show-friends .itemized-debts-for-friend,
+.show-friends .all-balances-container,
+.show-friends .all-settings-container,
+.show-friends .all-pending-debts-container,
+.show-friends .name-change-container,
+.show-friends .confirm-debts-container,
+.show-friends .current-debts-container,
+.show-friends .add-friend-name-change-container,
+.show-friends .back-nav-bar,
+.show-friends .create-debt-bar {
+  display: none  !important;
+}
+
+.show-pending .create-debt-container,
+.show-pending .add-friend-container,
+.show-pending .itemized-debts-for-friend,
+.show-pending .all-balances-container,
+.show-pending .all-settings-container,
+.show-pending .all-friends-container,
+.show-pending .name-change-container,
+.show-pending .confirm-debts-container,
+.show-pending .current-debts-container,
+.show-pending .add-friend-name-change-container,
+.show-pending .back-nav-bar,
+.show-pending .create-debt-bar,
+.show-pending .add-friend-bar {
+  display: none  !important;
+}
+
+.show-settings .create-debt-container,
+.show-settings .add-friend-container,
+.show-settings .itemized-debts-for-friend,
+.show-settings .all-balances-container,
+.show-settings .all-pending-debts-container,
+.show-settings .all-friends-container,
+.show-settings .name-change-container,
+.show-settings .confirm-debts-container,
+.show-settings .current-debts-container,
+.show-settings .add-friend-name-change-container,
+.show-settings .back-nav-bar,
+.show-settings .create-debt-bar,
+.show-settings .add-friend-bar {
+  display: none  !important;
+}
+
+.show-create-debt .all-friends-container,
+.show-create-debt .all-balances-container,
+.show-create-debt .all-settings-container,
+.show-create-debt .all-pending-debts-container,
+.show-create-debt .itemized-debts-for-friend,
+.show-create-debt .add-friend-name-change-container,
+.show-create-debt .add-friend-bar,
+.show-create-debt #header,
+.show-create-debt .create-debt-bar  {
+  display: none !important;
+}
+
+.show-add-friend .all-friends-container,
+.show-add-friend .all-balances-container,
+.show-add-friend .all-settings-container,
+.show-add-friend .all-pending-debts-container,
+.show-add-friend .itemized-debts-for-friend,
+.show-add-friend .create-debt-container,
+.show-add-friend .add-friend-bar,
+.show-add-friend #header,
+.show-add-friend .create-debt-bar  {
+  display: none !important;
+}
+
+.page-container > div {
+  margin-top: 20px;
+
+}
+
+/*friend page*/
+
+.all-friends-container .friend-row {
+  background-color: rgba(255,255,255,0.1);
+  margin-bottom: 3px;
+  width: 100%;
+  margin-left: 0;
+  padding: 5px;
+}
+
+.friend-row:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+.friend-row a {
+  display: block;
+  width: 100%;
+  color: white;
+  text-decoration: none;
+}
+
+.friend-row a:visited {
+  color: white;
+  text-decoration: none;
+}
+
+/*itemized debts page */
+.itemized-debts-for-friend ul {
+    list-style: none;
+    padding: 0;
+}
+
+.itemized-debts-for-friend .debt-amount {
+  background-color: rgba(255,255,255,0.1);
+  margin-bottom: 3px;
+  width: 100%;
+  margin-left: 0;
+  padding: 5px;
+}
+
+.itemized-debt-amount span:last-child {
+  float: right;
+}
+
+/* balance page */
+.all-balances-container ul {
+  list-style: none;
+  padding: 0;
+}
+
+.balance-row {
+  height: 50px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 5px;
+  margin: 10px;
+}
+
+.balance-row .creditor:after {
+  content: '↝';
+  color: #b10303;
+  right: -20px;
+  position: relative;
+}
+
+/*generic debt display*/
+.creditor a, .debtor a {
+  color: white;
+}
+
+.creditor a:hover, .debtor a:hover {
+  text-decoration: none;
+}
+
+.amount {
+    text-align: right;
+}
+
+/* pending debts page */
+.all-pending-debts-container ul {
+  list-style: none;
+  padding: 0;
+}
+
+.all-pending-debts-container .sent-debt-row {
+  height: 90px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 5px;
+  margin: 10px;
+}
+
+.all-pending-debts-container .todo-debt-row {
+  height: 130px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 5px;
+  margin: 10px;
+}
+
+.all-pending-debts-container .action-buttons, .all-pending-debts-container .debt-details {
+  width: 100%;
+}
+
+.all-pending-debts-container .card-title {
+  font-size: 18px;
+  font-weight: 100;
+  text-transform: uppercase;
+  margin-left: 10px;
+}
+
+.btn-cancel, .btn-confirm {
+  background: none;
+  border: none;
+  color: white;
+  text-align: center;
+  width: 100%;
+  border: 1px solid rgba(0,0,0,0.1);
+  background: rgba(0,0,0,0.1);
+  border-radius: 5px;
+}
+
+.action-buttons {
+  margin-left: 0;
+}
+
+.debt-details {
+  margin: 0;
+  font-size: 12px;
+}
+
+/* settings page */
+.default-currency-container, .foundation-id-container {
+  height: 30px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 5px;
+  margin: 10px;
+}
+
+.default-currency-container span, .foundation-id-container span {
+  float: right;
+  opacity: 0.8;
+}
+
+/*create debt*/
+
+.create-debt-container ul {
+  padding: 0;
+  list-style: none;
+}
+
+.createDebt input, .add-friend-container input,
+.name-change-container input{
+  background: transparent;
+  border: 1px dotted white;
+  border-radius: 5px;
+  margin: 0 5px 0 0;
+}
+
+.createDebt button, .add-friend-container button,
+.name-change-container button{
+  background: rgba(255,255,255, 0.1);
+  border: 0;
+  border-radius: 5px;
+  margin: 0 5px 0 0;
+  box-shadow: 0 1px 1px 1px rgba(0,0,0,0.1);
+}
+
+.createDebt button .confirmation-amount {
+  display: inline-block;
+}
+
+.create-debt-card, .addFriend {
+  margin: 10px;
+  background: rgba(0,0,0,0.1);
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.create-debt-card input, .addFriend input {
+  color: black;
+  background: white;
 }

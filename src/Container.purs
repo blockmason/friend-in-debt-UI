@@ -56,33 +56,40 @@ ui =
     initialState = { loggedIn: true
                    , loading: true
                    , errorBus: Nothing
-                   , currentScreen: "show-debts"
-                   , previousScreen: "show-debts"}
+                   , currentScreen: "show-balances"
+                   , previousScreen: "show-balances"}
 
     render :: State → H.ParentHTML Query ChildQuery ChildSlot (FIDMonad eff)
     render state =
       HH.div [ HP.id_ "container", HP.class_ (HH.ClassName $ "container-fluid " <> state.currentScreen) ]
       [ promptMetamask state.loggedIn
       , loadingOverlay state.loading
-      , HH.a [HP.href "#", HP.class_ (HH.ClassName "close-pop-button"), HE.onClick $ HE.input_ $ ShowPreviousScreen][HH.text "╳"]
+      , HH.div [ HP.id_ "back-nav-bar", HP.class_ (HH.ClassName "row back-nav-bar")]
+        [
+          HH.a [HP.href "#", HP.class_ (HH.ClassName "close-pop-button"), HE.onClick $ HE.input_ $ ShowPreviousScreen]
+          [HH.i [ HP.class_ (HH.ClassName "fa fa-chevron-left")][], HH.text " Back"]
+        ]
       , HH.div [ HP.id_ "header", HP.class_ (HH.ClassName "row")]
         [
-          HH.a [HP.href "#", HP.class_ (HH.ClassName $ "col" <> if state.currentScreen == "show-balances" then "active" else ""), HE.onClick $ HE.input_ $ SetScreen "show-balances"] [ HH.text "Balances"],
-          HH.a [HP.href "#", HP.class_ (HH.ClassName $ "col" <> if state.currentScreen == "show-friends" then "active" else "" ), HE.onClick $ HE.input_ $ SetScreen "show-friends"] [ HH.text "Friends"],
-          HH.a [HP.href "#", HP.class_ (HH.ClassName $ "col" <> if state.currentScreen == "show-pending" then "active" else ""), HE.onClick $ HE.input_ $ SetScreen "show-pending"] [ HH.text "Pending"],
-          HH.a [HP.href "#", HP.class_ (HH.ClassName $ "col" <> if state.currentScreen == "show-settings" then "active" else ""), HE.onClick $ HE.input_ $ SetScreen "show-settings"] [ HH.text "Settings"]
+          HH.a [HP.href "#", HP.class_ (HH.ClassName $ "col-3 " <> if state.currentScreen == "show-balances" then "active" else ""), HE.onClick $ HE.input_ $ SetScreen "show-balances"] [ HH.text "Balances"],
+          HH.a [HP.href "#", HP.class_ (HH.ClassName $ "col-3 " <> if state.currentScreen == "show-friends" then "active" else "" ), HE.onClick $ HE.input_ $ SetScreen "show-friends"] [ HH.text "Friends"],
+          HH.a [HP.href "#", HP.class_ (HH.ClassName $ "col-3 " <> if state.currentScreen == "show-pending" then "active" else ""), HE.onClick $ HE.input_ $ SetScreen "show-pending"] [ HH.text "Pending"],
+          HH.a [HP.href "#", HP.class_ (HH.ClassName $ "col-3 " <> if state.currentScreen == "show-settings" then "active" else ""), HE.onClick $ HE.input_ $ SetScreen "show-settings"] [ HH.text "Settings"]
         ]
+      , HH.div [ HP.class_ (HH.ClassName "row create-debt-bar") ]
+      [
+        HH.a [HP.href "#", HP.class_ (HH.ClassName ""), HE.onClick $ HE.input_ $ SetScreen "show-create-debt"] [
+        HH.i [ HP.class_ (HH.ClassName "fa fa-plus-circle")][], HH.text " Create Debt"]
+      ]
+      , HH.div [ HP.class_ (HH.ClassName "row add-friend-bar") ]
+      [
+        HH.a [HP.href "#", HP.class_ (HH.ClassName ""), HE.onClick $ HE.input_ $ SetScreen "show-add-friend"] [
+        HH.i [ HP.class_ (HH.ClassName "fa fa-plus-circle")][], HH.text " Add Friend"]
+      ]
       , HH.div [ HP.class_ (HH.ClassName "row")]
         [
           HH.slot' CP.cp1 unit D.component state.errorBus $ HE.input SetScreen
         ]
-      , HH.div [ HP.class_ (HH.ClassName "row toolbar") ]
-      [
-        HH.a [HP.href "#", HP.class_ (HH.ClassName "col create-debt-button"), HE.onClick $ HE.input_ $ SetScreen "show-create-debt"] [
-        HH.img [HP.src "create_debt_icon.svg"], HH.text "Create Debt"],
-        HH.a [HP.href "#", HP.class_ (HH.ClassName "col add-friend-button"), HE.onClick $ HE.input_ $ SetScreen "show-add-friend"] [
-        HH.img [HP.src "connect_friend_icon.svg"], HH.text "Add Friend"]
-      ]
       ]
 
     eval :: Query ~> H.ParentDSL State Query ChildQuery ChildSlot Void (FIDMonad eff)
