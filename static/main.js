@@ -8529,17 +8529,17 @@ var PS = {};
   };
   var displaySentDebt = function (me) {
       return function (fd) {
-          return [ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("debt-details") ])([ idSpan(me)(fd.debtor), idSpan(me)(fd.creditor), descSpan(fd), debtAmountSpan(fd) ]) ];
+          return [ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("debt-details") ])([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col creditor") ])([ idSpan(me)(fd.creditor) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col debtor") ])([ idSpan(me)(fd.debtor) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col desc") ])([ descSpan(fd) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col amount") ])([ debtAmountSpan(fd) ]) ]) ];
       };
   };
   var displaySentDebtLi = function (me) {
       return function (fd) {
-          return Halogen_HTML_Elements.li([ Halogen_HTML_Properties.class_("debt-row") ])(displaySentDebt(me)(fd));
+          return Halogen_HTML_Elements.li([ Halogen_HTML_Properties.class_("sent-debt-row row") ])(displaySentDebt(me)(fd));
       };
   };
   var displaySentDebtsList = function (me) {
       return function (debts) {
-          return [ Halogen_HTML_Elements.ul_(Data_Functor.map(Data_Functor.functorArray)(displaySentDebtLi(me))(debts)) ];
+          return Halogen_HTML_Elements.ul_(Data_Functor.map(Data_Functor.functorArray)(displaySentDebtLi(me))(debts));
       };
   };
   var itemizedDebt = function (fd) {
@@ -8582,12 +8582,12 @@ var PS = {};
   };
   var displayTodoLi = function (me) {
       return function (fd) {
-          return Halogen_HTML_Elements.li([ Halogen_HTML_Properties.class_("debt-row") ])(displayTodo(me)(fd));
+          return Halogen_HTML_Elements.li([ Halogen_HTML_Properties.class_("todo-debt-row row") ])(displayTodo(me)(fd));
       };
   };
   var displayTodoList = function (me) {
       return function (debts) {
-          return [ Halogen_HTML_Elements.ul_(Data_Functor.map(Data_Functor.functorArray)(displayTodoLi(me))(debts)) ];
+          return Halogen_HTML_Elements.ul_(Data_Functor.map(Data_Functor.functorArray)(displayTodoLi(me))(debts));
       };
   };
   var addFriendWidget = function (state) {
@@ -8605,7 +8605,7 @@ var PS = {};
           if (state.loading) {
               return Halogen_HTML_Elements.span_([ Halogen_HTML_Elements.h6_([ Halogen_HTML_Core.text("Loading debt info...") ]), Halogen_HTML_Elements.img([ Halogen_HTML_Properties.src("loading.gif"), Halogen_HTML_Properties.width(25) ]) ]);
           };
-          return Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("page-container col-12") ])(Data_Semigroup.append(Data_Semigroup.semigroupArray)([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("all-friends-container") ])([ Halogen_HTML_Elements.ul([ Halogen_HTML_Properties.class_("col") ])(Data_Functor.map(Data_Functor.functorArray)(displayFriendLi)(mockFriendNames)) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("all-balances-container") ])([ Halogen_HTML_Elements.ul([ Halogen_HTML_Properties.class_("col-12") ])(Data_Functor.map(Data_Functor.functorArray)(displayBalanceLi(mockMe))([ mockBalance, mockBalance ])) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("all-pending-debts-container") ])([ Halogen_HTML_Elements.ul_(displaySentDebtsList(mockMe)([ fakeDebt, fakeDebt ])), Halogen_HTML_Elements.ul_(displayTodoList(mockMe)([ fakeDebt, fakeDebt ])) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("all-settings-container") ])([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("default-currency-container") ])([ Halogen_HTML_Core.text("Default Currency: " + Data_Show.show(Network_Eth_FriendInDebt_Types.showCurrency)(state.defaultCurrency)) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("foundation-id-container") ])([ Halogen_HTML_Core.text("My Foundation Id: " + Data_Show.show(Network_Eth_Foundation.showFoundationId)(state.myId)) ]) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("add-friend-name-change-container") ])([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("add-friend-container") ])([ addFriendWidget(state) ]) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("create-debt-container") ])([ Halogen_HTML_Elements.h5_([ Halogen_HTML_Core.text("Create Debt") ]), Halogen_HTML_Elements.ul_(Data_Functor.map(Data_Functor.functorArray)(function (friend) {
+          return Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("page-container col-12") ])(Data_Semigroup.append(Data_Semigroup.semigroupArray)([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("all-friends-container") ])([ Halogen_HTML_Elements.ul([ Halogen_HTML_Properties.class_("col") ])(Data_Functor.map(Data_Functor.functorArray)(displayFriendLi)(mockFriendNames)) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("all-balances-container") ])([ Halogen_HTML_Elements.ul([ Halogen_HTML_Properties.class_("col-12") ])(Data_Functor.map(Data_Functor.functorArray)(displayBalanceLi(mockMe))([ mockBalance, mockBalance ])) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("all-pending-debts-container") ])([ displaySentDebtsList(mockMe)([ fakeDebt, fakeDebt ]), displayTodoList(mockMe)([ fakeDebt, fakeDebt ]) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("all-settings-container") ])([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("default-currency-container") ])([ Halogen_HTML_Core.text("Default Currency: " + Data_Show.show(Network_Eth_FriendInDebt_Types.showCurrency)(state.defaultCurrency)) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("foundation-id-container") ])([ Halogen_HTML_Core.text("My Foundation Id: " + Data_Show.show(Network_Eth_Foundation.showFoundationId)(state.myId)) ]) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("add-friend-name-change-container") ])([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("add-friend-container") ])([ addFriendWidget(state) ]) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("create-debt-container") ])([ Halogen_HTML_Elements.h5_([ Halogen_HTML_Core.text("Create Debt") ]), Halogen_HTML_Elements.ul_(Data_Functor.map(Data_Functor.functorArray)(function (friend) {
               return Halogen_HTML_Elements.li_([ createDebt(state.names)(state.creating)(state.myId)(friend) ]);
           })(state.friends)) ]) ])(Data_Functor.map(Data_Functor.functorArray)(itemizedDebtsForFriendContainer(state.showItemizedDebtFor))(mockFriendNames)));
       };

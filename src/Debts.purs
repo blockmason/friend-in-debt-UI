@@ -107,8 +107,8 @@ component =
       , HH.div
         [ HP.class_ $ HH.ClassName "all-pending-debts-container" ]
         [
-          HH.ul_ $ (displaySentDebtsList mockMe) [fakeDebt, fakeDebt],
-          HH.ul_ $ (displayTodoList mockMe) [fakeDebt, fakeDebt]
+          (displaySentDebtsList mockMe) [fakeDebt, fakeDebt],
+          (displayTodoList mockMe) [fakeDebt, fakeDebt]
         ]
       , HH.div
         [ HP.class_ $ HH.ClassName "all-settings-container" ]
@@ -260,12 +260,12 @@ displayBalanceLi (me)(F.Balance bal) =
   ]
 
 -- Pending Debts List
-displaySentDebtsList :: F.FoundationId → Array F.Debt → Array (H.ComponentHTML Query)
-displaySentDebtsList me debts = [HH.ul_ $ (displaySentDebtLi me) <$> debts]
+displaySentDebtsList :: F.FoundationId → Array F.Debt → H.ComponentHTML Query
+displaySentDebtsList me debts = HH.ul_ $ (displaySentDebtLi me) <$> debts
 
 displaySentDebtLi ∷ F.FoundationId → F.Debt → H.ComponentHTML Query
 displaySentDebtLi me fd =
-  HH.li [HP.class_ $ HH.ClassName "debt-row"] $
+  HH.li [HP.class_ $ HH.ClassName "sent-debt-row row"] $
   (displaySentDebt me) fd
 
 displaySentDebt :: F.FoundationId → F.Debt → Array (H.ComponentHTML Query)
@@ -274,19 +274,19 @@ displaySentDebt me fd =
   in [HH.div
       [HP.class_ $ HH.ClassName "debt-details"]
       [
-        idSpan me fd'.debtor,
-        idSpan me fd'.creditor,
-        descSpan fd,
-        debtAmountSpan fd
+        HH.div [HP.class_ $ HH.ClassName "col creditor"][idSpan me fd'.creditor],
+        HH.div [HP.class_ $ HH.ClassName "col debtor"][idSpan me fd'.debtor],
+        HH.div [HP.class_ $ HH.ClassName "col desc"][descSpan fd],
+        HH.div [HP.class_ $ HH.ClassName "col amount"][debtAmountSpan fd]
       ]
     ]
 
-displayTodoList :: F.FoundationId → Array F.Debt → Array (H.ComponentHTML Query)
-displayTodoList me debts = [HH.ul_ $ (displayTodoLi me) <$> debts]
+displayTodoList :: F.FoundationId → Array F.Debt → H.ComponentHTML Query
+displayTodoList me debts = HH.ul_ $ (displayTodoLi me) <$> debts
 
 displayTodoLi ∷  F.FoundationId → F.Debt → H.ComponentHTML Query
 displayTodoLi me fd =
-  HH.li [HP.class_ $ HH.ClassName "debt-row"] $
+  HH.li [HP.class_ $ HH.ClassName "todo-debt-row row"] $
   (displayTodo me) fd
 
 displayTodo ::  F.FoundationId → F.Debt → Array (H.ComponentHTML Query)

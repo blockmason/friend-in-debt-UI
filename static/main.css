@@ -168,13 +168,16 @@ html {
 .show-pending .create-debt-container,
 .show-pending .add-friend-container,
 .show-pending .itemized-debts-for-friend,
+.show-pending .all-balances-container,
+.show-pending .all-settings-container,
+.show-pending .all-friends-container,
 .show-pending .name-change-container,
 .show-pending .confirm-debts-container,
 .show-pending .current-debts-container,
 .show-pending .add-friend-name-change-container,
 .show-pending .back-nav-bar,
-.show-pending .add-friend-bar,
-.show-pending .create-debt-bar {
+.show-pending .create-debt-bar,
+.show-pending .add-friend-bar {
   display: none  !important;
 }
 
@@ -291,4 +294,17 @@ html {
 
 .amount {
     text-align: right;
+}
+
+/* pending debts page */
+.all-pending-debts-container ul {
+  list-style: none;
+  padding: 0;
+}
+
+.all-pending-debts-container li {
+  height: 50px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 5px;
+  margin: 10px;
 }
