@@ -37,21 +37,19 @@ data Query a
 type Input = ContainerMsgBus
 type Message = String
 
-type State = { friends     ∷ Array F.FoundationId
-             , balances    ∷ Array F.Balance
-             , myId        ∷ F.FoundationId
-             , debts       ∷ Array F.Debt
-             , pending     ∷ Array F.Debt
-             , sentPending ∷ Array F.Debt
-             , creating    ∷ DebtMap
-             , names       ∷ NameMap
-             , newFriend   ∷ Either String F.FoundationId
-             , userName    ∷ Either F.FoundationId F.UserName
-             , inputName   ∷ String
-             , showItemizedDebtFor :: String
-             , defaultCurrency :: F.Currency
-             , loading     ∷ Boolean
-             , errorBus    ∷ ContainerMsgBus }
+type State = { friends             ∷ Array F.FoundationId
+             , balances            ∷ Array F.Balance
+             , myId                ∷ F.FoundationId
+             , sentPending         ∷ Array F.Debt
+             , creating            ∷ DebtMap
+             , names               ∷ NameMap
+             , newFriend           ∷ Either String F.FoundationId
+             , userName            ∷ Either F.FoundationId F.UserName
+             , inputName           ∷ String
+             , showItemizedDebtFor ∷ String
+             , defaultCurrency     ∷ F.Currency
+             , loading             ∷ Boolean
+             , errorBus            ∷ ContainerMsgBus }
 
 component ∷ ∀ eff. H.Component HH.HTML Query Input Message (FIDMonad eff)
 component =
@@ -66,9 +64,7 @@ component =
   initialState ∷ Input → State
   initialState input = { friends: []
                        , balances: []
-                       , debts: []
                        , myId: (F.FoundationId "")
-                       , pending: []
                        , sentPending: []
                        , creating: M.empty
                        , names:    M.empty
@@ -142,8 +138,7 @@ component =
         , HH.ul_ $ (\friend → HH.li [ HP.class_ $ HH.ClassName "row create-debt-card" ] [ createDebt state.names state.creating state.myId friend]) <$> [fakeFriend, fakeFriend]
         ]
       ] $ (itemizedDebtsForFriendContainer state.showItemizedDebtFor) <$> mockFriendNames
-    where pending = filter (\(Tuple _ fd2) -> nonZero fd2) $ zip state.debts state.pending
-          friendNames = fromFoldable $ M.values state.names
+          where friendNames = fromFoldable $ M.values state.names
 
   eval ∷ Query ~> H.ComponentDSL State Query Message (FIDMonad eff)
   eval = case _ of

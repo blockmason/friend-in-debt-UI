@@ -34,13 +34,13 @@ data Query a
 type State = { loggedIn ∷ Boolean
              , loading  ∷ Boolean
              , errorBus ∷ ContainerMsgBus
-             , currentScreen :: String
-             , previousScreen :: String}
+             , currentScreen ∷ String
+             , previousScreen ∷ String }
 
 type ChildQuery = Coproduct1 D.Query
 type ChildSlot = Either1 Unit
 
-ui :: ∀ eff. H.Component HH.HTML Query Unit Void (FIDMonad eff)
+ui ∷ ∀ eff. H.Component HH.HTML Query Unit Void (FIDMonad eff)
 ui =
   H.lifecycleParentComponent
   { initialState: const initialState
@@ -52,14 +52,14 @@ ui =
   }
   where
 
-    initialState :: State
+    initialState ∷ State
     initialState = { loggedIn: true
                    , loading: true
                    , errorBus: Nothing
                    , currentScreen: "show-balances"
                    , previousScreen: "show-balances"}
 
-    render :: State → H.ParentHTML Query ChildQuery ChildSlot (FIDMonad eff)
+    render ∷ State → H.ParentHTML Query ChildQuery ChildSlot (FIDMonad eff)
     render state =
       HH.div [ HP.id_ "container", HP.class_ (HH.ClassName $ "container-fluid " <> state.currentScreen) ]
       [ promptMetamask state.loggedIn
@@ -92,7 +92,7 @@ ui =
         ]
       ]
 
-    eval :: Query ~> H.ParentDSL State Query ChildQuery ChildSlot Void (FIDMonad eff)
+    eval ∷ Query ~> H.ParentDSL State Query ChildQuery ChildSlot Void (FIDMonad eff)
     eval = case _ of
       Init next → do
         bus ← H.liftAff $ Bus.make
@@ -169,7 +169,7 @@ startCheckInterval maybeBus ms = do
 
 
 runTests = do
-  (H.liftAff $ F.runMonadF $ F.foundationId)       >>= hLog
+--  (H.liftAff $ F.runMonadF $ F.foundationId)       >>= hLog
   (H.liftAff $ F.runMonadF $ F.pendingFriendships) >>= hLog
   (H.liftAff $ F.runMonadF $ F.confirmedFriends)   >>= hLog
   (H.liftAff $ F.runMonadF $ F.pendingDebts)       >>= hLog
