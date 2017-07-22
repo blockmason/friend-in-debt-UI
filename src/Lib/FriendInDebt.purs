@@ -102,11 +102,6 @@ foundationId = do
   fid ← liftAff $ makeAff (\err succ → getMyFoundationIdImpl succ)
   if fid == "" then throwError NoFoundationId else pure $ FoundationId fid
 
-friends ∷ ∀ e. FoundationId → Aff e (Array FoundationId)
-friends (FoundationId fi) = do
-  friendList ← makeAff (\error success → friendsImpl success fi)
-  pure $ FoundationId <$> friendList
-
 createFriendship ∷ FoundationId → MonadF Unit
 createFriendship (FoundationId newFriend) = do
   (FoundationId myId) ← foundationId
@@ -136,8 +131,9 @@ pendingFriendships = do
 
 confirmedFriends ∷ MonadF (Array FoundationId)
 confirmedFriends = do
-  myId ← foundationId
-  liftAff $ friends myId
+  (FoundationId myId) ← foundationId
+  friendList ← liftAff $ makeAff (\error success → friendsImpl success myId)
+  pure $ FoundationId <$> friendList
 
 newPendingDebt ∷ FoundationId → FoundationId → Money → Description → MonadF Unit
 newPendingDebt (FoundationId debtor) (FoundationId creditor) m desc = do

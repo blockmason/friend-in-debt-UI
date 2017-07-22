@@ -40,7 +40,8 @@ type Message = String
 type State = { friends             ∷ Array F.FoundationId
              , balances            ∷ Array F.Balance
              , myId                ∷ F.FoundationId
-             , sentPending         ∷ Array F.Debt
+             , pendingSent         ∷ Array F.Debt
+             , pendingTodo         ∷ Array F.Debt
              , creating            ∷ DebtMap
              , names               ∷ NameMap
              , newFriend           ∷ Either String F.FoundationId
@@ -65,7 +66,8 @@ component =
   initialState input = { friends: []
                        , balances: []
                        , myId: (F.FoundationId "")
-                       , sentPending: []
+                       , pendingSent: []
+                       , pendingTodo: []
                        , creating: M.empty
                        , names:    M.empty
                        , newFriend: Left ""
@@ -200,9 +202,8 @@ component =
 
     RefreshDebts next → do
       errorBus ← H.gets _.errorBus
---      loadFriendsAndDebts errorBus
+      loadFriendsAndDebts errorBus
       pure next
-
 
 refreshButton =
   HH.button [ HE.onClick $ HE.input_ $ RefreshDebts
@@ -211,19 +212,16 @@ refreshButton =
 
 loadFriendsAndDebts errorBus = do
   H.modify (_ { loading = true })
---  friends     ← handleFIDCall errorBus [] F.currentUserFriends
-  userName    ← handleFIDCall errorBus (Right "") F.getCurrentUserName
---  names       ← handleFIDCall errorBus M.empty (F.allNames friends)
-  let debts = []
-      friends = []
-      pending = []
-      sentPending = []
-      names = M.empty
+  myId      ← handleFIDCall errorBus (F.FoundationId "") F.foundationId
+  friends   ← handleFIDCall errorBus [] F.confirmedFriends
+  pendingD  ← handleFIDCall errorBus F.blankPendingDebts F.pendingDebts
+  let names = M.empty
 --  debts       ← handleFIDCall errorBus [] (F.currentUserDebts friends)
 --  pending     ← handleFIDCall errorBus [] (F.currentUserPending friends)
---  sentPending ← handleFIDCall errorBus [] (F.currentUserSentPendings friends)
-  H.modify (_ { friends = friends, debts = debts, pending = pending, loading = false
-              , sentPending = sentPending, names = names, userName = userName  })
+  H.modify (_ { myId = myId, friends = friends, pendingSent = F.getSents pendingD
+              , pendingTodo = F.getTodos pendingD, loading = false, names = names
+
+              })
 
 -- Itemized Debts for Friend Page
 itemizedDebtsForFriendContainer :: String → String → H.ComponentHTML Query

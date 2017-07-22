@@ -185,3 +185,8 @@ instance showPendingFriendships ∷ Show PendingFriendships where
 newtype PendingDebts = PD { sent ∷ Array Debt, todo ∷ Array Debt }
 instance showPendingDebts ∷ Show PendingDebts where
   show (PD pd) = "{todo: " <> show pd.todo <> ", sent: " <> show pd.sent <> "}"
+getTodos ∷ PendingDebts → Array Debt
+getTodos (PD pd) = pd.todo
+getSents ∷ PendingDebts → Array Debt
+getSents (PD pd) = pd.sent
+blankPendingDebts = PD { sent: [], todo: [] }
