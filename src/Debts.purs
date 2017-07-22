@@ -92,7 +92,7 @@ component =
         [
           HH.ul
           [ HP.class_ $ HH.ClassName "col" ]
-          $ displayFriendLi <$> mockFriendNames
+          $ (displayFriendLi ∘ F.fiGetId) <$> state.friends
         ]
       , HH.div
         [ HP.class_ $ HH.ClassName "all-balances-container" ]
@@ -120,7 +120,7 @@ component =
             [HP.class_ $ HH.ClassName "col foundation-id-container"]
             [
               (HH.text  $ "My Foundation ID: "),
-              HH.span [] [ HH.text $ show mockMe ]
+              HH.span [] [ HH.text $ show state.myId ]
             ]
         ]
       , HH.div
@@ -199,7 +199,6 @@ component =
       s ← H.get
 --      handleFIDCall s.errorBus unit (F.cancelPending debt.friend)
       pure next
-
     RefreshDebts next → do
       errorBus ← H.gets _.errorBus
       loadFriendsAndDebts errorBus
@@ -213,6 +212,7 @@ refreshButton =
 loadFriendsAndDebts errorBus = do
   H.modify (_ { loading = true })
   myId      ← handleFIDCall errorBus (F.FoundationId "") F.foundationId
+  hLog myId
   friends   ← handleFIDCall errorBus [] F.confirmedFriends
   pendingD  ← handleFIDCall errorBus F.blankPendingDebts F.pendingDebts
   let names = M.empty

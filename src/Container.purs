@@ -147,7 +147,7 @@ refreshMetamask ∷ ∀ e. H.ParentDSL State Query ChildQuery ChildSlot Void (FI
 refreshMetamask = do
   mmStatus ← MM.loggedIn <$> (H.liftEff MM.checkStatus)
   if mmStatus
-    then do -- _ ← H.query' CP.cp1 unit (D.RefreshDebts unit)
+    then do _ ← H.query' CP.cp1 unit (D.RefreshDebts unit)
             newmmStatus ← MM.loggedIn <$> (H.liftEff MM.checkStatus)
             H.modify (_ { loggedIn = newmmStatus })
     else do H.modify (_ { loggedIn = mmStatus })
