@@ -37,6 +37,8 @@ type Input = ContainerMsgBus
 type Message = String
 
 type State = { friends             ∷ Array F.FoundationId
+             , pendingFriendsTodo  ∷ Array F.FoundationId
+             , pendingFriendsSent  ∷ Array F.FoundationId
              , balances            ∷ Array F.Balance
              , myId                ∷ F.FoundationId
              , pendingSent         ∷ Array F.Debt
@@ -63,6 +65,8 @@ component =
 
   initialState ∷ Input → State
   initialState input = { friends: []
+                       , pendingFriendsTodo: []
+                       , pendingFriendsSent: []
                        , balances: []
                        , myId: (F.FoundationId "")
                        , pendingSent: []
@@ -211,15 +215,19 @@ refreshButton =
 
 loadFriendsAndDebts errorBus = do
   H.modify (_ { loading = true })
-  myId      ← handleFIDCall errorBus (F.FoundationId "") F.foundationId
-  hLog myId
-  friends   ← handleFIDCall errorBus [] F.confirmedFriends
-  pendingD  ← handleFIDCall errorBus F.blankPendingDebts F.pendingDebts
+  myId           ← handleFIDCall errorBus (F.FoundationId "") F.foundationId
+  friends        ← handleFIDCall errorBus [] F.confirmedFriends
+  pendingFriends ← handleFIDCall errorBus F.blankPendingFriends F.pendingFriends
+  pendingD       ← handleFIDCall errorBus F.blankPendingDebts F.pendingDebts
   let names = M.empty
 --  debts       ← handleFIDCall errorBus [] (F.currentUserDebts friends)
 --  pending     ← handleFIDCall errorBus [] (F.currentUserPending friends)
-  H.modify (_ { myId = myId, friends = friends, pendingSent = F.getSents pendingD
-              , pendingTodo = F.getTodos pendingD, loading = false, names = names
+  H.modify (_ { myId = myId, friends = friends
+              , pendingFriendsSent = F.pfGetSents pendingFriends
+              , pendingFriendsTodo = F.pfGetTodos pendingFriends
+              , pendingSent = F.pdGetSents pendingD
+              , pendingTodo = F.pdGetTodos pendingD
+              , loading = false, names = names
 
               })
 

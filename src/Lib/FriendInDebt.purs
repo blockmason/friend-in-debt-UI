@@ -10,7 +10,7 @@ module Network.Eth.FriendInDebt
        , createFriendship
        , confirmFriendship
        , deleteFriendship
-       , pendingFriendships
+       , pendingFriends
 
        , newPendingDebt
        , confirmPendingDebt
@@ -117,8 +117,8 @@ deleteFriendship (FoundationId badFriend) = do
   (FoundationId myId) ← foundationId
   liftEff $ deleteFriendshipImpl myId badFriend
 
-pendingFriendships ∷ MonadF PendingFriendships
-pendingFriendships = do
+pendingFriends ∷ MonadF PendingFriendships
+pendingFriends = do
   (FoundationId fi) ← foundationId
   friendList ← liftAff $ makeAff (\err succ → pendingFriendshipsImpl succ fi)
   let myId = FoundationId fi
