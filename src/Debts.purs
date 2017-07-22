@@ -2,7 +2,6 @@ module Debts where
 
 
 import FriendInDebt.Prelude
-import Utils
 import Types (FIDMonad, ContainerMsgBus, ContainerMsg(..), NameMap(..), DebtMap(..))
 import Control.Monad.Eff.Console (logShow)
 import Control.Monad.Aff (Aff)
@@ -154,6 +153,7 @@ component =
 
     AddFriend eitherFriendId next → do
       s ← H.get
+      hLog eitherFriendId
       case eitherFriendId of
         Left  str → pure next
         Right friendId → do
@@ -374,7 +374,7 @@ addFriendWidget state =
              ]
   , HH.button [ HE.onClick $ HE.input_ $ AddFriend state.newFriend
               , HP.class_ $ HH.ClassName "col-2"]
-    [ HH.text "Add Friend by Address" ]
+    [ HH.text "Add Friend by FoundationId" ]
   ]
   where inputVal = either id show
 
