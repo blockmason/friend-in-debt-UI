@@ -2,6 +2,7 @@ module Network.Eth.Foundation
        (
          FoundationId(..)
        , fiGetId
+       , fiBlankId
        ) where
 
 import Prelude
@@ -15,3 +16,4 @@ instance eqFoundationId ∷ Eq FoundationId where
 instance ordFoundationId ∷ Ord FoundationId where
   compare (FoundationId fi1) (FoundationId fi2) = localeCompare fi1 fi2
 fiGetId (FoundationId fi) = fi
+fiBlankId = (FoundationId "")

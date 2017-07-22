@@ -137,7 +137,8 @@ confirmedFriends = do
 
 newPendingDebt ∷ FoundationId → FoundationId → Money → Description → MonadF Unit
 newPendingDebt (FoundationId debtor) (FoundationId creditor) m desc = do
-  liftEff $ newPendingDebtImpl debtor creditor (numAmount m) (strCurrency m) desc
+  liftEff $ newPendingDebtImpl debtor creditor (numAmount m)
+    (show $ moneyCurrency m) desc
 
 handleDebt ∷ HandleDebtFn → FoundationId → DebtId → MonadF Unit
 handleDebt handleDebtFn (FoundationId friendId) debtId = do

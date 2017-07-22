@@ -78,12 +78,12 @@ instance ordMoney ∷ Ord Money where
   compare (Money m1) (Money m2) = compare m1.amount m2.amount
   --TODO: make the above work with multiple currencies
 
-mkMoney ∷ Number → String → Money
-mkMoney val currencyCode = Money { amount: val, currency: fromString currencyCode }
+mkMoney ∷ Number → Currency → Money
+mkMoney val currency = Money { amount: val, currency: currency }
 numAmount ∷ Money → Number
 numAmount (Money m) = m.amount
-strCurrency ∷ Money → String
-strCurrency (Money m) = show m.currency
+moneyCurrency ∷ Money → Currency
+moneyCurrency (Money m) = m.currency
 
 -- rewrite this function using currency converter
 mockConvertCurrency :: Money → Currency → Money
@@ -98,14 +98,14 @@ instance showBalance ∷ Show Balance where
 rawToBalance ∷ FoundationId → RawBalance → Balance
 rawToBalance fi rb =
   let (Tuple d c) = debtorCreditor fi rb.counterParty rb.amount
-  in Balance { amount: mkMoney (abs rb.amount) rb.currency
+  in Balance { amount: mkMoney (abs rb.amount) (fromString rb.currency)
              , debtor: d, creditor: c }
   where debtorCreditor myId cpId val = if val >= (toNumber 0)
                                      then Tuple myId (FoundationId cpId)
                                      else Tuple (FoundationId cpId) myId
 
 sumMoney ∷ ∀ e. Money → Money → Aff e Money
-sumMoney m1 m2 = pure $ mkMoney ((numAmount m1) + (numAmount m2)) (strCurrency m1)
+sumMoney m1 m2 = pure $ mkMoney ((numAmount m1) + (numAmount m2)) (moneyCurrency m1)
 
 {- Debt -}
 newtype Debt = Debt { debtor     ∷ FoundationId
@@ -125,7 +125,7 @@ rawToDebt rd = Debt { debtId: DebtId rd.id
                     , debtor: FoundationId rd.debtor
                     , creditor: FoundationId rd.creditor
                     , toConfirm: FoundationId rd.confirmerId
-                    , debt: mkMoney rd.amount rd.currency
+                    , debt: mkMoney rd.amount (fromString rd.currency)
                     , desc: rd.desc }
 
 mkDebt ∷ FoundationId → FoundationId → FoundationId → Money → DebtId → Description
@@ -133,19 +133,20 @@ mkDebt ∷ FoundationId → FoundationId → FoundationId → Money → DebtId �
 mkDebt d c toC amount dId desc = Debt { debtor: d, creditor: c, debt: amount
                                   , debtId: dId, desc: desc, toConfirm: toC}
 zeroDebt ∷ Currency → FoundationId → FoundationId → FoundationId → Debt
-zeroDebt cur debtor creditor toConfirm = mkDebt debtor creditor toConfirm (mkMoney 0.0 (show cur)) NoDebtId ""
-mockFoundationId :: FoundationId
-mockFoundationId = FoundationId "snoopy"
-mockDebt :: FoundationId -> Debt
-mockDebt fid = mkDebt mockFoundationId fid fid (mkMoney 2.0 (show USD)) NoDebtId "Fictional Cat Poop"
+zeroDebt cur debtor creditor toConfirm = mkDebt debtor creditor toConfirm (mkMoney 0.0 cur) NoDebtId ""
 fdDebt ∷ Debt → Money
 fdDebt (Debt fd) = fd.debt
-setDebt ∷ Debt → Number → String → Debt
-setDebt (Debt fd) val currency = Debt $ fd { debt = mkMoney val currency}
+setDebt ∷ Debt → Number → Currency → Debt
+setDebt (Debt fd) val currency = Debt $ fd { debt = mkMoney val currency }
+setDebtAmount ∷ Debt → Number → Debt
+setDebtAmount (Debt d) val = Debt $
+  d { debt = mkMoney val $ (moneyCurrency <<< fdDebt) (Debt d) }
 getDesc :: Debt -> String
 getDesc (Debt d) = d.desc
+setDesc (Debt d) desc = Debt $ d { desc = desc }
 debtToConfirm ∷ Debt → FoundationId
 debtToConfirm (Debt d) = d.toConfirm
+debtAmount (Debt d) = d.debt
 debtCounterparty ∷ FoundationId → Debt → FoundationId
 debtCounterparty myId (Debt fd) = if fd.debtor == myId
                                  then fd.creditor else fd.debtor
