@@ -78,6 +78,17 @@ exports.confirmFriendshipImpl = function(myId) {
     };
 };
 
+exports.deleteFriendshipImpl = function(myId) {
+    return function(friendId) {
+        return function() {
+            Friendships.deployed().then(function(instance) {
+                return instance.deleteFriend(myId, friendId);
+            });
+        };
+    };
+};
+
+
 /* Debt Functions */
 exports.newPendingDebtImpl = function(debtor) {
     return function(creditor) {

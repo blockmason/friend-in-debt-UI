@@ -9,6 +9,7 @@ module Network.Eth.FriendInDebt
        , confirmedFriends
        , createFriendship
        , confirmFriendship
+       , deleteFriendship
        , pendingFriendships
 
        , newPendingDebt
@@ -71,6 +72,7 @@ foreign import friendsImpl ∷ FriendsLookupFn
 foreign import pendingFriendshipsImpl ∷ PendingFriendsFn
 foreign import createFriendshipImpl ∷ ∀ e. StringId → StringId → Eff e Unit
 foreign import confirmFriendshipImpl ∷ ∀ e. StringId → StringId → Eff e Unit
+foreign import deleteFriendshipImpl ∷ ∀ e. StringId → StringId → Eff e Unit
 
 foreign import newPendingDebtImpl ∷ ∀ e. StringId → StringId → Number → String
                                   → Description → Eff e Unit
@@ -114,6 +116,11 @@ confirmFriendship ∷ FoundationId → MonadF Unit
 confirmFriendship (FoundationId newFriend) = do
   (FoundationId myId) ← foundationId
   liftEff $ confirmFriendshipImpl myId newFriend
+
+deleteFriendship ∷ FoundationId → MonadF Unit
+deleteFriendship (FoundationId badFriend) = do
+  (FoundationId myId) ← foundationId
+  liftEff $ deleteFriendshipImpl myId badFriend
 
 pendingFriendships ∷ MonadF PendingFriendships
 pendingFriendships = do
