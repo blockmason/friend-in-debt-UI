@@ -104,6 +104,8 @@ component =
       , HH.div
         [ HP.class_ $ HH.ClassName "all-pending-debts-container" ]
         [
+          displaySentFriendsList [fakeFriend, fakeFriend],
+          displayTodoFriendsList [fakeFriend, fakeFriend],
           (displaySentDebtsList mockMe) [fakeDebt, fakeDebt],
           (displayTodoList mockMe) [fakeDebt, fakeDebt]
         ]
@@ -258,6 +260,51 @@ displayBalanceLi (me)(F.Balance bal) =
     HH.div [HP.class_ $ HH.ClassName "col amount"][verboseMoneySpan bal.amount]
   ]
 
+-- Pending Friendships
+displaySentFriendsList :: Array F.FoundationId → H.ComponentHTML Query
+displaySentFriendsList friends = HH.ul_ $ displaySentFriendLi <$> friends
+
+displaySentFriendLi ∷ F.FoundationId → H.ComponentHTML Query
+displaySentFriendLi friend =
+  HH.li [HP.class_ $ HH.ClassName "sent-friend-row row align-items-center"] $
+    append
+      (cardHeader "Waiting for response:")
+      (displaySentFriend friend)
+
+displaySentFriend :: F.FoundationId → Array (H.ComponentHTML Query)
+displaySentFriend friend =
+    [
+      HH.div [HP.class_ $ HH.ClassName "row friend-details align-items-center"]
+      [
+        HH.div [HP.class_ $ HH.ClassName "col"][HH.text $ "Sent Friend Request to:" <> show friend]
+      ]
+    ]
+
+displayTodoFriendsList :: Array F.FoundationId → H.ComponentHTML Query
+displayTodoFriendsList friends = HH.ul_ $ displayTodoFriendLi <$> friends
+
+displayTodoFriendLi ∷  F.FoundationId → H.ComponentHTML Query
+displayTodoFriendLi friend =
+  HH.li [HP.class_ $ HH.ClassName "todo-friend-row row align-items-center"]
+  $ append
+    (append
+      (cardHeader "Respond to Request:")
+      (displayTodoFriend friend))
+  [
+    HH.div [HP.class_ $ HH.ClassName "row action-buttons row align-items-center"][
+      HH.div [HP.class_ $ HH.ClassName "col"][confirmFriendshipButton friend]
+    ]
+  ]
+
+displayTodoFriend ::  F.FoundationId → Array (H.ComponentHTML Query)
+displayTodoFriend friend =
+    [
+      HH.div [HP.class_ $ HH.ClassName "row friend-details row align-items-center"]
+      [
+        HH.div [HP.class_ $ HH.ClassName "col"][HH.text $ "Friend Request From:" <> show friend]
+      ]
+    ]
+
 -- Pending Debts List
 displaySentDebtsList :: F.FoundationId → Array F.Debt → H.ComponentHTML Query
 displaySentDebtsList me debts = HH.ul_ $ (displaySentDebtLi me) <$> debts
@@ -361,6 +408,12 @@ cancelButton ∷ F.Debt → H.ComponentHTML Query
 cancelButton fd = HH.button [ HP.class_ $ HH.ClassName "btn-cancel"
                              , HE.onClick $ HE.input_ $ CancelPending fd]
   [ HH.text "Cancel" ]
+
+confirmFriendshipButton :: F.FoundationId -> H.ComponentHTML Query
+confirmFriendshipButton friend =
+  HH.button [ HE.onClick $ HE.input_ $ AddFriend $ Right friend
+            , HP.class_ $ HH.ClassName "confirm-friend-button"]
+            [ HH.text "Confirm Friendship" ]
 
 addFriendWidget ∷ State → H.ComponentHTML Query
 addFriendWidget state =

@@ -308,11 +308,15 @@ html {
   padding: 0;
 }
 
-.all-pending-debts-container .sent-debt-row {
+.all-pending-debts-container .sent-debt-row, .all-pending-debts-container .sent-friend-row {
   height: 90px;
   background: rgba(255,255,255,0.1);
   border-radius: 5px;
   margin: 10px;
+}
+
+.all-pending-debts-container .sent-friend-row {
+  height: 50px;
 }
 
 .all-pending-debts-container .todo-debt-row {
@@ -322,7 +326,7 @@ html {
   margin: 10px;
 }
 
-.all-pending-debts-container .action-buttons, .all-pending-debts-container .debt-details {
+.all-pending-debts-container .action-buttons, .all-pending-debts-container .debt-details, .all-pending-debts-container .friend-details {
   width: 100%;
 }
 
@@ -348,7 +352,7 @@ html {
   margin-left: 0;
 }
 
-.debt-details {
+.debt-details, .friend-details {
   margin: 0;
   font-size: 12px;
 }
