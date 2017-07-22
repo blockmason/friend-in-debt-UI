@@ -181,12 +181,17 @@ type RawFriendship = { friendId     ∷ StringId
 newtype PendingFriendships = PF {todo ∷ Array FoundationId, sent ∷ Array FoundationId}
 instance showPendingFriendships ∷ Show PendingFriendships where
   show (PF pf) = "{todo: " <> show pf.todo <> ", sent: " <> show pf.sent <> "}"
+pfGetTodos ∷ PendingFriendships → Array FoundationId
+pfGetTodos (PF pf) = pf.todo
+pfGetSents ∷ PendingFriendships → Array FoundationId
+pfGetSents (PF pf) = pf.sent
+blankPendingFriends = PF { sent: [], todo: [] }
 
 newtype PendingDebts = PD { sent ∷ Array Debt, todo ∷ Array Debt }
 instance showPendingDebts ∷ Show PendingDebts where
   show (PD pd) = "{todo: " <> show pd.todo <> ", sent: " <> show pd.sent <> "}"
-getTodos ∷ PendingDebts → Array Debt
-getTodos (PD pd) = pd.todo
-getSents ∷ PendingDebts → Array Debt
-getSents (PD pd) = pd.sent
+pdGetTodos ∷ PendingDebts → Array Debt
+pdGetTodos (PD pd) = pd.todo
+pdGetSents ∷ PendingDebts → Array Debt
+pdGetSents (PD pd) = pd.sent
 blankPendingDebts = PD { sent: [], todo: [] }
