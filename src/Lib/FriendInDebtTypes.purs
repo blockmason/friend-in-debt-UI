@@ -134,13 +134,15 @@ mkDebt d c toC amount dId desc = Debt { debtor: d, creditor: c, debt: amount
                                   , debtId: dId, desc: desc, toConfirm: toC}
 zeroDebt ∷ Currency → FoundationId → FoundationId → FoundationId → Debt
 zeroDebt cur debtor creditor toConfirm = mkDebt debtor creditor toConfirm (mkMoney 0.0 cur) NoDebtId ""
-fdDebt ∷ Debt → Money
-fdDebt (Debt fd) = fd.debt
+debtMoney ∷ Debt → Money
+debtMoney (Debt fd) = fd.debt
+debtSetDebtor   (Debt d) debtor   = Debt $ d { debtor   = debtor }
+debtSetCreditor (Debt d) creditor = Debt $ d { creditor = creditor }
 setDebt ∷ Debt → Number → Currency → Debt
 setDebt (Debt fd) val currency = Debt $ fd { debt = mkMoney val currency }
 setDebtAmount ∷ Debt → Number → Debt
 setDebtAmount (Debt d) val = Debt $
-  d { debt = mkMoney val $ (moneyCurrency <<< fdDebt) (Debt d) }
+  d { debt = mkMoney val $ (moneyCurrency <<< debtMoney) (Debt d) }
 getDesc :: Debt -> String
 getDesc (Debt d) = d.desc
 setDesc (Debt d) desc = Debt $ d { desc = desc }

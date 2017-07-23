@@ -5,7 +5,7 @@ import FriendInDebt.Prelude
 import Types (FIDMonad, ContainerMsgBus, ContainerMsg(..), NameMap(..), DebtMap(..))
 import Control.Monad.Eff.Console (logShow)
 import Control.Monad.Aff (Aff)
-import Data.Array (singleton)
+import Data.Array (singleton, head)
 import Control.Monad.Aff.Bus as Bus
 import Data.Int (toNumber, decimal, fromStringAs)
 import Data.Number as N
@@ -23,10 +23,8 @@ import Network.Eth.FriendInDebt as F
 data Query a
   = RefreshDebts a
   | HandleInput Input a
-  | InputDebtAmount String a
-  | InputDebtTarget String a
-  | InputDebtDesc String a
-  | AddDebt (Maybe F.Debt) a
+  | InputDebt F.Debt a
+  | AddDebt F.Debt a
   | ConfirmPending F.Debt a
   | CancelPending F.Debt a
   | AddFriend (Either String F.FoundationId) a
@@ -46,6 +44,7 @@ type State = { friends             ∷ Array F.FoundationId
              , pendingSent         ∷ Array F.Debt
              , pendingTodo         ∷ Array F.Debt
              , newDebt             ∷ Maybe F.Debt
+             , newCredit           ∷ Maybe F.Debt
              , names               ∷ NameMap
              , newFriend           ∷ Either String F.FoundationId
              , userName            ∷ Either F.FoundationId F.UserName
@@ -76,6 +75,7 @@ component =
                        , names:    M.empty
                        , newFriend: Left ""
                        , newDebt: Nothing
+                       , newCredit: Nothing
                        , userName: (Right "")
                        , inputName: ""
                        , showItemizedDebtFor: ""
@@ -144,7 +144,12 @@ component =
         [ HP.class_ $ HH.ClassName "create-debt-container" ]
         [
           HH.h5_ [ HH.text "Create Debt" ]
-        , HH.ul_ $ (\friend → HH.li [ HP.class_ $ HH.ClassName "row create-debt-card" ] [ inputDebt state.names state.myId state.newDebt ]) <$> [fakeFriend, fakeFriend]
+        , HH.ul_ [
+            HH.li [ HP.class_ $ HH.ClassName "row create-debt-card" ]
+            [inputDebt state.defaultCurrency state.myId state.friends state.newDebt]
+        , HH.li [ HP.class_ $ HH.ClassName "row create-debt-card" ]
+            [inputCredit state.defaultCurrency state.myId state.friends state.newDebt]
+        ]
         ]
       ] $ (itemizedDebtsForFriendContainer state.showItemizedDebtFor) <$> mockFriendNames
           where friendNames = fromFoldable $ M.values state.names
@@ -180,14 +185,7 @@ component =
       handleFIDCall s.errorBus unit (F.setCurrentUserName s.inputName)
       H.modify (_ { inputName = "" })
       pure next
-    InputDebtAmount strAmount next → do
-      nd ← H.gets _.newDebt
-      pure next
-    InputDebtTarget strTarget next → do
-      nd ← H.gets _.newDebt
-      pure next
-    InputDebtDesc strDesc next → do
-      nd ← H.gets _.newDebt
+    InputDebt debt next → do
       pure next
     AddDebt maybeDebt next → do
       s ← H.get
@@ -448,34 +446,45 @@ nameChangeWidget inputName userName =
   ]
 
 nonZero ∷ F.Debt → Boolean
-nonZero fd = ((F.numAmount ∘ F.fdDebt) fd) /= (toNumber 0)
+nonZero fd = ((F.numAmount ∘ F.debtMoney) fd) /= (toNumber 0)
 
-inputDebt ∷ NameMap → F.FoundationId → Maybe F.Debt → H.ComponentHTML Query
-inputDebt nm myId maybeDebt =
-  HH.div [ HP.class_ $ HH.ClassName "createDebt col row" ]
-  [
-    HH.input [ HP.type_ HP.InputNumber
-             , HP.class_ $ HH.ClassName "debt-amount col-2"
-             , HP.value "0"
-             , HE.onValueInput
-               (HE.input (\val → InputDebtAmount val))
-             , HP.min $ toNumber (-1000000)
-             , HP.max $ toNumber 1000000]
-  , HH.input [ HP.type_ HP.InputText
-             , HP.class_ $ HH.ClassName "debt-description col "
-             , HP.placeholder $ "debt description"
-             , HE.onValueInput
-               (HE.input (\val → InputDebtTarget val))
-             , HP.value ""]
-  , HH.input [ HP.type_ HP.InputText
-             , HP.placeholder $ "debt description"
-             , HE.onValueInput
-               (HE.input (\val → InputDebtDesc val))
-             , HP.value ""]
-  , HH.button [ HE.onClick $ HE.input_ $ AddDebt maybeDebt
-              , HP.class_ $ HH.ClassName "create-debt-button col-2"]
-    [HH.text $ "Debt " <> (show $ (F.debtCounterparty myId) <$> maybeDebt) ]
-  ]
+data DebtType = Debt | Credit
+inputFDebt ∷ DebtType → F.Currency → F.FoundationId → Array F.FoundationId
+          → Maybe F.Debt → H.ComponentHTML Query
+inputFDebt debtType cur myId friends maybeDebt =
+  case head friends of
+    Nothing       → HH.div_ [ HH.text "No friends to debt" ]
+    Just friendId →
+      let d = case debtType of
+            Debt   → fromMaybe (F.zeroDebt cur myId friendId friendId) maybeDebt
+            Credit → fromMaybe (F.zeroDebt cur friendId myId friendId) maybeDebt
+      in HH.div [ HP.class_ $ HH.ClassName "createDebt col row" ]
+         [
+           HH.input [ HP.type_ HP.InputNumber
+                    , HP.class_ $ HH.ClassName "debt-amount col-2"
+                    , HP.value $ show $ (F.numAmount ∘ F.debtMoney) d
+                    , HE.onValueInput
+                      (HE.input (\val → InputDebt $ amount d val))
+                    , HP.min $ toNumber (-1000000)
+                    , HP.max $ toNumber 1000000]
+         , HH.select_ $
+             (\f → HH.option_ [ HH.text $ F.fiGetId f ]) <$> friends
+         , HH.input [ HP.type_ HP.InputText
+                    , HP.placeholder $ "debt description"
+                    , HE.onValueInput
+                      (HE.input (\val → InputDebt $ F.setDesc d (S.take 32 val)))
+                    , HP.value $ F.getDesc d ]
+         , HH.button [ HE.onClick $ HE.input_ $ AddDebt d
+                     , HP.class_ $ HH.ClassName "create-debt-button col-2"]
+           [HH.text $ "Debt " <> (show $ (F.debtCounterparty myId) <$> maybeDebt) ]
+         ]
+      where amount debt v = F.setDebtAmount debt $ fromMaybe 0.0 (N.fromString v)
+            counterparty debt debtType v = case debtType of
+              Debt   → F.debtSetCreditor debt (F.fiMkId v)
+              Credit → F.debtSetDebtor   debt (F.fiMkId v)
+
+inputDebt   = inputFDebt Debt
+inputCredit = inputFDebt Credit
 
 numberFromString ∷ String → Number
 numberFromString s = fromMaybe (toNumber 0) (N.fromString s)
