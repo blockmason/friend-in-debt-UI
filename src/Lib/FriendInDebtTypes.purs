@@ -14,7 +14,7 @@ import Data.Traversable            (traverse)
 import Data.Format.Money           (formatDollar)
 import Data.Int                    (toNumber)
 import Data.String                 (localeCompare)
-import Math                        (abs)
+import Math                        (abs, pow)
 import Data.Map                                                    as M
 import Data.Array                                                  as A
 import Data.Tuple                  (Tuple(..))
@@ -57,6 +57,9 @@ mkCurrency ∷ String → Int → Currency
 mkCurrency isoCode decimals = Currency { isoCode: isoCode, decimals: decimals }
 invalidCurrency = Currency { isoCode: "INVALID", decimals: 0 }
 
+cDecimals (Currency c) = c.decimals
+cDecimals _            = 0
+
 instance showCurrency ∷ Show Currency where
   show (Currency c) = c.isoCode <> ", decimals: " <> show c.decimals
   show InvalidCurrency = "InvalidCurrency"
@@ -71,6 +74,8 @@ fromIsoCode ∷ String → Currency
 fromIsoCode "USD" = cUSD
 fromIsoCode "EUR" = cEUR
 fromIsoCode _     = InvalidCurrency
+conversionFactor ∷ Currency → Number
+conversionFactor = (pow 10.0) <<< toNumber <<< cDecimals
 
 newtype Money = Money { amount ∷ Number, currency ∷ Currency }
 
@@ -89,6 +94,13 @@ numAmount ∷ Money → Number
 numAmount (Money m) = m.amount
 moneyCurrency ∷ Money → Currency
 moneyCurrency (Money m) = m.currency
+--multiples money amount by 10^DECIMALS
+moneyToBlockchain ∷ Money → Number
+moneyToBlockchain m = (numAmount m) * (conversionFactor (moneyCurrency m))
+moneyFromBlockchain ∷ Number → String → Money
+moneyFromBlockchain amount isoCode =
+  let curr = fromIsoCode isoCode
+  in mkMoney (amount / (conversionFactor curr)) curr
 
 -- rewrite this function using currency converter
 mockConvertCurrency :: Money → Currency → Money

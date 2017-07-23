@@ -8005,6 +8005,7 @@ var PS = {};
   var Data_Array = PS["Data.Array"];
   var Data_Either = PS["Data.Either"];
   var Data_Eq = PS["Data.Eq"];
+  var Data_EuclideanRing = PS["Data.EuclideanRing"];
   var Data_Foldable = PS["Data.Foldable"];
   var Data_Format_Money = PS["Data.Format.Money"];
   var Data_Function = PS["Data.Function"];
@@ -8082,8 +8083,8 @@ var PS = {};
   }; 
   var showMoney = new Data_Show.Show(function (v) {
       return (function () {
-          var $52 = v.amount < Data_Int.toNumber(0);
-          if ($52) {
+          var $53 = v.amount < Data_Int.toNumber(0);
+          if ($53) {
               return "-";
           };
           return "";
@@ -8111,19 +8112,19 @@ var PS = {};
       if (v instanceof InvalidCurrency) {
           return "InvalidCurrency";
       };
-      throw new Error("Failed pattern match at Network.Eth.FriendInDebt.Types line 61, column 3 - line 61, column 69: " + [ v.constructor.name ]);
+      throw new Error("Failed pattern match at Network.Eth.FriendInDebt.Types line 64, column 3 - line 64, column 69: " + [ v.constructor.name ]);
   });
   var setDesc = function (v) {
       return function (desc) {
           return Debt((function () {
-              var $62 = {};
-              for (var $63 in v) {
-                  if ({}.hasOwnProperty.call(v, $63)) {
-                      $62[$63] = v[$63];
+              var $63 = {};
+              for (var $64 in v) {
+                  if ({}.hasOwnProperty.call(v, $64)) {
+                      $63[$64] = v[$64];
                   };
               };
-              $62.desc = desc;
-              return $62;
+              $63.desc = desc;
+              return $63;
           })());
       };
   };
@@ -8211,28 +8212,28 @@ var PS = {};
   var debtSetDebtor = function (v) {
       return function (debtor) {
           return Debt((function () {
-              var $101 = {};
-              for (var $102 in v) {
-                  if ({}.hasOwnProperty.call(v, $102)) {
-                      $101[$102] = v[$102];
+              var $102 = {};
+              for (var $103 in v) {
+                  if ({}.hasOwnProperty.call(v, $103)) {
+                      $102[$103] = v[$103];
                   };
               };
-              $101.debtor = debtor;
-              return $101;
+              $102.debtor = debtor;
+              return $102;
           })());
       };
   };
   var debtSetCreditor = function (v) {
       return function (creditor) {
           return Debt((function () {
-              var $106 = {};
-              for (var $107 in v) {
-                  if ({}.hasOwnProperty.call(v, $107)) {
-                      $106[$107] = v[$107];
+              var $107 = {};
+              for (var $108 in v) {
+                  if ({}.hasOwnProperty.call(v, $108)) {
+                      $107[$108] = v[$108];
                   };
               };
-              $106.creditor = creditor;
-              return $106;
+              $107.creditor = creditor;
+              return $107;
           })());
       };
   };
@@ -8242,14 +8243,14 @@ var PS = {};
   var setDebtAmount = function (v) {
       return function (val) {
           return Debt((function () {
-              var $112 = {};
-              for (var $113 in v) {
-                  if ({}.hasOwnProperty.call(v, $113)) {
-                      $112[$113] = v[$113];
+              var $113 = {};
+              for (var $114 in v) {
+                  if ({}.hasOwnProperty.call(v, $114)) {
+                      $113[$114] = v[$114];
                   };
               };
-              $112.debt = mkMoney(val)(moneyCurrency(debtMoney(v)));
-              return $112;
+              $113.debt = mkMoney(val)(moneyCurrency(debtMoney(v)));
+              return $113;
           })());
       };
   };
@@ -8264,15 +8265,15 @@ var PS = {};
   };
   var debtCounterparty = function (myId) {
       return function (v) {
-          var $120 = Data_Eq.eq(Network_Eth_Foundation.eqFoundationId)(v.debtor)(myId);
-          if ($120) {
+          var $121 = Data_Eq.eq(Network_Eth_Foundation.eqFoundationId)(v.debtor)(myId);
+          if ($121) {
               return v.creditor;
           };
           return v.debtor;
       };
   };
-  var debtAmount = function ($126) {
-      return numAmount(debtMoney($126));
+  var debtAmount = function ($129) {
+      return numAmount(debtMoney($129));
   };
   var cUSD = mkCurrency("USD")(2);
   var cEUR = mkCurrency("EUR")(2);
@@ -8290,8 +8291,8 @@ var PS = {};
           var debtorCreditor = function (myId) {
               return function (cpId) {
                   return function (val) {
-                      var $122 = val >= Data_Int.toNumber(0);
-                      if ($122) {
+                      var $123 = val >= Data_Int.toNumber(0);
+                      if ($123) {
                           return new Data_Tuple.Tuple(myId, cpId);
                       };
                       return new Data_Tuple.Tuple(cpId, myId);
