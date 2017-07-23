@@ -187,6 +187,7 @@ component =
       H.modify (_ { inputName = "" })
       pure next
     InputDebt debt next → do
+      hLog debt
       H.modify (_ { newDebt = Just debt })
       pure next
     InputCredit credit next → do
@@ -401,8 +402,8 @@ debtAmountSpan (F.Debt fd) =
   verboseMoneySpan fd.debt
 
 verboseMoneySpan :: F.Money → H.ComponentHTML Query
-verboseMoneySpan (F.Money d) =
-  HH.span [] [ HH.text $ show d.currency <> " " <> show d.amount]
+verboseMoneySpan m =
+  HH.span [] [ HH.text $ show m ]
 
 moneyClass ∷ F.Debt → String
 moneyClass fd = "debt-amount"
@@ -472,9 +473,9 @@ inputFDebt debtType cur myId friends maybeDebt =
          [
            HH.input [ HP.type_ HP.InputNumber
                     , HP.class_ $ HH.ClassName "debt-amount col-2"
-                    , HP.value $ show $ (F.numAmount ∘ F.debtMoney) d
+                    , HP.value $ noDecimals $ F.formatMoney $ F.debtMoney d
                     , HE.onValueInput
-                      (HE.input (\val → handler $ amount d val))
+                      (HE.input (\val → handler $ amount d val cur))
                     , HP.min $ toNumber (-1000000)
                     , HP.max $ toNumber 1000000]
          , HH.select [ HE.onValueChange
@@ -491,7 +492,9 @@ inputFDebt debtType cur myId friends maybeDebt =
                      , HP.class_ $ HH.ClassName "create-debt-button col-2"]
            [ HH.text $ "Send Debt" ]
          ]
-      where amount debt v = F.setDebtAmount debt $ fromMaybe 0.0 (N.fromString v)
+      where noDecimals = S.takeWhile (\c → c /= '.')
+            amount debt v cur = F.setDebtMoney debt $
+              F.moneyFromDecString (noDecimals v) cur
             counterparty debt debtType v = case debtType of
               Debt   → F.debtSetCreditor debt (F.fiMkId v)
               Credit → F.debtSetDebtor   debt (F.fiMkId v)
@@ -550,4 +553,4 @@ mockPendingDebts = F.PD {sent: [fakeDebt], todo: [fakeDebt]}
 mockFoundationId :: F.FoundationId
 mockFoundationId = F.FoundationId "snoopy"
 mockDebt :: F.FoundationId -> F.Debt
-mockDebt fid = F.mkDebt mockFoundationId fid fid (F.mkMoney 2.0 F.cUSD) F.NoDebtId "Fictional Cat Poop"
+mockDebt fid = F.mkDebt mockFoundationId fid fid (F.moneyFromDecString "2.0" F.cUSD) F.NoDebtId "Fictional Cat Poop"

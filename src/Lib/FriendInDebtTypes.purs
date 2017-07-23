@@ -13,6 +13,7 @@ import Data.Maybe                  (Maybe(..), fromMaybe)
 import Data.Traversable            (traverse)
 import Data.Format.Money           (formatDollar)
 import Data.Int                    (toNumber)
+import Data.Number                                                 as N
 import Data.String                 (localeCompare)
 import Math                        (abs, pow)
 import Data.Map                                                    as M
@@ -57,6 +58,8 @@ mkCurrency ∷ String → Int → Currency
 mkCurrency isoCode decimals = Currency { isoCode: isoCode, decimals: decimals }
 invalidCurrency = Currency { isoCode: "INVALID", decimals: 0 }
 
+cIsoCode (Currency c)  = c.isoCode
+cIsoCode _             = "INVALID"
 cDecimals (Currency c) = c.decimals
 cDecimals _            = 0
 
@@ -79,28 +82,26 @@ conversionFactor = (pow 10.0) <<< toNumber <<< cDecimals
 
 newtype Money = Money { amount ∷ Number, currency ∷ Currency }
 
+formatMoney ∷ Money → String
+formatMoney m = show $ (numAmount m) / (conversionFactor (moneyCurrency m))
 instance showMoney ∷ Show Money where
-  show (Money m) =
-    (if (m.amount < (toNumber 0)) then "-" else "") <> (formatDollar $ abs m.amount)
+  show m = cIsoCode (moneyCurrency m) <> " " <> (formatMoney $ m)
 instance eqMoney ∷ Eq Money where
   eq (Money m1) (Money m2) = (m1.amount == m2.amount) && (m1.currency == m2.currency)
 instance ordMoney ∷ Ord Money where
   compare (Money m1) (Money m2) = compare m1.amount m2.amount
   --TODO: make the above work with multiple currencies
 
+moneyFromDecString ∷ String → Currency → Money
+moneyFromDecString val c =
+  let amount = (fromMaybe 0.0 $ N.fromString val) * (conversionFactor c)
+  in mkMoney amount c
 mkMoney ∷ Number → Currency → Money
 mkMoney val currency = Money { amount: val, currency: currency }
 numAmount ∷ Money → Number
 numAmount (Money m) = m.amount
 moneyCurrency ∷ Money → Currency
 moneyCurrency (Money m) = m.currency
---multiples money amount by 10^DECIMALS
-moneyToBlockchain ∷ Money → Number
-moneyToBlockchain m = (numAmount m) * (conversionFactor (moneyCurrency m))
-moneyFromBlockchain ∷ Number → String → Money
-moneyFromBlockchain amount isoCode =
-  let curr = fromIsoCode isoCode
-  in mkMoney (amount / (conversionFactor curr)) curr
 
 -- rewrite this function using currency converter
 mockConvertCurrency :: Money → Currency → Money
@@ -162,9 +163,8 @@ debtCreditor (Debt d ) = d.creditor
 debtGetId (Debt d) = d.debtId
 setDebt ∷ Debt → Number → Currency → Debt
 setDebt (Debt fd) val currency = Debt $ fd { debt = mkMoney val currency }
-setDebtAmount ∷ Debt → Number → Debt
-setDebtAmount (Debt d) val = Debt $
-  d { debt = mkMoney val $ (moneyCurrency <<< debtMoney) (Debt d) }
+setDebtMoney ∷ Debt → Money → Debt
+setDebtMoney (Debt d) m = Debt $ d { debt = m }
 getDesc :: Debt -> String
 getDesc (Debt d) = d.desc
 setDesc (Debt d) desc = Debt $ d { desc = desc }
