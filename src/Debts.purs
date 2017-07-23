@@ -2,7 +2,7 @@ module Debts where
 
 
 import FriendInDebt.Prelude
-import Types (FIDMonad, ContainerMsgBus, ContainerMsg(..), NameMap(..), DebtMap(..))
+import Types (FIDMonad, ContainerMsgBus, ContainerMsg(..), NameMap, DebtsMap)
 import Control.Monad.Eff.Console (logShow)
 import Control.Monad.Aff (Aff)
 import Data.Array (singleton, head)
@@ -32,7 +32,7 @@ data Query a
   | InputFriend String a
   | InputName String a
   | UpdateName String a
-  | ShowItemizedDebtFor String a
+  | ShowItemizedDebtFor (Maybe F.FoundationId) a
 
 type Input = ContainerMsgBus
 type Message = String
@@ -41,16 +41,16 @@ type State = { friends             ∷ Array F.FoundationId
              , pendingFriendsTodo  ∷ Array F.FoundationId
              , pendingFriendsSent  ∷ Array F.FoundationId
              , balances            ∷ Array F.Balance
+             , itemizedDebts       ∷ DebtsMap
              , myId                ∷ F.FoundationId
              , pendingSent         ∷ Array F.Debt
              , pendingTodo         ∷ Array F.Debt
              , newDebt             ∷ Maybe F.Debt
              , newCredit           ∷ Maybe F.Debt
-             , names               ∷ NameMap
              , newFriend           ∷ Either String F.FoundationId
              , userName            ∷ Either F.FoundationId F.UserName
              , inputName           ∷ String
-             , showItemizedDebtFor ∷ String
+             , showItemizedDebtFor ∷ Maybe F.FoundationId
              , defaultCurrency     ∷ F.Currency
              , loading             ∷ Boolean
              , errorBus            ∷ ContainerMsgBus }
@@ -70,16 +70,16 @@ component =
                        , pendingFriendsTodo: []
                        , pendingFriendsSent: []
                        , balances: []
+                       , itemizedDebts: M.empty
                        , myId: F.fiBlankId
                        , pendingSent: []
                        , pendingTodo: []
-                       , names:    M.empty
                        , newFriend: Left ""
                        , newDebt: Nothing
                        , newCredit: Nothing
                        , userName: (Right "")
                        , inputName: ""
-                       , showItemizedDebtFor: ""
+                       , showItemizedDebtFor: Nothing
                        , defaultCurrency: F.cUSD
                        , loading: false
                        , errorBus: input }
@@ -106,7 +106,7 @@ component =
         [
           HH.ul
           [ HP.class_ $ HH.ClassName "col-12" ]
-          $ (displayBalanceLi mockMe) <$> state.balances
+          $ (displayBalanceLi state.myId) <$> state.balances
         ]
       , HH.div
         [ HP.class_ $ HH.ClassName "all-pending-debts-container" ]
@@ -114,7 +114,7 @@ component =
           displaySentFriendsList state.pendingFriendsSent
         , displayTodoFriendsList state.pendingFriendsTodo
         , (displaySentDebtsList state.myId) state.pendingSent
-        , (displayTodoList mockMe) state.pendingTodo
+        , (displayTodoList state.myId) state.pendingTodo
         ]
       , HH.div
         [ HP.class_ $ HH.ClassName "all-settings-container" ]
@@ -152,13 +152,13 @@ component =
             [inputCredit state.defaultCurrency state.myId state.friends state.newCredit]
         ]
         ]
-      ] $ (itemizedDebtsForFriendContainer state.showItemizedDebtFor) <$> mockFriendNames
-          where friendNames = fromFoldable $ M.values state.names
+      ] $ (itemizedDebtsForFriendContainer state.showItemizedDebtFor) <$> state.friends
 
   eval ∷ Query ~> H.ComponentDSL State Query Message (FIDMonad eff)
   eval = case _ of
-    ShowItemizedDebtFor name next → do
-      H.modify (_ {showItemizedDebtFor = name})
+    ShowItemizedDebtFor maybeFriend next → do
+      hLog maybeFriend
+      H.modify (_ {showItemizedDebtFor = maybeFriend })
       H.raise "show-itemized-debt"
       pure next
     HandleInput input next → do
@@ -224,23 +224,25 @@ loadFriendsAndDebts errorBus = do
   pendingFriends ← handleFIDCall errorBus F.blankPendingFriends F.pendingFriends
   pendingD       ← handleFIDCall errorBus F.blankPendingDebts F.pendingDebts
   balances       ← handleFIDCall errorBus [] F.debtBalances
-  let names = M.empty
   H.modify (_ { myId = myId, friends = friends
               , pendingFriendsSent = F.pfGetSents pendingFriends
               , pendingFriendsTodo = F.pfGetTodos pendingFriends
               , pendingSent = F.pdGetSents pendingD
               , pendingTodo = F.pdGetTodos pendingD
               , balances = balances
-              , loading = false, names = names
+              , loading = false
               })
 
 -- Itemized Debts for Friend Page
-itemizedDebtsForFriendContainer :: String → String → H.ComponentHTML Query
-itemizedDebtsForFriendContainer friendToShow nm =
-  HH.div
-    [ HP.class_ $ HH.ClassName $ "itemized-debts-for-friend", HP.attr (HH.AttrName "style") $ if (nm == friendToShow) then "display: block" else "display: none" ]
-    [ HH.h5_ [ HH.text $ "History with " <> friendToShow <> ":" ],
-      HH.ul_ $ itemizedDebtLi <$> [fakeDebt, fakeDebt]]
+itemizedDebtsForFriendContainer :: Maybe F.FoundationId → F.FoundationId → H.ComponentHTML Query
+itemizedDebtsForFriendContainer friendToShow curFriend =
+  case friendToShow of
+    Just f →
+      HH.div
+      [ HP.class_ $ HH.ClassName $ "itemized-debts-for-friend", HP.attr (HH.AttrName "style") $ if (curFriend == f) then "display: block" else "display: none" ]
+      [ HH.h5_ [ HH.text $ "History with " <> show f <> ":" ],
+        HH.ul_ $ itemizedDebtLi <$> []]
+    Nothing → HH.div_ [ HH.text "" ]
 
 itemizedDebtLi ∷ F.Debt → H.ComponentHTML Query
 itemizedDebtLi fd =
@@ -256,7 +258,8 @@ itemizedDebt fd =
 displayFriendLi ∷ String → H.ComponentHTML Query
 displayFriendLi n =
   HH.li [HP.class_ $ HH.ClassName "friend-row row"]
-  [HH.a [HP.href "#", HE.onClick $ HE.input_ $ ShowItemizedDebtFor n] [HH.text n]]
+  [HH.a [HP.href "#", HE.onClick $ HE.input_ $ ShowItemizedDebtFor $ Just (F.fiMkId n)]
+   [HH.text n]]
 
 -- Balance List
 
@@ -382,7 +385,7 @@ idSpan me idToDisplay =
   let isItMe = me == idToDisplay
   in case isItMe of
     true → HH.text $ "Me"
-    false → HH.a [HP.href "#", HE.onClick $ HE.input_ $ ShowItemizedDebtFor $ show idToDisplay] [HH.text $ show idToDisplay]
+    false → HH.a [HP.href "#", HE.onClick $ HE.input_ $ ShowItemizedDebtFor $ Just idToDisplay] [HH.text $ show idToDisplay]
 
 descSpan ∷ F.Debt → H.ComponentHTML Query
 descSpan (F.Debt fd) =
@@ -493,9 +496,9 @@ inputFDebt debtType cur myId friends maybeDebt =
            [ HH.text $ "Send Debt" ]
          ]
       where noDecimals = S.takeWhile (\c → c /= '.')
-            amount debt v cur = F.setDebtMoney debt $
-              F.moneyFromDecString (noDecimals v) cur
-            counterparty debt debtType v = case debtType of
+            amount debt v currency = F.setDebtMoney debt $
+              F.moneyFromDecString (noDecimals v) currency
+            counterparty debt dType v = case dType of
               Debt   → F.debtSetCreditor debt (F.fiMkId v)
               Credit → F.debtSetDebtor   debt (F.fiMkId v)
 
@@ -522,6 +525,7 @@ handleFIDCall errorBus blankVal fidAffCall = do
 
 -- Mocks for Testing purposes
 
+{-
 mockFriendNames :: Array String
 mockFriendNames = ["bob", "tim", "kevin"]
 
@@ -540,6 +544,7 @@ mockMe = (F.FoundationId "me")
 fakeFriend :: F.FoundationId
 fakeFriend = (F.FoundationId "bob")
 
+
 mockDebtMap :: DebtMap
 mockDebtMap = M.insert (F.FoundationId "bob") fakeDebt $ M.empty
 
@@ -554,3 +559,4 @@ mockFoundationId :: F.FoundationId
 mockFoundationId = F.FoundationId "snoopy"
 mockDebt :: F.FoundationId -> F.Debt
 mockDebt fid = F.mkDebt mockFoundationId fid fid (F.moneyFromDecString "2.0" F.cUSD) F.NoDebtId "Fictional Cat Poop"
+-}
