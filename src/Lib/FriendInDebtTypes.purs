@@ -136,9 +136,12 @@ mkDebt d c toC amount dId desc = Debt { debtor: d, creditor: c, debt: amount
 zeroDebt ∷ Currency → FoundationId → FoundationId → FoundationId → Debt
 zeroDebt cur debtor creditor toConfirm = mkDebt debtor creditor toConfirm (mkMoney 0.0 cur) NoDebtId ""
 debtMoney ∷ Debt → Money
-debtMoney (Debt fd) = fd.debt
+debtMoney (Debt d) = d.debt
+debtAmount = numAmount <<< debtMoney
 debtSetDebtor   (Debt d) debtor   = Debt $ d { debtor   = debtor }
 debtSetCreditor (Debt d) creditor = Debt $ d { creditor = creditor }
+debtDebtor (Debt d ) = d.debtor
+debtCreditor (Debt d ) = d.creditor
 setDebt ∷ Debt → Number → Currency → Debt
 setDebt (Debt fd) val currency = Debt $ fd { debt = mkMoney val currency }
 setDebtAmount ∷ Debt → Number → Debt
@@ -149,7 +152,6 @@ getDesc (Debt d) = d.desc
 setDesc (Debt d) desc = Debt $ d { desc = desc }
 debtToConfirm ∷ Debt → FoundationId
 debtToConfirm (Debt d) = d.toConfirm
-debtAmount (Debt d) = d.debt
 debtCounterparty ∷ FoundationId → Debt → FoundationId
 debtCounterparty myId (Debt fd) = if fd.debtor == myId
                                  then fd.creditor else fd.debtor

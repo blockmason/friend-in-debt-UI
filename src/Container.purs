@@ -180,8 +180,3 @@ mkFriends = do
   _ ← H.liftAff $ F.runMonadF $ F.createFriendship (F.FoundationId "timtime")
   _ ← H.liftAff $ F.runMonadF $ F.confirmFriendship (F.FoundationId "timgalebach")
   pure unit
-
-mkDebts = do
-  _ ← H.liftAff $ F.runMonadF $ F.newPendingDebt (F.FoundationId "timtime") (F.FoundationId "timgalebach") (F.mkMoney 1200.0 F.USD) "hookers"
-  _ ← H.liftAff $ F.runMonadF $ F.newPendingDebt (F.FoundationId "timgalebach") (F.FoundationId "timtime") (F.mkMoney 500.0 F.USD) "blow"
-  pure unit

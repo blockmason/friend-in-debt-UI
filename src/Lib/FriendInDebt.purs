@@ -135,10 +135,11 @@ confirmedFriends = do
   friendList ← liftAff $ makeAff (\error success → friendsImpl success myId)
   pure $ FoundationId <$> friendList
 
-newPendingDebt ∷ FoundationId → FoundationId → Money → Description → MonadF Unit
-newPendingDebt (FoundationId debtor) (FoundationId creditor) m desc = do
-  liftEff $ newPendingDebtImpl debtor creditor (numAmount m)
-    (show $ moneyCurrency m) desc
+newPendingDebt ∷ Debt → MonadF Unit
+newPendingDebt debt = do
+  let m = debtMoney debt
+  liftEff $ newPendingDebtImpl (fiGetId $ debtDebtor debt)
+    (fiGetId $ debtCreditor debt) (numAmount m) (show $ moneyCurrency m) (getDesc debt)
 
 handleDebt ∷ HandleDebtFn → FoundationId → DebtId → MonadF Unit
 handleDebt handleDebtFn (FoundationId friendId) debtId = do

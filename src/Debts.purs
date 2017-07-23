@@ -194,8 +194,9 @@ component =
       hLog credit
       H.modify (_ { newCredit = Just credit })
       pure next
-    AddDebt maybeDebt next → do
+    AddDebt debt next → do
       s ← H.get
+      handleFIDCall s.errorBus unit (F.newPendingDebt debt)
       pure next
     ConfirmPending debt next → do
       s ← H.get
@@ -481,13 +482,14 @@ inputFDebt debtType cur myId friends maybeDebt =
                      ]
              ((\f → HH.option_ [ HH.text $ F.fiGetId f ]) <$> friends)
          , HH.input [ HP.type_ HP.InputText
-                    , HP.placeholder $ "debt description"
+                    , HP.placeholder $ "Enter debt memo here"
                     , HE.onValueInput
                       (HE.input (\val → handler $ F.setDesc d (S.take 32 val)))
                     , HP.value $ S.take 32 $ F.getDesc d ]
          , HH.button [ HE.onClick $ HE.input_ $ AddDebt d
+                     , HP.disabled $ F.debtAmount d == 0.0
                      , HP.class_ $ HH.ClassName "create-debt-button col-2"]
-           [HH.text $ "Debt " <> (show $ (F.debtCounterparty myId) <$> maybeDebt) ]
+           [ HH.text $ "Send Debt" ]
          ]
       where amount debt v = F.setDebtAmount debt $ fromMaybe 0.0 (N.fromString v)
             counterparty debt debtType v = case debtType of
