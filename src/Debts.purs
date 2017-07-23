@@ -164,7 +164,6 @@ component =
           s ← H.get
           H.modify (_ { loading = true })
           idebts ← handleFIDCall s.errorBus [] (F.itemizedDebts f)
-          hLog idebts
           H.modify (_ { showItemizedDebtFor = maybeFriend, loading = false
                       , itemizedDebts = M.insert f idebts s.itemizedDebts })
           H.raise "show-itemized-debt"
