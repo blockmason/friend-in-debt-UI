@@ -28,6 +28,7 @@ module Network.Eth.FriendInDebt
 import Prelude
 import Network.Eth.FriendInDebt.Types
 import Control.Monad.Eff           (Eff, kind Effect)
+import Control.Monad.Eff.Console   (logShow, CONSOLE)
 import Math                        (abs)
 import Control.Monad.Eff.Class     (liftEff)
 import Control.Monad.Aff.Class     (liftAff)
@@ -50,7 +51,7 @@ import Network.Eth.Foundation
 infixr 9 compose as ∘
 
 foreign import data FID ∷ Effect
-type MonadF a = ∀ e. ExceptT Error (Aff (fid ∷ FID, metamask ∷ MM.METAMASK | e)) a
+type MonadF a = ∀ e. ExceptT Error (Aff (console ∷ CONSOLE, fid ∷ FID, metamask ∷ MM.METAMASK | e)) a
 runMonadF = runExceptT
 
 type PendingFriend = { friendId    ∷ StringId
@@ -138,20 +139,23 @@ confirmedFriends = do
 newPendingDebt ∷ Debt → MonadF Unit
 newPendingDebt debt = do
   let m = debtMoney debt
-  liftEff $ newPendingDebtImpl (fiGetId $ debtDebtor debt)
-    (fiGetId $ debtCreditor debt) (numAmount m) (show $ moneyCurrency m) (getDesc debt)
+      debtor = (fiGetId $ debtDebtor debt)
+      creditor = (fiGetId $ debtCreditor debt)
+  liftEff $ newPendingDebtImpl debtor creditor (numAmount m) (show $ moneyCurrency m) (getDesc debt)
 
-handleDebt ∷ HandleDebtFn → FoundationId → DebtId → MonadF Unit
-handleDebt handleDebtFn (FoundationId friendId) debtId = do
+handleDebt ∷ HandleDebtFn → Debt → MonadF Unit
+handleDebt handleDebtFn debt = do
   (FoundationId myId) ← foundationId
-  if isValidDebtId debtId
+  let debtId = debtGetId debt
+      friendId = fiGetId $ debtCounterparty (fiMkId myId) debt
+  if isValidDebtId $ debtId
     then liftEff $ handleDebtFn myId friendId (getDebtId debtId)
     else throwError InvalidDebtId
 
-confirmPendingDebt ∷ FoundationId → DebtId → MonadF Unit
+confirmPendingDebt ∷ Debt → MonadF Unit
 confirmPendingDebt = handleDebt confirmDebtImpl
 
-rejectPendingDebt  ∷ FoundationId → DebtId → MonadF Unit
+rejectPendingDebt  ∷ Debt → MonadF Unit
 rejectPendingDebt  = handleDebt rejectDebtImpl
 
 debtBalances ∷ MonadF (Array Balance)

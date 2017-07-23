@@ -51,21 +51,26 @@ getDebtId _           = -1.0
 
 -- money
 data Currency =
-    USD
-  | EUR
-  | Invalid
-
-fromString ∷ String → Currency
-fromString "USD" = USD
-fromString "EUR" = EUR
-fromString _     = Invalid
+    Currency { isoCode ∷ String, decimals ∷ Int }
+  | InvalidCurrency
+mkCurrency ∷ String → Int → Currency
+mkCurrency isoCode decimals = Currency { isoCode: isoCode, decimals: decimals }
+invalidCurrency = Currency { isoCode: "INVALID", decimals: 0 }
 
 instance showCurrency ∷ Show Currency where
-  show USD = "USD"
-  show EUR = "EUR"
-  show _   = "Invalid"
+  show (Currency c) = c.isoCode <> ", decimals: " <> show c.decimals
+  show InvalidCurrency = "InvalidCurrency"
 instance eqCurrency ∷ Eq Currency where
-  eq c1 c2 = (show c1) == (show c2)
+  eq (Currency c1) (Currency c2)     = c1.isoCode == c2.isoCode
+  eq InvalidCurrency InvalidCurrency = true
+  eq _ _                             = false
+
+cUSD = mkCurrency "USD" 2
+cEUR = mkCurrency "EUR" 2
+fromIsoCode ∷ String → Currency
+fromIsoCode "USD" = cUSD
+fromIsoCode "EUR" = cEUR
+fromIsoCode _     = InvalidCurrency
 
 newtype Money = Money { amount ∷ Number, currency ∷ Currency }
 
@@ -98,7 +103,7 @@ instance showBalance ∷ Show Balance where
 rawToBalance ∷ FoundationId → RawBalance → Balance
 rawToBalance fi rb =
   let (Tuple d c) = debtorCreditor fi rb.counterParty rb.amount
-  in Balance { amount: mkMoney (abs rb.amount) (fromString rb.currency)
+  in Balance { amount: mkMoney (abs rb.amount) (fromIsoCode rb.currency)
              , debtor: d, creditor: c }
   where debtorCreditor myId cpId val = if val >= (toNumber 0)
                                      then Tuple myId (FoundationId cpId)
@@ -126,7 +131,7 @@ rawToDebt rd = Debt { debtId: DebtId rd.id
                     , debtor: FoundationId rd.debtor
                     , creditor: FoundationId rd.creditor
                     , toConfirm: FoundationId rd.confirmerId
-                    , debt: mkMoney rd.amount (fromString rd.currency)
+                    , debt: mkMoney rd.amount (fromIsoCode rd.currency)
                     , desc: rd.desc }
 
 mkDebt ∷ FoundationId → FoundationId → FoundationId → Money → DebtId → Description
@@ -142,6 +147,7 @@ debtSetDebtor   (Debt d) debtor   = Debt $ d { debtor   = debtor }
 debtSetCreditor (Debt d) creditor = Debt $ d { creditor = creditor }
 debtDebtor (Debt d ) = d.debtor
 debtCreditor (Debt d ) = d.creditor
+debtGetId (Debt d) = d.debtId
 setDebt ∷ Debt → Number → Currency → Debt
 setDebt (Debt fd) val currency = Debt $ fd { debt = mkMoney val currency }
 setDebtAmount ∷ Debt → Number → Debt

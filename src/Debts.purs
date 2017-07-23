@@ -27,7 +27,7 @@ data Query a
   | InputCredit F.Debt a
   | AddDebt F.Debt a
   | ConfirmPending F.Debt a
-  | CancelPending F.Debt a
+  | RejectPending F.Debt a
   | AddFriend (Either String F.FoundationId) a
   | InputFriend String a
   | InputName String a
@@ -80,7 +80,7 @@ component =
                        , userName: (Right "")
                        , inputName: ""
                        , showItemizedDebtFor: ""
-                       , defaultCurrency: F.USD
+                       , defaultCurrency: F.cUSD
                        , loading: false
                        , errorBus: input }
 
@@ -106,15 +106,15 @@ component =
         [
           HH.ul
           [ HP.class_ $ HH.ClassName "col-12" ]
-          $ (displayBalanceLi mockMe) <$> [mockBalance, mockBalance]
+          $ (displayBalanceLi mockMe) <$> state.balances
         ]
       , HH.div
         [ HP.class_ $ HH.ClassName "all-pending-debts-container" ]
         [
           displaySentFriendsList state.pendingFriendsSent
         , displayTodoFriendsList state.pendingFriendsTodo
-        , (displaySentDebtsList mockMe) [fakeDebt, fakeDebt]
-        , (displayTodoList mockMe) [fakeDebt, fakeDebt]
+        , (displaySentDebtsList state.myId) state.pendingSent
+        , (displayTodoList mockMe) state.pendingTodo
         ]
       , HH.div
         [ HP.class_ $ HH.ClassName "all-settings-container" ]
@@ -187,23 +187,24 @@ component =
       H.modify (_ { inputName = "" })
       pure next
     InputDebt debt next → do
-      hLog debt
       H.modify (_ { newDebt = Just debt })
       pure next
     InputCredit credit next → do
-      hLog credit
       H.modify (_ { newCredit = Just credit })
       pure next
     AddDebt debt next → do
+      hLog debt
       s ← H.get
       handleFIDCall s.errorBus unit (F.newPendingDebt debt)
+      H.modify (_ { newDebt = Nothing, newCredit = Nothing })
       pure next
     ConfirmPending debt next → do
       s ← H.get
+      handleFIDCall s.errorBus unit (F.confirmPendingDebt debt)
       pure next
-    CancelPending (F.Debt debt) next → do
+    RejectPending debt next → do
       s ← H.get
---      handleFIDCall s.errorBus unit (F.cancelPending debt.friend)
+      handleFIDCall s.errorBus unit (F.rejectPendingDebt debt)
       pure next
     RefreshDebts next → do
       errorBus ← H.gets _.errorBus
@@ -221,16 +222,15 @@ loadFriendsAndDebts errorBus = do
   friends        ← handleFIDCall errorBus [] F.confirmedFriends
   pendingFriends ← handleFIDCall errorBus F.blankPendingFriends F.pendingFriends
   pendingD       ← handleFIDCall errorBus F.blankPendingDebts F.pendingDebts
+  balances       ← handleFIDCall errorBus [] F.debtBalances
   let names = M.empty
---  debts       ← handleFIDCall errorBus [] (F.currentUserDebts friends)
---  pending     ← handleFIDCall errorBus [] (F.currentUserPending friends)
   H.modify (_ { myId = myId, friends = friends
               , pendingFriendsSent = F.pfGetSents pendingFriends
               , pendingFriendsTodo = F.pfGetTodos pendingFriends
               , pendingSent = F.pdGetSents pendingD
               , pendingTodo = F.pdGetTodos pendingD
+              , balances = balances
               , loading = false, names = names
-
               })
 
 -- Itemized Debts for Friend Page
@@ -414,7 +414,7 @@ confirmButton fd = HH.button [ HP.class_ $ HH.ClassName "btn-confirm"
 
 cancelButton ∷ F.Debt → H.ComponentHTML Query
 cancelButton fd = HH.button [ HP.class_ $ HH.ClassName "btn-cancel"
-                             , HE.onClick $ HE.input_ $ CancelPending fd]
+                             , HE.onClick $ HE.input_ $ RejectPending fd]
   [ HH.text "Cancel" ]
 
 confirmFriendshipButton :: F.FoundationId -> H.ComponentHTML Query
@@ -518,6 +518,7 @@ handleFIDCall errorBus blankVal fidAffCall = do
         Right val  → pure val
 
 -- Mocks for Testing purposes
+
 mockFriendNames :: Array String
 mockFriendNames = ["bob", "tim", "kevin"]
 
@@ -540,12 +541,13 @@ mockDebtMap :: DebtMap
 mockDebtMap = M.insert (F.FoundationId "bob") fakeDebt $ M.empty
 
 mockBalance :: F.Balance
-mockBalance = F.Balance { debtor: mockMe, creditor: fakeFriend, amount: F.Money {amount: 5.0, currency: F.USD}}
+mockBalance = F.Balance { debtor: mockMe, creditor: fakeFriend, amount: F.Money {amount: 5.0, currency: F.cUSD}}
 
 mockPendingDebts :: F.PendingDebts
 mockPendingDebts = F.PD {sent: [fakeDebt], todo: [fakeDebt]}
 
+
 mockFoundationId :: F.FoundationId
 mockFoundationId = F.FoundationId "snoopy"
 mockDebt :: F.FoundationId -> F.Debt
-mockDebt fid = F.mkDebt mockFoundationId fid fid (F.mkMoney 2.0 F.USD) F.NoDebtId "Fictional Cat Poop"
+mockDebt fid = F.mkDebt mockFoundationId fid fid (F.mkMoney 2.0 F.cUSD) F.NoDebtId "Fictional Cat Poop"

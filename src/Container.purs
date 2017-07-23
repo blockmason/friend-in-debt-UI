@@ -170,8 +170,8 @@ startCheckInterval maybeBus ms = do
 
 runTests = do
   (H.liftAff $ F.runMonadF $ F.foundationId)       >>= hLog
-  (H.liftAff $ F.runMonadF $ F.pendingFriends)     >>= hLog
-  (H.liftAff $ F.runMonadF $ F.confirmedFriends)   >>= hLog
+--  (H.liftAff $ F.runMonadF $ F.pendingFriends)     >>= hLog
+--  (H.liftAff $ F.runMonadF $ F.confirmedFriends)   >>= hLog
 --  (H.liftAff $ F.runMonadF $ F.pendingDebts)       >>= hLog
 --  (H.liftAff $ F.runMonadF $ F.debtBalances)       >>= hLog
   pure unit
