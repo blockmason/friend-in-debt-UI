@@ -24,6 +24,7 @@ data Query a
   = RefreshDebts a
   | HandleInput Input a
   | InputDebt F.Debt a
+  | InputCredit F.Debt a
   | AddDebt F.Debt a
   | ConfirmPending F.Debt a
   | CancelPending F.Debt a
@@ -148,7 +149,7 @@ component =
             HH.li [ HP.class_ $ HH.ClassName "row create-debt-card" ]
             [inputDebt state.defaultCurrency state.myId state.friends state.newDebt]
         , HH.li [ HP.class_ $ HH.ClassName "row create-debt-card" ]
-            [inputCredit state.defaultCurrency state.myId state.friends state.newDebt]
+            [inputCredit state.defaultCurrency state.myId state.friends state.newCredit]
         ]
         ]
       ] $ (itemizedDebtsForFriendContainer state.showItemizedDebtFor) <$> mockFriendNames
@@ -186,6 +187,12 @@ component =
       H.modify (_ { inputName = "" })
       pure next
     InputDebt debt next → do
+      hLog debt
+      H.modify (_ { newDebt = Just debt })
+      pure next
+    InputCredit credit next → do
+      hLog credit
+      H.modify (_ { newCredit = Just credit })
       pure next
     AddDebt maybeDebt next → do
       s ← H.get
@@ -458,22 +465,26 @@ inputFDebt debtType cur myId friends maybeDebt =
       let d = case debtType of
             Debt   → fromMaybe (F.zeroDebt cur myId friendId friendId) maybeDebt
             Credit → fromMaybe (F.zeroDebt cur friendId myId friendId) maybeDebt
+          handler = case debtType of Debt   → InputDebt
+                                     Credit → InputCredit
       in HH.div [ HP.class_ $ HH.ClassName "createDebt col row" ]
          [
            HH.input [ HP.type_ HP.InputNumber
                     , HP.class_ $ HH.ClassName "debt-amount col-2"
                     , HP.value $ show $ (F.numAmount ∘ F.debtMoney) d
                     , HE.onValueInput
-                      (HE.input (\val → InputDebt $ amount d val))
+                      (HE.input (\val → handler $ amount d val))
                     , HP.min $ toNumber (-1000000)
                     , HP.max $ toNumber 1000000]
-         , HH.select_ $
-             (\f → HH.option_ [ HH.text $ F.fiGetId f ]) <$> friends
+         , HH.select [ HE.onValueChange
+                       (HE.input (\v → handler $ counterparty d debtType v))
+                     ]
+             ((\f → HH.option_ [ HH.text $ F.fiGetId f ]) <$> friends)
          , HH.input [ HP.type_ HP.InputText
                     , HP.placeholder $ "debt description"
                     , HE.onValueInput
-                      (HE.input (\val → InputDebt $ F.setDesc d (S.take 32 val)))
-                    , HP.value $ F.getDesc d ]
+                      (HE.input (\val → handler $ F.setDesc d (S.take 32 val)))
+                    , HP.value $ S.take 32 $ F.getDesc d ]
          , HH.button [ HE.onClick $ HE.input_ $ AddDebt d
                      , HP.class_ $ HH.ClassName "create-debt-button col-2"]
            [HH.text $ "Debt " <> (show $ (F.debtCounterparty myId) <$> maybeDebt) ]

@@ -116,6 +116,7 @@ newtype Debt = Debt { debtor     ∷ FoundationId
                     , desc       ∷ String }
 instance showDebt ∷ Show Debt where
   show (Debt fd) = show fd.debt <> ": " <> show fd.debtor <> " " <> show fd.creditor
+    <> " | " <> show fd.desc
 instance eqDebt ∷ Eq Debt where
   eq (Debt fd1) (Debt fd2) =
     (fd1.debtor == fd2.debtor) && (fd1.creditor == fd2.creditor) && (fd1.debt == fd2.debt)
