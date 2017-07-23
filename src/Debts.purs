@@ -152,15 +152,23 @@ component =
             [inputCredit state.defaultCurrency state.myId state.friends state.newCredit]
         ]
         ]
-      ] $ (itemizedDebtsForFriendContainer state.showItemizedDebtFor) <$> state.friends
+      ] $
+      (itemizedDebtsForFriendContainer state.showItemizedDebtFor state.itemizedDebts) <$> state.friends
 
   eval ∷ Query ~> H.ComponentDSL State Query Message (FIDMonad eff)
   eval = case _ of
     ShowItemizedDebtFor maybeFriend next → do
-      hLog maybeFriend
-      H.modify (_ {showItemizedDebtFor = maybeFriend })
-      H.raise "show-itemized-debt"
-      pure next
+      case maybeFriend of
+        Nothing → pure next
+        Just f  → do
+          s ← H.get
+          H.modify (_ { loading = true })
+          idebts ← handleFIDCall s.errorBus [] (F.itemizedDebts f)
+          hLog idebts
+          H.modify (_ { showItemizedDebtFor = maybeFriend, loading = false
+                      , itemizedDebts = M.insert f idebts s.itemizedDebts })
+          H.raise "show-itemized-debt"
+          pure next
     HandleInput input next → do
       H.modify (_ { errorBus = input })
       pure next
@@ -234,14 +242,14 @@ loadFriendsAndDebts errorBus = do
               })
 
 -- Itemized Debts for Friend Page
-itemizedDebtsForFriendContainer :: Maybe F.FoundationId → F.FoundationId → H.ComponentHTML Query
-itemizedDebtsForFriendContainer friendToShow curFriend =
+itemizedDebtsForFriendContainer :: Maybe F.FoundationId → DebtsMap → F.FoundationId → H.ComponentHTML Query
+itemizedDebtsForFriendContainer friendToShow debtsMap curFriend =
   case friendToShow of
     Just f →
       HH.div
       [ HP.class_ $ HH.ClassName $ "itemized-debts-for-friend", HP.attr (HH.AttrName "style") $ if (curFriend == f) then "display: block" else "display: none" ]
       [ HH.h5_ [ HH.text $ "History with " <> show f <> ":" ],
-        HH.ul_ $ itemizedDebtLi <$> []]
+        HH.ul_ $ itemizedDebtLi <$> (fromMaybe [] $ M.lookup f debtsMap)]
     Nothing → HH.div_ [ HH.text "" ]
 
 itemizedDebtLi ∷ F.Debt → H.ComponentHTML Query

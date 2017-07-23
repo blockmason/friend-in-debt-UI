@@ -16,6 +16,7 @@ module Network.Eth.FriendInDebt
        , confirmPendingDebt
        , rejectPendingDebt
        , debtBalances
+       , itemizedDebts
        , pendingDebts
 
        , allNames
@@ -61,6 +62,7 @@ type IdLookupFn   = ∀ e. (StringId → Eff e Unit) → Eff e Unit
 type BalanceLookupFn = ∀ e. (Array RawBalance → Eff e Unit) → StringId → Eff e Unit
 type HandleDebtFn = ∀ e. StringId → StringId → Number → Eff e Unit
 type DebtLookupFn = ∀ e. (Array RawDebt → Eff e Unit) → StringId → Eff e Unit
+type DebtLookupFn' = ∀ e. (Array RawConfirmed → Eff e Unit) → StringId → StringId → Eff e Unit
 type NameLookupFn = ∀ e. (String → Eff e Unit) → StringId → Eff e Unit
 type FriendsLookupFn = ∀ e. ((Array StringId) → Eff e Unit) → StringId → Eff e Unit
 type PendingFriendsFn = ∀ e. ((Array PendingFriend) → Eff e Unit) → StringAddr → Eff e Unit
@@ -81,6 +83,7 @@ foreign import confirmDebtImpl  ∷ HandleDebtFn
 foreign import rejectDebtImpl   ∷ HandleDebtFn
 foreign import debtBalancesImpl ∷ BalanceLookupFn
 foreign import pendingDebtsImpl ∷ DebtLookupFn
+foreign import itemizedDebtsImpl ∷ DebtLookupFn'
 
 foreign import getNameImpl ∷ NameLookupFn
 foreign import setNameImpl ∷ ∀ e. String → Eff e Unit
@@ -163,6 +166,12 @@ debtBalances = do
   (FoundationId myId) ← foundationId
   rawBalances ← liftAff $ makeAff (\err succ → debtBalancesImpl succ myId)
   pure $ (rawToBalance (FoundationId myId)) <$> rawBalances
+
+itemizedDebts ∷ FoundationId → MonadF (Array Debt)
+itemizedDebts (FoundationId friendId) = do
+  (FoundationId myId) ← foundationId
+  rawDebts ← liftAff $ makeAff (\e s → itemizedDebtsImpl s myId friendId)
+  pure $ rawConfirmedToDebt <$> rawDebts
 
 pendingDebts ∷ MonadF PendingDebts
 pendingDebts = do

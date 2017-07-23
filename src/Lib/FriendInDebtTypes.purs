@@ -21,7 +21,7 @@ import Data.Array                                                  as A
 import Data.Tuple                  (Tuple(..))
 import Data.Foldable               (foldr)
 import Network.Eth.Metamask                                        as MM
-import Network.Eth.Foundation      (FoundationId(..))
+import Network.Eth.Foundation      (fiBlankId, fiMkId, FoundationId(..))
 
 type StringAddr = String
 type StringId   = String
@@ -149,6 +149,14 @@ rawToDebt rd = Debt { debtId: DebtId rd.id
                     , debt: mkMoney rd.amount (fromIsoCode rd.currency)
                     , desc: rd.desc }
 
+rawConfirmedToDebt ∷ RawConfirmed → Debt
+rawConfirmedToDebt rd = Debt { debtId: NoDebtId
+                             , debtor: fiMkId rd.debtor
+                             , creditor: fiMkId rd.creditor
+                             , toConfirm: fiBlankId
+                             , debt: mkMoney rd.amount (fromIsoCode rd.currency)
+                             , desc: rd.desc }
+
 mkDebt ∷ FoundationId → FoundationId → FoundationId → Money → DebtId → Description
        → Debt
 mkDebt d c toC amount dId desc = Debt { debtor: d, creditor: c, debt: amount
@@ -195,6 +203,12 @@ type RawDebt = { id          ∷ Number
                , desc        ∷ String
                , debtor      ∷ StringId
                , creditor    ∷ StringId }
+
+type RawConfirmed = { currency    ∷ String
+                    , amount      ∷ Number
+                    , desc        ∷ String
+                    , debtor      ∷ StringId
+                    , creditor    ∷ StringId }
 
 type RawBalance = { counterParty ∷ StringId
                   , amount       ∷ Number

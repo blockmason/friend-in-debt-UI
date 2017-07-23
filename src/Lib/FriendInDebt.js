@@ -130,6 +130,20 @@ exports.pendingDebtsImpl = function(callback) {
     };
 };
 
+exports.itemizedDebtsImpl = function(callback) {
+    return function(myId) {
+        return function(friendId) {
+            return function() {
+                FriendInDebt.deployed().then(function(instance) {
+                    return instance.confirmedDebts.call(myId, friendId);
+                }).then(function(res) {
+                    callback(confirmedDebts2Js(res.valueOf()))();
+                });
+            };
+        };
+    };
+};
+
 exports.confirmDebtImpl = function(myId) {
     return function(friendId) {
         return function(debtId) {
