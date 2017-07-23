@@ -11,7 +11,7 @@ import Control.Monad.Except.Trans  (ExceptT, throwError, runExceptT, lift)
 import Data.Either                 (Either(Left, Right))
 import Data.Maybe                  (Maybe(..), fromMaybe)
 import Data.Traversable            (traverse)
-import Data.Format.Money           (formatDollar)
+import Data.Format.Money           (formatDecimal)
 import Data.Int                    (toNumber)
 import Data.Number                                                 as N
 import Data.String                 (localeCompare)
@@ -83,7 +83,9 @@ conversionFactor = (pow 10.0) <<< toNumber <<< cDecimals
 newtype Money = Money { amount ∷ Number, currency ∷ Currency }
 
 formatMoney ∷ Money → String
-formatMoney m = show $ (numAmount m) / (conversionFactor (moneyCurrency m))
+formatMoney m =
+  let c = moneyCurrency m
+  in formatDecimal ((numAmount m) / (conversionFactor c)) $ cDecimals c
 instance showMoney ∷ Show Money where
   show m = cIsoCode (moneyCurrency m) <> " " <> (formatMoney $ m)
 instance eqMoney ∷ Eq Money where

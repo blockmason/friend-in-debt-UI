@@ -1,6 +1,13 @@
 module Data.Format.Money
        (
          formatDollar
+       , formatDecimal
+       , MoneyAmount
+       , Decimals
        ) where
 
-foreign import formatDollar :: Number → String
+type Decimals = Int
+type MoneyAmount = Number
+
+foreign import formatDollar  :: MoneyAmount → String
+foreign import formatDecimal :: MoneyAmount → Decimals → String
