@@ -3,7 +3,7 @@
 /* general */
 body {
   height: 100%;
-  color: white;
+  color: black;
   font-family: "Lato", Arial, sans-serif;
   background-color: #444;
 }
@@ -13,7 +13,7 @@ html {
 }
 
 .container {
-  background-image: linear-gradient(-180deg, #a7759e 0%, #F76B1C 100%);
+  background: white;
   max-width: 600px;
   box-shadow: 0 0 5px 5px rgba(0,0,0,0.3);
   height: 100vh;
@@ -65,22 +65,28 @@ html {
     display: none;
 }
 
+.back-nav-bar, #header {
+  background: #2196f3;
+}
 /* home bar*/
 .home-bar img {
   height: 30px;
 }
 
 .home-bar {
-    background: rgba(0,0,0,0.3);
-    box-shadow: inset -5px -4px 2px 0px rgba(0,0,0,0.3);
+    background: #111;
+    box-shadow: inset 0 -4px 7px -1px rgba(0,0,0,0.3);
     transition: all 1s;
     height: 0;
     opacity: 0;
+    padding-left: 10px;
 }
 
 .home-bar a {
   padding: 10px 10px 10px 0;
   color: white;
+  text-transform: uppercase;
+  font-weight: 100;
   text-decoration: none;
 }
 
@@ -113,18 +119,18 @@ html {
   text-decoration: none;
   background: rgba(0,0,0,0.7);
   box-shadow:  9px 1px 5px -1px rgba(0,0,0,0.2);
-  font-weight: 100;
+  font-weight: 500;
   line-height: 10px;
 }
 
 /* back navigation */
 
 #back-nav-bar {
-  background: rgba(255,255,255,0.1);
+  background: rgba(0,0,0,0.5);
 }
 
 #back-nav-bar:hover {
-  background: none;
+  background: #2196f3;
 }
 
 .close-pop-button {
@@ -275,15 +281,10 @@ html {
   transform: translateX(-3000px); height: 0; margin: 0; padding: 0;
 }
 
-.page-container > div {
-  margin-top: 20px;
-
-}
-
 /*friend page*/
 
 .all-friends-container .friend-row {
-  background-color: rgba(255,255,255,0.1);
+  background-color: rgba(0,0,0,0.1);
   margin-bottom: 3px;
   width: 100%;
   margin-left: 0;
@@ -297,12 +298,12 @@ html {
 .friend-row a {
   display: block;
   width: 100%;
-  color: white;
+  color: #333;
   text-decoration: none;
 }
 
 .friend-row a:visited {
-  color: white;
+  color: #333;
   text-decoration: none;
 }
 
@@ -313,7 +314,7 @@ html {
 }
 
 .itemized-debts-for-friend .debt-amount {
-  background-color: rgba(255,255,255,0.1);
+  background-color: rgba(0,0,0,0.1);
   margin-bottom: 3px;
   width: 100%;
   margin-left: 0;
@@ -331,10 +332,16 @@ html {
 }
 
 .balance-row {
-  height: 50px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 5px;
-  margin: 10px;
+  height: 60px;
+  border-bottom: 1px solid #aaa;
+}
+
+.balance-row:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+.balance-row .col {
+  height: 100%;
 }
 
 .balance-row .creditor:after {
@@ -346,7 +353,7 @@ html {
 
 /*generic debt display*/
 .creditor a, .debtor a {
-  color: white;
+  color: #333;
 }
 
 .creditor a:hover, .debtor a:hover {
@@ -365,7 +372,7 @@ html {
 
 .all-pending-debts-container .sent-debt-row, .all-pending-debts-container .sent-friend-row {
   height: 90px;
-  background: rgba(255,255,255,0.1);
+  background: rgba(0,0,0,0.1);
   border-radius: 5px;
   margin: 10px;
 }
@@ -376,7 +383,7 @@ html {
 
 .all-pending-debts-container .todo-debt-row {
   height: 130px;
-  background: rgba(255,255,255,0.1);
+  background: rgba(0,0,0,0.1);
   border-radius: 5px;
   margin: 10px;
 }
@@ -395,7 +402,7 @@ html {
 .btn-cancel, .btn-confirm {
   background: none;
   border: none;
-  color: white;
+  color: #333;
   text-align: center;
   width: 100%;
   border: 1px solid rgba(0,0,0,0.1);
@@ -415,7 +422,7 @@ html {
 /* settings page */
 .default-currency-container, .foundation-id-container {
   height: 30px;
-  background: rgba(255,255,255,0.1);
+  background: rgba(0,0,0,0.1);
   border-radius: 5px;
   margin: 10px;
   padding: 0 5px;
@@ -456,7 +463,7 @@ html {
 
 .create-debt-card, .addFriend {
   margin: 10px;
-  background: rgba(0,0,0,0.1);
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,.14), 0 3px 1px -2px rgba(0,0,0,.2), 0 1px 5px 0 rgba(0,0,0,.12);
   padding: 10px;
   border-radius: 5px;
 }
@@ -464,6 +471,8 @@ html {
 .create-debt-card input, .addFriend input {
   color: black;
   background: white;
+  border: 1px solid #333;
+  border-radius: 5px;
 }
 
 /* add friend page*/
@@ -472,8 +481,16 @@ html {
   width: 100%;
   margin: auto;
 }
+.addFriend small {
+  text-transform: uppercase;
+}
 
 .addFriend input {
   margin-bottom: 10px;
+  color: #333;
+}
+
+.addFriend button:hover {
+  background-color: #2196f3;
   color: white;
 }
