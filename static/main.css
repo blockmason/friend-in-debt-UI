@@ -58,6 +58,25 @@ html {
     display: none;
 }
 
+/* home bar*/
+.home-bar img {
+  height: 30px;
+}
+
+.home-bar {
+    background: rgba(0,0,0,0.3);
+    box-shadow: inset -5px -4px 2px 0px rgba(0,0,0,0.3);
+    transition: all 1s;
+    height: 0;
+    opacity: 0;
+}
+
+.home-bar a {
+  padding: 10px 10px 10px 0;
+  color: white;
+  text-decoration: none;
+}
+
 /* header */
 
 #header {
@@ -147,6 +166,11 @@ html {
 .show-balances .back-nav-bar,
 .show-balances .add-friend-bar {
   display: none  !important;
+}
+
+.show-balances .home-bar {
+  height: 50px;
+  opacity: 1;
 }
 
 .show-friends .create-debt-container,
