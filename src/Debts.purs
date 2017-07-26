@@ -120,15 +120,15 @@ component =
         [ HP.class_ $ HH.ClassName "all-settings-container" ]
         [
           HH.div
-            [HP.class_ $ HH.ClassName "col default-currency-container"]
+            [HP.class_ $ HH.ClassName "row default-currency-container"]
             [
-              (HH.text  $ "Default Currency: "),
+              (HH.text  $ "Default Currency:  "),
               HH.span [] [ HH.text $ show state.defaultCurrency ]
             ]
           , HH.div
-            [HP.class_ $ HH.ClassName "col foundation-id-container"]
+            [HP.class_ $ HH.ClassName "row foundation-id-container"]
             [
-              (HH.text  $ "My Foundation ID: "),
+              (HH.text  $ "My Foundation ID:  "),
               HH.span [] [ HH.text $ show state.myId ]
             ]
         ]
@@ -436,16 +436,18 @@ confirmFriendshipButton friend =
 
 addFriendWidget ∷ State → H.ComponentHTML Query
 addFriendWidget state =
-  HH.div [ HP.class_ $ HH.ClassName "addFriend row col" ]
+  HH.div [ HP.class_ $ HH.ClassName "addFriend" ]
   [
+    HH.small_ [HH.text "Friend's FoundationID"],
     HH.input [ HP.type_ HP.InputText
              , HP.value $ inputVal state.newFriend
-             , HP.class_ $ HH.ClassName "col"
+             , HP.class_ $ HH.ClassName "form-control"
+             , HP.placeholder $ "johndoe"
              , HE.onValueInput
                (HE.input (\val → InputFriend val))
              ]
   , HH.button [ HE.onClick $ HE.input_ $ AddFriend state.newFriend
-              , HP.class_ $ HH.ClassName "col-2"]
+              , HP.class_ $ HH.ClassName "form-control"]
     [ HH.text "Add Friend by FoundationId" ]
   ]
   where inputVal = either id show

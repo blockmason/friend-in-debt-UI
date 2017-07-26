@@ -61,7 +61,7 @@ ui =
 
     render ∷ State → H.ParentHTML Query ChildQuery ChildSlot (FIDMonad eff)
     render state =
-      HH.div [ HP.id_ "container", HP.class_ (HH.ClassName $ "container-fluid " <> state.currentScreen) ]
+      HH.div [ HP.id_ "container", HP.class_ (HH.ClassName $ "container " <> state.currentScreen) ]
       [ promptMetamask state.loggedIn
       , loadingOverlay state.loading
       , HH.div [ HP.id_ "home-bar", HP.class_ (HH.ClassName "row home-bar")]
