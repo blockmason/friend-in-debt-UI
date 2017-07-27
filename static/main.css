@@ -3,7 +3,7 @@
 /* general */
 body {
   height: 100%;
-  color: black;
+  color: #444;
   font-family: "Lato", Arial, sans-serif;
   background-color: #444;
 }
@@ -13,7 +13,7 @@ html {
 }
 
 .container {
-  background: white;
+  background-image: linear-gradient(-180deg, #0F2422 0%, #1C4737 100%);
   max-width: 600px;
   box-shadow: 0 0 5px 5px rgba(0,0,0,0.3);
   height: 100vh;
@@ -40,9 +40,16 @@ html {
     left: 0;
     height: 2000px;
     width: 100%;
-    background-color: black;
     color: white;
     z-index: 99;
+}
+
+.container.loading .page-container {
+    filter: progid:DXImageTransform.Microsoft.Blur(PixelRadius='3');
+    -webkit-filter: url(#blur-filter);
+    filter: url(#blur-filter);
+    -webkit-filter: blur(3px);
+    filter: blur(3px);
 }
 
 #debtLoadingOverlay {
@@ -63,6 +70,22 @@ html {
 
 .inActive {
     display: none;
+}
+
+.expandable-id {
+  border-bottom: 1px dotted #aaa;
+  transition: all 0.5s;
+}
+
+.expandable-id:before {
+  content: '⇢';
+  margin-left: -1em;
+  opacity: 0;
+  transition: all 0.5s;
+}
+.expandable-id:hover:before {
+  margin-left: 0;
+  opacity: 1;
 }
 
 .back-nav-bar, #header {
@@ -284,15 +307,19 @@ html {
 /*friend page*/
 
 .all-friends-container .friend-row {
-  background-color: rgba(0,0,0,0.1);
-  margin-bottom: 3px;
+  border-bottom: 1px solid #aaa;
+  border-top: 1px solid #aaa;
+  margin-top: 10px;
   width: 100%;
   margin-left: 0;
   padding: 5px;
+  height: 3em;
+  line-height: 2em;
+  border-radius: 5px;
 }
 
 .friend-row:hover {
-  background: rgba(255,255,255,0.3);
+  background: rgba(0,0,0,0.05);
 }
 
 .friend-row a {
@@ -314,56 +341,98 @@ html {
 }
 
 .itemized-debts-for-friend .debt-amount {
-  background-color: rgba(0,0,0,0.1);
-  margin-bottom: 3px;
+  border-bottom: 1px solid #aaa;
+  border-top: 1px solid #aaa;
+  margin-top: 10px;
   width: 100%;
   margin-left: 0;
   padding: 5px;
+  height: 4em;
+  line-height: 3em;
+  border-radius: 5px;
+}
+
+.itemized-debt-amount span:first-child {
+    line-height: 1em;
+    max-width: 50%;
+    float: left;
+    max-height: 3em;
+    overflow: hidden;
 }
 
 .itemized-debt-amount span:last-child {
   float: right;
+  font-weight: 100;
+  border-left: 1px dotted #aaa;
+  font-size: 30px;
+  padding-left: 5px;
 }
 
 /* balance page */
 .all-balances-container ul {
   list-style: none;
-  padding: 0;
+  padding: 1em;
 }
 
 .balance-row {
-  height: 60px;
-  border-bottom: 1px solid #aaa;
+  height: 140px;
+  background: white;
+  border-radius: 5px;
+  overflow: hidden;
 }
 
 .balance-row:hover {
-  background: rgba(0,0,0,0.05);
+  
 }
 
-.balance-row .col {
-  height: 100%;
+.balance-row .highlight {
+  background: orange;
+  flex: 0 0 2.333333%;
 }
 
-.balance-row .creditor:after {
-  content: '↝';
-  color: #b10303;
-  right: -20px;
-  position: relative;
+.balance-row small {
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 9px;
+  color: #B8B8B8;
 }
 
-/*generic debt display*/
-.creditor a, .debtor a {
-  color: #333;
+.balance-row .debt-amount {
+  font-size: 24px;
+  font-weight: 100;
 }
 
-.creditor a:hover, .debtor a:hover {
-  text-decoration: none;
+.balance-row .thin-item {
+  /* date: */
+  font-weight: 100;
+  font-size: 11px;
+  color: #000000;
 }
 
-.amount {
-    text-align: right;
+.row.thin-item-row {
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
 }
 
+.debt-excerpt {
+    padding-left: 30px;
+    border-right: 1px solid #ddd;
+}
+
+.debt-relationship {
+  margin-top: 10px;
+}
+
+.debt-relationship .row:first-child {
+  border-bottom: 1px dotted #ddd;
+}
+
+.label-row {
+    position: absolute;
+    bottom: 30px;
+    width: 100%;
+}
 /* pending debts page */
 .all-pending-debts-container ul {
   list-style: none;
@@ -421,16 +490,20 @@ html {
 
 /* settings page */
 .default-currency-container, .foundation-id-container {
-  height: 30px;
-  background: rgba(0,0,0,0.1);
+  height: 50px;
+  padding: 10px 10px 0 30px;
+  border-bottom: 1px solid #aaa;
+  border-top: 1px solid #aaa;
   border-radius: 5px;
-  margin: 10px;
-  padding: 0 5px;
+  margin: 10px 0;
 }
 
 .default-currency-container span, .foundation-id-container span {
+  margin-left: 10px;
+  font-weight: 100;
+  display: block;
   float: right;
-  opacity: 0.8;
+  font-size: 17px;
 }
 
 /*create debt*/

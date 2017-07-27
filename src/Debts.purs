@@ -19,6 +19,7 @@ import Halogen.HTML.Properties as HP
 import Halogen.HTML.Events as HE
 
 import Network.Eth.FriendInDebt as F
+import UI.IconGenerator as ICON
 
 data Query a
   = RefreshDebts a
@@ -38,6 +39,7 @@ type Input = ContainerMsgBus
 type Message = String
 
 type State = { friends             ∷ Array F.FoundationId
+             , gradients           ∷ Array ICON.GradientCss
              , pendingFriendsTodo  ∷ Array F.FoundationId
              , pendingFriendsSent  ∷ Array F.FoundationId
              , balances            ∷ Array F.Balance
@@ -67,6 +69,7 @@ component =
 
   initialState ∷ Input → State
   initialState input = { friends: []
+                       , gradients: []
                        , pendingFriendsTodo: []
                        , pendingFriendsSent: []
                        , balances: []
@@ -99,14 +102,14 @@ component =
         [
           HH.ul
           [ HP.class_ $ HH.ClassName "col" ]
-          $ (displayFriendLi ∘ F.fiGetId) <$> state.friends
+          $ displayFriendLi <$> (zip state.friends state.gradients)
         ]
       , HH.div
         [ HP.class_ $ HH.ClassName "all-balances-container" ]
         [
           HH.ul
           [ HP.class_ $ HH.ClassName "col-12" ]
-          $ (displayBalanceLi state.myId) <$> state.balances
+          $ (displayBalanceLi state.myId) <$> [mockBalance, mockBalance, mockBalance, mockBalance, mockBalance, mockBalance]
         ]
       , HH.div
         [ HP.class_ $ HH.ClassName "all-pending-debts-container" ]
@@ -153,7 +156,7 @@ component =
         ]
         ]
       ] $
-      (itemizedDebtsForFriendContainer state.showItemizedDebtFor state.itemizedDebts) <$> state.friends
+      (itemizedDebtsForFriendContainer state.showItemizedDebtFor state.itemizedDebts) <$> mockFriends
 
   eval ∷ Query ~> H.ComponentDSL State Query Message (FIDMonad eff)
   eval = case _ of
@@ -169,7 +172,11 @@ component =
           H.raise "show-itemized-debt"
           pure next
     HandleInput input next → do
-      H.modify (_ { errorBus = input })
+      state <- H.get
+      -- gradients <- H.liftEff $ sequence $ ICON.randomGradient <$> state.friends
+      gradients <- H.liftEff $ sequence $ (const ICON.randomGradient) <$> mockFriends
+      H.modify (_ { errorBus = input, gradients = gradients, friends = mockFriends })
+      -- H.modify (_ { errorBus = input, gradients = gradients })
       pure next
     AddFriend eitherFriendId next → do
       s ← H.get
@@ -248,7 +255,8 @@ itemizedDebtsForFriendContainer friendToShow debtsMap curFriend =
       HH.div
       [ HP.class_ $ HH.ClassName $ "itemized-debts-for-friend", HP.attr (HH.AttrName "style") $ if (curFriend == f) then "display: block" else "display: none" ]
       [ HH.h5_ [ HH.text $ "History with " <> show f <> ":" ],
-        HH.ul_ $ itemizedDebtLi <$> (fromMaybe [] $ M.lookup f debtsMap)]
+        -- HH.ul_ $ itemizedDebtLi <$> (fromMaybe [] $ M.lookup f debtsMap)]
+        HH.ul_ $ itemizedDebtLi <$> fakeDebts]
     Nothing → HH.div_ [ HH.text "" ]
 
 itemizedDebtLi ∷ F.Debt → H.ComponentHTML Query
@@ -262,11 +270,11 @@ itemizedDebt fd =
 
 -- Friends List
 
-displayFriendLi ∷ String → H.ComponentHTML Query
-displayFriendLi n =
+-- displayFriendLi ∷ Tuple(F.FoundationId ICON.GradientCss) → H.ComponentHTML Query
+displayFriendLi (Tuple fid gradient) =
   HH.li [HP.class_ $ HH.ClassName "friend-row row"]
-  [HH.a [HP.href "#", HE.onClick $ HE.input_ $ ShowItemizedDebtFor $ Just (F.fiMkId n)]
-   [HH.text n]]
+  [HH.a [HP.href "#", HE.onClick $ HE.input_ $ ShowItemizedDebtFor $ Just fid]
+        [ICON.generatedIcon (show fid) gradient, HH.text $ show fid]]
 
 -- Balance List
 
@@ -274,8 +282,12 @@ displayBalanceLi :: F.FoundationId → F.Balance → H.ComponentHTML Query
 displayBalanceLi (me)(F.Balance bal) =
   HH.li [HP.class_ $ HH.ClassName "balance-row row align-items-center"]
   [
-    HH.div [HP.class_ $ HH.ClassName "col creditor"][idSpan me bal.creditor],
-    HH.div [HP.class_ $ HH.ClassName "col debtor"][idSpan me bal.debtor],
+    HH.div [HP.class_ $ HH.ClassName "col"][
+      HH.div [HP.class_ $ HH.ClassName "row creditor"][
+        idSpan me bal.creditor],
+      HH.div [HP.class_ $ HH.ClassName "row debtor"][
+        idSpan me bal.debtor]
+    ],
     HH.div [HP.class_ $ HH.ClassName "col amount"][verboseMoneySpan bal.amount]
   ]
 
@@ -392,20 +404,19 @@ idSpan me idToDisplay =
   let isItMe = me == idToDisplay
   in case isItMe of
     true → HH.text $ "Me"
-    false → HH.a [HP.href "#", HE.onClick $ HE.input_ $ ShowItemizedDebtFor $ Just idToDisplay] [HH.text $ show idToDisplay]
+    false → HH.a [HP.class_ $ HH.ClassName "expandable-id", HP.href "#", HE.onClick $ HE.input_ $ ShowItemizedDebtFor $ Just idToDisplay] [HH.text $ show idToDisplay]
 
 descSpan ∷ F.Debt → H.ComponentHTML Query
 descSpan (F.Debt fd) =
   HH.span [] [ HH.text $ fd.desc ]
 
-currencySpan ∷ F.Debt → H.ComponentHTML Query
-currencySpan (F.Debt fd) =
-  let (F.Money d) = fd.debt
-  in HH.span [] [ HH.text $ show d.currency ]
+currencySpan ∷ F.Money → H.ComponentHTML Query
+currencySpan (F.Money m) =
+  HH.span [HP.class_ $ HH.ClassName "currency-span"] [ HH.text $ show m.currency ]
 
-moneySpan ∷ F.Debt → H.ComponentHTML Query
-moneySpan (F.Debt fd) =
-  HH.span [] [ HH.text $ show $ fd.debt ]
+moneySpan ∷ F.Money → H.ComponentHTML Query
+moneySpan (F.Money m) =
+  HH.span [HP.class_ $ HH.ClassName "money-span"] [ HH.text $ show $ m.amount ]
 
 debtAmountSpan ∷ F.Debt → H.ComponentHTML Query
 debtAmountSpan (F.Debt fd) =
@@ -413,7 +424,10 @@ debtAmountSpan (F.Debt fd) =
 
 verboseMoneySpan :: F.Money → H.ComponentHTML Query
 verboseMoneySpan m =
-  HH.span [] [ HH.text $ show m ]
+  HH.span [] [
+    currencySpan m,
+    moneySpan m
+  ]
 
 moneyClass ∷ F.Debt → String
 moneyClass fd = "debt-amount"
@@ -534,12 +548,12 @@ handleFIDCall errorBus blankVal fidAffCall = do
 
 -- Mocks for Testing purposes
 
-{-
+
 mockFriendNames :: Array String
 mockFriendNames = ["bob", "tim", "kevin"]
 
 mockFriends :: Array F.FoundationId
-mockFriends = [F.FoundationId "bob", F.FoundationId "Tim", F.FoundationId "Kevin"]
+mockFriends = [F.FoundationId "jaredbowie", F.FoundationId "TimTime", F.FoundationId "chinmich", F.FoundationId "tom", F.FoundationId "aki", F.FoundationId "brad"]
 
 mockNameMap :: NameMap
 mockNameMap = M.insert (F.FoundationId "bob") "Bob Brown" $ M.empty
@@ -547,15 +561,18 @@ mockNameMap = M.insert (F.FoundationId "bob") "Bob Brown" $ M.empty
 fakeDebt :: F.Debt
 fakeDebt = mockDebt $ F.FoundationId "bob"
 
+fakeDebts :: Array F.Debt
+fakeDebts = [fakeDebt, fakeDebt]
+
 mockMe :: F.FoundationId
-mockMe = (F.FoundationId "me")
+mockMe = (F.FoundationId "lukezhang")
 
 fakeFriend :: F.FoundationId
-fakeFriend = (F.FoundationId "bob")
-
-
-mockDebtMap :: DebtMap
-mockDebtMap = M.insert (F.FoundationId "bob") fakeDebt $ M.empty
+fakeFriend = (F.FoundationId "jaredbowie")
+--
+--
+-- mockDebtMap :: DebtsMap
+-- mockDebtMap = M.insert (F.FoundationId "bob") fakeDebt $ M.empty
 
 mockBalance :: F.Balance
 mockBalance = F.Balance { debtor: mockMe, creditor: fakeFriend, amount: F.Money {amount: 5.0, currency: F.cUSD}}
@@ -567,5 +584,4 @@ mockPendingDebts = F.PD {sent: [fakeDebt], todo: [fakeDebt]}
 mockFoundationId :: F.FoundationId
 mockFoundationId = F.FoundationId "snoopy"
 mockDebt :: F.FoundationId -> F.Debt
-mockDebt fid = F.mkDebt mockFoundationId fid fid (F.moneyFromDecString "2.0" F.cUSD) F.NoDebtId "Fictional Cat Poop"
--}
+mockDebt fid = F.mkDebt mockFoundationId fid fid (F.moneyFromDecString "2.0" F.cUSD) F.NoDebtId "Dinner @ KRBB"
