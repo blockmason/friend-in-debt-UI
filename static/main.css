@@ -58,6 +58,25 @@ html {
     display: none;
 }
 
+/* home bar*/
+.home-bar img {
+  height: 30px;
+}
+
+.home-bar {
+    background: rgba(0,0,0,0.3);
+    box-shadow: inset -5px -4px 2px 0px rgba(0,0,0,0.3);
+    transition: all 1s;
+    height: 0;
+    opacity: 0;
+}
+
+.home-bar a {
+  padding: 10px 10px 10px 0;
+  color: white;
+  text-decoration: none;
+}
+
 /* header */
 
 #header {
@@ -125,6 +144,24 @@ html {
 }
 
 /*navigation*/
+.create-debt-container,
+.add-friend-container,
+.itemized-debts-for-friend,
+.all-balances-container,
+.all-pending-debts-container,
+.all-friends-container,
+.name-change-container,
+.confirm-debts-container,
+.current-debts-container,
+.add-friend-name-change-container,
+.back-nav-bar,
+.create-debt-bar,
+.add-friend-bar,
+.all-settings-container {
+  transition: all 0.5s;
+  transform: translateX(0);
+}
+
 
 .show-itemized-debt .all-friends-container,
 .show-itemized-debt .all-balances-container,
@@ -135,7 +172,7 @@ html {
 .show-itemized-debt .add-friend-bar,
 .show-itemized-debt #header,
 .show-itemized-debt .create-debt-bar  {
-  display: none !important;
+  transform: translateX(-3000px); height: 0; margin: 0; padding: 0;
 }
 
 .show-balances .create-debt-container,
@@ -146,7 +183,12 @@ html {
 .show-balances .itemized-debts-for-friend,
 .show-balances .back-nav-bar,
 .show-balances .add-friend-bar {
-  display: none  !important;
+  transform: translateX(-3000px); height: 0; margin: 0; padding: 0;
+}
+
+.show-balances .home-bar {
+  height: 50px;
+  opacity: 1;
 }
 
 .show-friends .create-debt-container,
@@ -161,7 +203,7 @@ html {
 .show-friends .add-friend-name-change-container,
 .show-friends .back-nav-bar,
 .show-friends .create-debt-bar {
-  display: none  !important;
+  transform: translateX(-3000px); height: 0; margin: 0; padding: 0;
 }
 
 .show-pending .create-debt-container,
@@ -177,7 +219,7 @@ html {
 .show-pending .back-nav-bar,
 .show-pending .create-debt-bar,
 .show-pending .add-friend-bar {
-  display: none  !important;
+  transform: translateX(-3000px); height: 0; margin: 0; padding: 0;
 }
 
 .show-settings .create-debt-container,
@@ -193,7 +235,7 @@ html {
 .show-settings .back-nav-bar,
 .show-settings .create-debt-bar,
 .show-settings .add-friend-bar {
-  display: none  !important;
+  transform: translateX(-3000px); height: 0; margin: 0; padding: 0;
 }
 
 .show-create-debt .all-friends-container,
@@ -205,7 +247,7 @@ html {
 .show-create-debt .add-friend-bar,
 .show-create-debt #header,
 .show-create-debt .create-debt-bar  {
-  display: none !important;
+  transform: translateX(-3000px); height: 0; margin: 0; padding: 0;
 }
 
 .show-add-friend .all-friends-container,
@@ -217,7 +259,7 @@ html {
 .show-add-friend .add-friend-bar,
 .show-add-friend #header,
 .show-add-friend .create-debt-bar  {
-  display: none !important;
+  transform: translateX(-3000px); height: 0; margin: 0; padding: 0;
 }
 
 .page-container > div {
