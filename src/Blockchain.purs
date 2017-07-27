@@ -23,5 +23,13 @@ handleCall errorBus blankVal affCall = do
                         pure blankVal
         Right val  → pure val
 
+setWatchTx message tx = if E.isBlank tx then pure unit else H.raise $ message tx
+
+handleTx message state fnToRun = do
+  tx ← handleCall state.errorBus E.blankTx fnToRun
+  setWatchTx message tx
+--  H.raise $ ScreenChange
+
+
 hasNetworkError ∷ Array E.TxStatus → Boolean
 hasNetworkError = not ∘ A.null ∘ (A.filter E.hasError)

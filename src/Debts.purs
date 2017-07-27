@@ -18,7 +18,7 @@ import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
 import Halogen.HTML.Events as HE
 
-import FriendInDebt.Blockchain          (handleCall, hasNetworkError)
+import FriendInDebt.Blockchain          (handleCall, handleTx, hasNetworkError)
 import Network.Eth.FriendInDebt         as F
 import Network.Eth                      as E
 
@@ -180,7 +180,7 @@ component =
         Left  str → pure next
         Right friendId → do
           H.modify (_ { newFriend = Left "" })
-          handleTx $ F.createFriendship friendId
+          handleTx NewTX s $ F.createFriendship friendId
           pure next
     InputFriend friendStr next → do
       if ((S.length friendStr) > 3) --id should be longer than 3 characters
@@ -197,14 +197,16 @@ component =
     AddDebt debt next → do
       hLog debt
       s ← H.get
-      handleTx $ F.newPendingDebt debt
+      handleTx NewTX s $ F.newPendingDebt debt
       H.modify (_ { newDebt = Nothing, newCredit = Nothing })
       pure next
     ConfirmPending debt next → do
-      handleTx $ F.confirmPendingDebt debt
+      s ← H.get
+      handleTx NewTX s $ F.confirmPendingDebt debt
       pure next
     RejectPending debt next → do
-      handleTx $ F.rejectPendingDebt debt
+      s ← H.get
+      handleTx NewTX s $ F.rejectPendingDebt debt
       pure next
     RefreshDebts next → do
       errorBus ← H.gets _.errorBus
@@ -492,11 +494,3 @@ inputCredit = inputFDebt Credit
 
 numberFromString ∷ String → Number
 numberFromString s = fromMaybe (toNumber 0) (N.fromString s)
-
-watchTx tx = if E.isBlank tx then pure unit else H.raise $ NewTX tx
-
-handleTx f = do
-  s ← H.get
-  tx ← handleCall s.errorBus E.blankTx f
-  watchTx tx
---  H.raise $ ScreenChange
