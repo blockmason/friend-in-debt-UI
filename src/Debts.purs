@@ -280,15 +280,30 @@ displayFriendLi (Tuple fid gradient) =
 
 displayBalanceLi :: F.FoundationId → F.Balance → H.ComponentHTML Query
 displayBalanceLi (me)(F.Balance bal) =
-  HH.li [HP.class_ $ HH.ClassName "balance-row row align-items-center"]
+  HH.li [HP.class_ $ HH.ClassName "balance-row row"]
   [
-    HH.div [HP.class_ $ HH.ClassName "col"][
-      HH.div [HP.class_ $ HH.ClassName "row creditor"][
-        idSpan me bal.creditor],
-      HH.div [HP.class_ $ HH.ClassName "row debtor"][
-        idSpan me bal.debtor]
+    HH.div [HP.class_ $ HH.ClassName "highlight"][],
+    HH.div [HP.class_ $ HH.ClassName "col-4 debt-excerpt"][
+      HH.div [HP.class_ $ HH.ClassName "row debt-amount"][moneySpan bal.amount],
+      HH.div [HP.class_ $ HH.ClassName "row label-row"][HH.small_[HH.text "last"]],
+      HH.div [HP.class_ $ HH.ClassName "row thin-item-row"][
+        HH.span [HP.class_ $ HH.ClassName "thin-item"][HH.text "2017/07/01"]
+      ]
     ],
-    HH.div [HP.class_ $ HH.ClassName "col amount"][verboseMoneySpan bal.amount]
+    HH.div [HP.class_ $ HH.ClassName "col debt-details"][
+      HH.div [HP.class_ $ HH.ClassName "col debt-relationship"][
+        HH.div [HP.class_ $ HH.ClassName "row"][HH.text "Owing..."],
+        HH.div [HP.class_ $ HH.ClassName "row"][HH.h6_ [HH.text $ show bal.debtor]]
+      ],
+      HH.div [HP.class_ $ HH.ClassName "row label-row"][
+        HH.div [HP.class_ $ HH.ClassName "col-6"][HH.small_[HH.text "currency"]],
+        HH.div [HP.class_ $ HH.ClassName "col-6"][HH.small_[HH.text "debts"]]
+      ],
+      HH.div [HP.class_ $ HH.ClassName "row thin-item-row"][
+        HH.div [HP.class_ $ HH.ClassName "col thin-item"][currencySpan bal.amount],
+        HH.div [HP.class_ $ HH.ClassName "col thin-item"][HH.text $ "314" <> "debts"]
+      ]
+    ]
   ]
 
 -- Pending Friendships
@@ -416,7 +431,7 @@ currencySpan (F.Money m) =
 
 moneySpan ∷ F.Money → H.ComponentHTML Query
 moneySpan (F.Money m) =
-  HH.span [HP.class_ $ HH.ClassName "money-span"] [ HH.text $ show $ m.amount ]
+  HH.span [HP.class_ $ HH.ClassName "money-span"] [ HH.text $ "$" <> (show $ m.amount) ]
 
 debtAmountSpan ∷ F.Debt → H.ComponentHTML Query
 debtAmountSpan (F.Debt fd) =

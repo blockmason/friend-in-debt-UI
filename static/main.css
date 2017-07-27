@@ -379,10 +379,12 @@ html {
   background: white;
   border-radius: 5px;
   overflow: hidden;
+  margin-bottom: 10px;
 }
 
 .balance-row:hover {
-  
+  transform: rotateX(15deg) translateY(-5px);
+  box-shadow: 6px 5px 4px 0px rgba(0,0,0,0.9);
 }
 
 .balance-row .highlight {
