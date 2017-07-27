@@ -2,7 +2,7 @@ module Debts where
 
 
 import FriendInDebt.Prelude
-import Types (FIDMonad, ContainerMsgBus, ContainerMsg(..), NameMap, DebtsMap)
+import FriendInDebt.Types (FIDMonad, ContainerMsgBus, ContainerMsg(..), NameMap, DebtsMap)
 import Control.Monad.Eff.Console (logShow)
 import Control.Monad.Aff (Aff)
 import Data.Array (singleton, head)
@@ -18,7 +18,9 @@ import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
 import Halogen.HTML.Events as HE
 
-import Network.Eth.FriendInDebt as F
+import FriendInDebt.Blockchain          (handleCall, hasNetworkError)
+import Network.Eth.FriendInDebt         as F
+import Network.Eth                      as E
 
 data Query a
   = RefreshDebts a
@@ -35,7 +37,9 @@ data Query a
   | ShowItemizedDebtFor (Maybe F.FoundationId) a
 
 type Input = ContainerMsgBus
-type Message = String
+data Message
+  = ScreenChange String
+  | NewTX E.TX
 
 type State = { friends             ∷ Array F.FoundationId
              , pendingFriendsTodo  ∷ Array F.FoundationId
@@ -163,10 +167,10 @@ component =
         Just f  → do
           s ← H.get
           H.modify (_ { loading = true })
-          idebts ← handleFIDCall s.errorBus [] (F.itemizedDebts f)
+          idebts ← handleCall s.errorBus [] (F.itemizedDebts f)
           H.modify (_ { showItemizedDebtFor = maybeFriend, loading = false
                       , itemizedDebts = M.insert f idebts s.itemizedDebts })
-          H.raise "show-itemized-debt"
+          H.raise $ ScreenChange "show-itemized-debt"
           pure next
     HandleInput input next → do
       H.modify (_ { errorBus = input })
@@ -178,7 +182,7 @@ component =
         Left  str → pure next
         Right friendId → do
           H.modify (_ { newFriend = Left "" })
-          handleFIDCall s.errorBus unit (F.createFriendship friendId)
+          handleTx $ F.createFriendship friendId
           pure next
     InputFriend friendStr next → do
       if ((S.length friendStr) > 3) --id should be longer than 3 characters
@@ -190,7 +194,7 @@ component =
       pure next
     UpdateName inputName next → do
       s ← H.get
-      handleFIDCall s.errorBus unit (F.setCurrentUserName s.inputName)
+      handleCall s.errorBus unit (F.setCurrentUserName s.inputName)
       H.modify (_ { inputName = "" })
       pure next
     InputDebt debt next → do
@@ -203,16 +207,14 @@ component =
     AddDebt debt next → do
       hLog debt
       s ← H.get
-      handleFIDCall s.errorBus unit (F.newPendingDebt debt)
+      handleTx $ F.newPendingDebt debt
       H.modify (_ { newDebt = Nothing, newCredit = Nothing })
       pure next
     ConfirmPending debt next → do
-      s ← H.get
-      handleFIDCall s.errorBus unit (F.confirmPendingDebt debt)
+      handleTx $ F.confirmPendingDebt debt
       pure next
     RejectPending debt next → do
-      s ← H.get
-      handleFIDCall s.errorBus unit (F.rejectPendingDebt debt)
+      handleTx $ F.rejectPendingDebt debt
       pure next
     RefreshDebts next → do
       errorBus ← H.gets _.errorBus
@@ -226,11 +228,11 @@ refreshButton =
 
 loadFriendsAndDebts errorBus = do
   H.modify (_ { loading = true })
-  myId           ← handleFIDCall errorBus (F.FoundationId "") F.foundationId
-  friends        ← handleFIDCall errorBus [] F.confirmedFriends
-  pendingFriends ← handleFIDCall errorBus F.blankPendingFriends F.pendingFriends
-  pendingD       ← handleFIDCall errorBus F.blankPendingDebts F.pendingDebts
-  balances       ← handleFIDCall errorBus [] F.debtBalances
+  myId           ← handleCall errorBus (F.FoundationId "") F.foundationId
+  friends        ← handleCall errorBus [] F.confirmedFriends
+  pendingFriends ← handleCall errorBus F.blankPendingFriends F.pendingFriends
+  pendingD       ← handleCall errorBus F.blankPendingDebts F.pendingDebts
+  balances       ← handleCall errorBus [] F.debtBalances
   H.modify (_ { myId = myId, friends = friends
               , pendingFriendsSent = F.pfGetSents pendingFriends
               , pendingFriendsTodo = F.pfGetTodos pendingFriends
@@ -450,7 +452,7 @@ addFriendWidget state =
   ]
   where inputVal = either id show
 
-nameChangeWidget ∷ String → Either F.EthAddress F.UserName → H.ComponentHTML Query
+nameChangeWidget ∷ String → Either E.EthAddress F.UserName → H.ComponentHTML Query
 nameChangeWidget inputName userName =
   HH.div [ HP.class_ $ HH.ClassName "nameChange" ]
   [
@@ -460,7 +462,7 @@ nameChangeWidget inputName userName =
              ]
   , HH.button [ HE.onClick $ HE.input_ $ UpdateName inputName
               , HP.class_ $ HH.ClassName "btn-info"]
-    [ HH.text $ "Change My Name from " <> (either F.getAddr id userName) <>
+    [ HH.text $ "Change My Name from " <> (either E.getEa id userName) <>
       if (S.length inputName) > 0 then " to " <> inputName else "" ]
   ]
 
@@ -515,55 +517,10 @@ inputCredit = inputFDebt Credit
 numberFromString ∷ String → Number
 numberFromString s = fromMaybe (toNumber 0) (N.fromString s)
 
---helper to query the blockchain
---blankVal is a value to return if there's an error
---writes a message to the error bus if there's an error
-handleFIDCall errorBus blankVal fidAffCall = do
-  case errorBus of
-    Nothing → do
-      H.liftEff $ logShow "No bus initialized"
-      pure blankVal
-    Just b → do
-      result ← H.liftAff $ F.runMonadF fidAffCall
-      case result of
-        Left error → do _ ← H.liftAff $ Bus.write (FIDError error) b
-                        pure blankVal
-        Right val  → pure val
+watchTx tx = if E.isBlank tx then pure unit else H.raise $ NewTX tx
 
--- Mocks for Testing purposes
-
-{-
-mockFriendNames :: Array String
-mockFriendNames = ["bob", "tim", "kevin"]
-
-mockFriends :: Array F.FoundationId
-mockFriends = [F.FoundationId "bob", F.FoundationId "Tim", F.FoundationId "Kevin"]
-
-mockNameMap :: NameMap
-mockNameMap = M.insert (F.FoundationId "bob") "Bob Brown" $ M.empty
-
-fakeDebt :: F.Debt
-fakeDebt = mockDebt $ F.FoundationId "bob"
-
-mockMe :: F.FoundationId
-mockMe = (F.FoundationId "me")
-
-fakeFriend :: F.FoundationId
-fakeFriend = (F.FoundationId "bob")
-
-
-mockDebtMap :: DebtMap
-mockDebtMap = M.insert (F.FoundationId "bob") fakeDebt $ M.empty
-
-mockBalance :: F.Balance
-mockBalance = F.Balance { debtor: mockMe, creditor: fakeFriend, amount: F.Money {amount: 5.0, currency: F.cUSD}}
-
-mockPendingDebts :: F.PendingDebts
-mockPendingDebts = F.PD {sent: [fakeDebt], todo: [fakeDebt]}
-
-
-mockFoundationId :: F.FoundationId
-mockFoundationId = F.FoundationId "snoopy"
-mockDebt :: F.FoundationId -> F.Debt
-mockDebt fid = F.mkDebt mockFoundationId fid fid (F.moneyFromDecString "2.0" F.cUSD) F.NoDebtId "Fictional Cat Poop"
--}
+handleTx f = do
+  s ← H.get
+  tx ← handleCall s.errorBus E.blankTx f
+  watchTx tx
+--  H.raise $ ScreenChange

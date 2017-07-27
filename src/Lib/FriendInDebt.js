@@ -1,12 +1,30 @@
-"use strict";
+v"use strict";
 //requires web3, FriendInDebt, FriendInDebtNS, Friendships configs
 
 var FriendInDebt;
 var FriendInDebtNS;
 var Friendships;
 
+var fidAbi;
+var fidContract;
+var fidContractAddress;
+
+var friendshipsAbi;
+var friendshipsContract;
+var friendshipsContractAddress;
+
+var myAddress;
+
 exports.initImpl = function(dummyVal) {
     return function() {
+        fidAbi = web3.eth.contract(friendInDebtConfig.abi);
+        fidContract = fidAbi.at(friendInDebtConfig.address);
+        fidContractAddress = friendInDebtConfig.address;
+
+        friendshipsAbi = web3.eth.contract(friendshipsConfig.abi);
+        friendshipsContract = friendshipAbi.at(friendshipsConfig.address);
+        friendshipsContractAddress = friendshipsConfig.address;
+
         FriendInDebt = TruffleContract(friendInDebtConfig);
         FriendInDebt.setProvider(web3.currentProvider);
         FriendInDebtNS = TruffleContract(friendInDebtNSConfig);
@@ -58,47 +76,51 @@ exports.pendingFriendshipsImpl = function(callback) {
     };
 };
 
-exports.createFriendshipImpl = function(myId) {
-    return function(friendId) {
-        return function() {
-            Friendships.deployed().then(function(instance) {
-                return instance.addFriend(myId, friendId);
-            });
+exports.createFriendshipImpl = function(callback) {
+    return function(myId) {
+        return function(friendId) {
+            return function() {
+                var data = friendshipsContract.createFriendship.getData(myId, friendId);
+                sendFriendshipsTx(data, 0, callback);
+            };
         };
     };
 };
 
-exports.confirmFriendshipImpl = function(myId) {
-    return function(friendId) {
-        return function() {
-            Friendships.deployed().then(function(instance) {
-                return instance.addFriend(myId, friendId);
-            });
+exports.confirmFriendshipImpl = function(callback) {
+    return function(myId) {
+        return function(friendId) {
+            return function() {
+                var data = friendshipsContract.addFriend.getData(myId, friendId);
+                sendFriendshipsTx(data, 0, callback);
+            };
         };
     };
 };
 
-exports.deleteFriendshipImpl = function(myId) {
-    return function(friendId) {
-        return function() {
-            Friendships.deployed().then(function(instance) {
-                return instance.deleteFriend(myId, friendId);
-            });
+exports.deleteFriendshipImpl = function(callback) {
+    return function(myId) {
+        return function(friendId) {
+            return function() {
+                var data = friendshipsContract.deleteFriend.getData(myId, friendId);
+                sendFriendshipsTx(data, 0, callback);
+            };
         };
     };
 };
 
 
 /* Debt Functions */
-exports.newPendingDebtImpl = function(debtor) {
-    return function(creditor) {
-        return function(amount) {
-            return function(currencyCode) {
-                return function(desc) {
-                    return function() {
-                        FriendInDebt.deployed().then(function(instance) {
-                            return instance.newDebt(debtor, creditor, currencyCode, amount, desc);
-                        });
+exports.newPendingDebtImpl = function(callback) {
+    return function(debtor) {
+        return function(creditor) {
+            return function(amount) {
+                return function(currencyCode) {
+                    return function(desc) {
+                        return function() {
+                            var data = fidContract.newDebt(debtor, creditor, currencyCode, amount, desc);
+                            sendFIDTx(data, 0, callback);
+                        };
                     };
                 };
             };
@@ -144,25 +166,27 @@ exports.itemizedDebtsImpl = function(callback) {
     };
 };
 
-exports.confirmDebtImpl = function(myId) {
-    return function(friendId) {
-        return function(debtId) {
-            return function() {
-                FriendInDebt.deployed().then(function(instance) {
-                    return instance.confirmDebt(myId, friendId, debtId);
-                });
+exports.confirmDebtImpl = function(callback) {
+    return function(myId) {
+        return function(friendId) {
+            return function(debtId) {
+                return function() {
+                    var data = fidContract.confirmDebt(debtor, creditor, debtId);
+                    sendFIDTx(data, 0, callback);
+                };
             };
         };
     };
 };
 
-exports.rejectDebtImpl = function(myId) {
-    return function(friendId) {
-        return function(debtId) {
-            return function() {
-                FriendInDebt.deployed().then(function(instance) {
-                    return instance.rejectDebt(myId, friendId, debtId);
-                });
+exports.rejectDebtImpl = function(callback) {
+    return function(myId) {
+        return function(friendId) {
+            return function(debtId) {
+                return function() {
+                    var data = fidContract.rejectDebt(debtor, creditor, debtId);
+                    sendFIDTx(data, 0, callback);
+                };
             };
         };
     };
@@ -192,6 +216,43 @@ exports.setNameImpl = function(newName) {
 };
 
 //helper functions
+var sendFIDTx = function(data, value, callback) {
+    web3.eth.sendTransaction(
+        {to: fidContractAddress,
+         from: myAddress,
+         data: data,
+         value: value},
+        function(err, result) {
+            if ( !err )
+                callback(goodTx(result))();
+            else
+                callback(errTx())();
+        });
+};
+
+var sendFriendshipsTx = function(data, value, callback) {
+    web3.eth.sendTransaction(
+        {to: friendshipsContractAddress,
+         from: myAddress,
+         data: data,
+         value: value},
+        function(err, result) {
+            if ( !err )
+                callback(goodTx(result))();
+            else
+                callback(errTx())();
+        });
+};
+
+var goodTx = function(t) {
+    return { txHash: t, error: false };
+};
+
+var errTx = function() {
+    return { txHash: "", error: true };
+};
+
+
 var confirmedFriends2Js = function(friends) {
     for ( var i=0; i < friends.length; i++ ) {
         friends[i] = b2s(friends[i]);

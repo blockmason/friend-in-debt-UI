@@ -2,7 +2,7 @@ module Container where
 
 import FriendInDebt.Prelude
 
-import Types (FIDMonad, ContainerMsgBus, ContainerMsg(..))
+import FriendInDebt.Types (FIDMonad, ContainerMsgBus, ContainerMsg(..))
 import Data.Either.Nested (Either1)
 import Control.Monad.Eff.Console (logShow)
 import Data.Functor.Coproduct.Nested (Coproduct1)
@@ -20,8 +20,9 @@ import Halogen.Component.ChildPath as CP
 import Halogen.Component.Utils (busEventSource)
 import Halogen.Query.EventSource as ES
 
-import Debts as D
-import Network.Eth.Metamask as MM
+import Debts                    as D
+import Network.Eth.Metamask     as MM
+import Network.Eth              as E
 import Network.Eth.FriendInDebt as F
 
 data Query a
@@ -30,10 +31,12 @@ data Query a
   | RefreshMetamask a
   | SetScreen String a
   | ShowPreviousScreen a
+  | DebtViewMsg D.Message a
 
 type State = { loggedIn ∷ Boolean
              , loading  ∷ Boolean
              , errorBus ∷ ContainerMsgBus
+             , txs      ∷ Array E.TX
              , currentScreen ∷ String
              , previousScreen ∷ String }
 
@@ -56,6 +59,7 @@ ui =
     initialState = { loggedIn: true
                    , loading: true
                    , errorBus: Nothing
+                   , txs: []
                    , currentScreen: "show-balances"
                    , previousScreen: "show-balances"}
 
@@ -88,7 +92,7 @@ ui =
       ]
       , HH.div [ HP.class_ (HH.ClassName "row")]
         [
-          HH.slot' CP.cp1 unit D.component state.errorBus $ HE.input SetScreen
+          HH.slot' CP.cp1 unit D.component state.errorBus $ HE.input DebtViewMsg
         ]
       ]
 
@@ -121,6 +125,15 @@ ui =
         H.modify (\state -> state {previousScreen = state.currentScreen})
         H.modify (_ {currentScreen = className})
         pure next
+      DebtViewMsg msg next →
+        case msg of
+          D.ScreenChange screen → do
+            H.modify (\state -> state {previousScreen = state.currentScreen})
+            H.modify (_ {currentScreen = screen })
+            pure next
+          D.NewTX newTx → do
+            H.modify (\s → s { txs = s.txs <> [newTx] })
+            pure next
       ShowPreviousScreen next → do
         H.modify (\state -> state {currentScreen = state.previousScreen})
         pure next

@@ -48,6 +48,7 @@ import Data.Tuple                  (Tuple(..))
 import Data.Foldable               (foldr)
 import Network.Eth.Metamask                                        as MM
 import Network.Eth.Foundation
+import Network.Eth                                                 as E
 
 infixr 9 compose as ∘
 
@@ -60,12 +61,16 @@ type PendingFriend = { friendId    ∷ StringId
 
 type IdLookupFn   = ∀ e. (StringId → Eff e Unit) → Eff e Unit
 type BalanceLookupFn = ∀ e. (Array RawBalance → Eff e Unit) → StringId → Eff e Unit
-type HandleDebtFn = ∀ e. StringId → StringId → Number → Eff e Unit
 type DebtLookupFn = ∀ e. (Array RawDebt → Eff e Unit) → StringId → Eff e Unit
 type DebtLookupFn' = ∀ e. (Array RawConfirmed → Eff e Unit) → StringId → StringId → Eff e Unit
 type NameLookupFn = ∀ e. (String → Eff e Unit) → StringId → Eff e Unit
 type FriendsLookupFn = ∀ e. ((Array StringId) → Eff e Unit) → StringId → Eff e Unit
 type PendingFriendsFn = ∀ e. ((Array PendingFriend) → Eff e Unit) → StringAddr → Eff e Unit
+type ZeroArgTx = ∀ e. (E.RawTx → Eff e Unit)                   → Eff e Unit
+type OneArgTx  = ∀ e. (E.RawTx → Eff e Unit) → String          → Eff e Unit
+type TwoArgTx  = ∀ e. (E.RawTx → Eff e Unit) → String → String → Eff e Unit
+type NewDebtTx  = ∀ e. (E.RawTx → Eff e Unit) → String → String → Number → String → Description → Eff e Unit
+type HandleDebtTx = ∀ e. (E.RawTx → Eff e Unit) → StringId → StringId → Number → Eff e Unit
 
 foreign import initImpl ∷ ∀ e. Unit → Eff e Unit
 foreign import currentUserImpl ∷ ∀ e. Unit → Eff e StringAddr
@@ -73,20 +78,21 @@ foreign import getMyFoundationIdImpl ∷ IdLookupFn
 
 foreign import friendsImpl ∷ FriendsLookupFn
 foreign import pendingFriendshipsImpl ∷ PendingFriendsFn
-foreign import createFriendshipImpl ∷ ∀ e. StringId → StringId → Eff e Unit
-foreign import confirmFriendshipImpl ∷ ∀ e. StringId → StringId → Eff e Unit
-foreign import deleteFriendshipImpl ∷ ∀ e. StringId → StringId → Eff e Unit
+foreign import createFriendshipImpl ∷ TwoArgTx
+foreign import confirmFriendshipImpl ∷ TwoArgTx
+foreign import deleteFriendshipImpl ∷ TwoArgTx
 
-foreign import newPendingDebtImpl ∷ ∀ e. StringId → StringId → Number → String
-                                  → Description → Eff e Unit
-foreign import confirmDebtImpl  ∷ HandleDebtFn
-foreign import rejectDebtImpl   ∷ HandleDebtFn
+foreign import newPendingDebtImpl ∷ NewDebtTx
+foreign import confirmDebtImpl  ∷ HandleDebtTx
+foreign import rejectDebtImpl   ∷ HandleDebtTx
 foreign import debtBalancesImpl ∷ BalanceLookupFn
 foreign import pendingDebtsImpl ∷ DebtLookupFn
 foreign import itemizedDebtsImpl ∷ DebtLookupFn'
 
 foreign import getNameImpl ∷ NameLookupFn
 foreign import setNameImpl ∷ ∀ e. String → Eff e Unit
+
+--
 
 checkAndInit ∷ MonadF Unit
 checkAndInit = do
@@ -95,10 +101,10 @@ checkAndInit = do
     then liftEff $ initImpl unit
     else throwError NoMetamask
 
-currentUser ∷ MonadF EthAddress
+currentUser ∷ MonadF E.EthAddress
 currentUser = do
   checkAndInit
-  EthAddress <$> (liftEff $ currentUserImpl unit)
+  E.eaMkAddr <$> (liftEff $ currentUserImpl unit)
 
 foundationId ∷ MonadF FoundationId
 foundationId = do
@@ -106,20 +112,23 @@ foundationId = do
   fid ← liftAff $ makeAff (\err succ → getMyFoundationIdImpl succ)
   if fid == "" then throwError NoFoundationId else pure $ FoundationId fid
 
-createFriendship ∷ FoundationId → MonadF Unit
+createFriendship ∷ FoundationId → MonadF E.TX
 createFriendship (FoundationId newFriend) = do
   (FoundationId myId) ← foundationId
-  liftEff $ createFriendshipImpl myId newFriend
+  tx ← liftAff $ makeAff (\e s → createFriendshipImpl s myId newFriend)
+  E.rawToTX TxError tx
 
-confirmFriendship ∷ FoundationId → MonadF Unit
+confirmFriendship ∷ FoundationId → MonadF E.TX
 confirmFriendship (FoundationId newFriend) = do
   (FoundationId myId) ← foundationId
-  liftEff $ confirmFriendshipImpl myId newFriend
+  tx ← liftAff $ makeAff (\_ s → confirmFriendshipImpl s myId newFriend)
+  E.rawToTX TxError tx
 
-deleteFriendship ∷ FoundationId → MonadF Unit
+deleteFriendship ∷ FoundationId → MonadF E.TX
 deleteFriendship (FoundationId badFriend) = do
   (FoundationId myId) ← foundationId
-  liftEff $ deleteFriendshipImpl myId badFriend
+  tx ← liftAff $ makeAff (\_ s → deleteFriendshipImpl s myId badFriend)
+  E.rawToTX TxError tx
 
 pendingFriends ∷ MonadF PendingFriendships
 pendingFriends = do
@@ -139,26 +148,29 @@ confirmedFriends = do
   friendList ← liftAff $ makeAff (\error success → friendsImpl success myId)
   pure $ FoundationId <$> friendList
 
-newPendingDebt ∷ Debt → MonadF Unit
+newPendingDebt ∷ Debt → MonadF E.TX
 newPendingDebt debt = do
   let m = debtMoney debt
       debtor = (fiGetId $ debtDebtor debt)
       creditor = (fiGetId $ debtCreditor debt)
-  liftEff $ newPendingDebtImpl debtor creditor (numAmount m) (show $ moneyCurrency m) (getDesc debt)
+  tx ← liftAff $ makeAff (\_ s → newPendingDebtImpl s debtor creditor (numAmount m) (show $ moneyCurrency m) (getDesc debt))
+  E.rawToTX TxError tx
 
-handleDebt ∷ HandleDebtFn → Debt → MonadF Unit
+handleDebt ∷ HandleDebtTx → Debt → MonadF E.TX
 handleDebt handleDebtFn debt = do
   (FoundationId myId) ← foundationId
   let debtId = debtGetId debt
       friendId = fiGetId $ debtCounterparty (fiMkId myId) debt
   if isValidDebtId $ debtId
-    then liftEff $ handleDebtFn myId friendId (getDebtId debtId)
+    then do
+      tx ← liftAff $ makeAff (\_ s → handleDebtFn s myId friendId (getDebtId debtId))
+      E.rawToTX TxError tx
     else throwError InvalidDebtId
 
-confirmPendingDebt ∷ Debt → MonadF Unit
+confirmPendingDebt ∷ Debt → MonadF E.TX
 confirmPendingDebt = handleDebt confirmDebtImpl
 
-rejectPendingDebt  ∷ Debt → MonadF Unit
+rejectPendingDebt  ∷ Debt → MonadF E.TX
 rejectPendingDebt  = handleDebt rejectDebtImpl
 
 debtBalances ∷ MonadF (Array Balance)

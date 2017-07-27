@@ -33,11 +33,13 @@ data Error =
     NoMetamask
   | InvalidDebtId
   | NoFoundationId
+  | TxError
 
 instance showError ∷ Show Error where
   show NoMetamask     = "FriendInDebtError: Metamask not logged in."
   show InvalidDebtId  = "FriendInDebtError: InvalidDebtId"
   show NoFoundationId = "FriendInDebtError: NoFoundationId"
+  show TxError        = "FriendInDebtError: TxError"
 
 data DebtId =
     DebtId Number

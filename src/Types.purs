@@ -1,4 +1,4 @@
-module Types where
+module FriendInDebt.Types where
 
 import FriendInDebt.Prelude
 import Data.String (joinWith)

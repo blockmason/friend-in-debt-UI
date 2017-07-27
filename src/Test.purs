@@ -7,7 +7,7 @@ import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Aff.Class     (liftAff)
 import Control.Monad.Aff (launchAff, Aff(..))
 import Config as C
-import Types as T
+import FriendInDebt.Types as T
 import Network.HTTP.Affjax (affjax, defaultRequest, AJAX)
 import Network.Eth.FriendInDebt as F
 
