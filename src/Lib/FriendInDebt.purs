@@ -19,9 +19,6 @@ module Network.Eth.FriendInDebt
        , itemizedDebts
        , pendingDebts
 
-       , allNames
-       , getCurrentUserName
-       , setCurrentUserName
        ) where
 
 --TODO: throw a different type of error if no FoundationId exists
@@ -88,9 +85,6 @@ foreign import rejectDebtImpl   ∷ HandleDebtTx
 foreign import debtBalancesImpl ∷ BalanceLookupFn
 foreign import pendingDebtsImpl ∷ DebtLookupFn
 foreign import itemizedDebtsImpl ∷ DebtLookupFn'
-
-foreign import getNameImpl ∷ NameLookupFn
-foreign import setNameImpl ∷ ∀ e. String → Eff e Unit
 
 --
 
@@ -193,29 +187,3 @@ pendingDebts = do
       todo = (A.filter (\d → myId == (debtToConfirm d)) ∘ (map rawToDebt))
       sent = (A.filter (\d → myId /= (debtToConfirm d)) ∘ (map rawToDebt))
   pure $ PD { todo: todo debtList, sent: sent debtList }
-
-{- FriendInDebtNS -}
-getName ∷ ∀ e. FoundationId → Aff e (Maybe UserName)
-getName (FoundationId fi) = do
-  userName ← makeAff (\err succ → getNameImpl succ fi)
-  if userName == "" then pure Nothing else pure $ Just userName
-
-getCurrentUserName ∷ ∀ e. MonadF (Either FoundationId UserName)
-getCurrentUserName = do
-  myId ← foundationId
-  (liftAff $ getName myId) >>= (pure ∘ (maybe (Left myId) Right))
-
-setCurrentUserName ∷ ∀ e. UserName → MonadF Unit
-setCurrentUserName userNameStr = do
-  checkAndInit
-  liftEff $ setNameImpl userNameStr
-
-allNames ∷ ∀ e. Array FoundationId → MonadF (M.Map FoundationId UserName)
-allNames friendList = do
-  myId ← foundationId
-  let allUsers = friendList <> [myId]
-  names ← liftAff $ traverse getName $ allUsers
-  pure $ foldr f M.empty $ A.zip allUsers names
-  where f (Tuple address userName) map = insertMap map address userName
-        insertMap map address Nothing         = map
-        insertMap map address (Just userName) = M.insert address userName map

@@ -32,8 +32,6 @@ data Query a
   | RejectPending F.Debt a
   | AddFriend (Either String F.FoundationId) a
   | InputFriend String a
-  | InputName String a
-  | UpdateName String a
   | ShowItemizedDebtFor (Maybe F.FoundationId) a
 
 type Input = ContainerMsgBus
@@ -188,14 +186,6 @@ component =
       if ((S.length friendStr) > 3) --id should be longer than 3 characters
         then H.modify (_ { newFriend = Right $ F.FoundationId friendStr })
         else H.modify (_ { newFriend = Left friendStr })
-      pure next
-    InputName inputName next → do
-      H.modify (_ { inputName = inputName })
-      pure next
-    UpdateName inputName next → do
-      s ← H.get
-      handleCall s.errorBus unit (F.setCurrentUserName s.inputName)
-      H.modify (_ { inputName = "" })
       pure next
     InputDebt debt next → do
       hLog debt
@@ -451,20 +441,6 @@ addFriendWidget state =
     [ HH.text "Add Friend by FoundationId" ]
   ]
   where inputVal = either id show
-
-nameChangeWidget ∷ String → Either E.EthAddress F.UserName → H.ComponentHTML Query
-nameChangeWidget inputName userName =
-  HH.div [ HP.class_ $ HH.ClassName "nameChange" ]
-  [
-    HH.input [ HP.type_ HP.InputText
-             , HP.value inputName
-             , HE.onValueInput (HE.input (\val → InputName val))
-             ]
-  , HH.button [ HE.onClick $ HE.input_ $ UpdateName inputName
-              , HP.class_ $ HH.ClassName "btn-info"]
-    [ HH.text $ "Change My Name from " <> (either E.getEa id userName) <>
-      if (S.length inputName) > 0 then " to " <> inputName else "" ]
-  ]
 
 nonZero ∷ F.Debt → Boolean
 nonZero fd = ((F.numAmount ∘ F.debtMoney) fd) /= (toNumber 0)

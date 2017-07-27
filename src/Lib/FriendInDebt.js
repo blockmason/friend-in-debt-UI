@@ -2,7 +2,6 @@ v"use strict";
 //requires web3, FriendInDebt, FriendInDebtNS, Friendships configs
 
 var FriendInDebt;
-var FriendInDebtNS;
 var Friendships;
 
 var fidAbi;
@@ -25,10 +24,9 @@ exports.initImpl = function(dummyVal) {
         friendshipsContract = friendshipAbi.at(friendshipsConfig.address);
         friendshipsContractAddress = friendshipsConfig.address;
 
+
         FriendInDebt = TruffleContract(friendInDebtConfig);
         FriendInDebt.setProvider(web3.currentProvider);
-        FriendInDebtNS = TruffleContract(friendInDebtNSConfig);
-        FriendInDebtNS.setProvider(web3.currentProvider);
         Friendships = TruffleContract(friendshipsConfig);
         Friendships.setProvider(web3.currentProvider);
     };
@@ -188,29 +186,6 @@ exports.rejectDebtImpl = function(callback) {
                     sendFIDTx(data, 0, callback);
                 };
             };
-        };
-    };
-};
-
-/* FriendInDebtNS Functions */
-exports.getNameImpl = function(callback) {
-    return function(foundationId) {
-        return function() {
-            FriendInDebtNS.deployed().then(function(instance) {
-                return instance.getName.call(foundationId);
-            }).then(function(res) {
-                callback(res.valueOf())();
-            });
-        };
-    };
-};
-
-exports.setNameImpl = function(newName) {
-    return function(foundationId) {
-        return function() {
-            FriendInDebtNS.deployed().then(function(instance) {
-                return instance.setName(newName, foundationId);
-            });
         };
     };
 };
