@@ -30,6 +30,5 @@ handleTx message state fnToRun = do
   setWatchTx message tx
 --  H.raise $ ScreenChange
 
-
 hasNetworkError ∷ Array E.TxStatus → Boolean
 hasNetworkError = not ∘ A.null ∘ (A.filter E.hasError)

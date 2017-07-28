@@ -12,7 +12,7 @@ import Data.Either                 (Either(Left, Right))
 import Data.Maybe                  (Maybe(..), fromMaybe)
 import Data.Traversable            (traverse)
 import Data.Format.Money           (formatDecimal)
-import Data.Int                    (toNumber)
+import Data.Int                                                    as I
 import Data.Number                                                 as N
 import Data.String                 (localeCompare)
 import Math                        (abs, pow)
@@ -20,6 +20,9 @@ import Data.Map                                                    as M
 import Data.Array                                                  as A
 import Data.Tuple                  (Tuple(..))
 import Data.Foldable               (foldr)
+import Data.DateTime.Instant       (instant, toDateTime)
+import Data.Time.Duration          (Milliseconds(..))
+import Data.DateTime               (DateTime(..))
 import Network.Eth.Metamask                                        as MM
 import Network.Eth.Foundation      (fiBlankId, fiMkId, FoundationId(..))
 
@@ -27,6 +30,7 @@ type StringAddr = String
 type StringId   = String
 type UserName   = String
 type Description = String
+
 
 -- error
 data Error =
@@ -51,6 +55,11 @@ isValidDebtId _        = true
 getDebtId ∷ DebtId → Number
 getDebtId (DebtId id) = id
 getDebtId _           = -1.0
+
+numToDate ∷ Number → Maybe DateTime
+numToDate n = toDateTime <$> instant (Milliseconds n)
+zeroDate ∷ Maybe DateTime
+zeroDate = numToDate 0.0
 
 -- money
 data Currency =
@@ -80,7 +89,7 @@ fromIsoCode "USD" = cUSD
 fromIsoCode "EUR" = cEUR
 fromIsoCode _     = InvalidCurrency
 conversionFactor ∷ Currency → Number
-conversionFactor = (pow 10.0) <<< toNumber <<< cDecimals
+conversionFactor = (pow 10.0) <<< I.toNumber <<< cDecimals
 
 newtype Money = Money { amount ∷ Number, currency ∷ Currency }
 
@@ -113,7 +122,9 @@ mockConvertCurrency (m) (c) = m
 
 newtype Balance = Balance { debtor     ∷ FoundationId
                           , creditor   ∷ FoundationId
-                          , amount     ∷ Money }
+                          , amount     ∷ Money
+                          , totalDebts ∷ Int
+                          , mostRecent ∷ Maybe DateTime }
 instance showBalance ∷ Show Balance where
   show (Balance b) = (show b.debtor) <> ", " <> (show b.creditor) <> ": " <> (show b.amount)
 
@@ -121,8 +132,10 @@ rawToBalance ∷ FoundationId → RawBalance → Balance
 rawToBalance fi rb =
   let (Tuple d c) = debtorCreditor fi rb.counterParty rb.amount
   in Balance { amount: mkMoney (abs rb.amount) (fromIsoCode rb.currency)
-             , debtor: d, creditor: c }
-  where debtorCreditor myId cpId val = if val >= (toNumber 0)
+             , debtor: d, creditor: c
+             , totalDebts: (fromMaybe 0 $ I.fromNumber rb.totalDebts)
+             , mostRecent: toDateTime <$> instant (Milliseconds rb.mostRecent) }
+  where debtorCreditor myId cpId val = if val >= (I.toNumber 0)
                                      then Tuple myId (FoundationId cpId)
                                      else Tuple (FoundationId cpId) myId
 
@@ -135,7 +148,8 @@ newtype Debt = Debt { debtor     ∷ FoundationId
                     , toConfirm  ∷ FoundationId
                     , debt       ∷ Money
                     , debtId     ∷ DebtId
-                    , desc       ∷ String }
+                    , desc       ∷ String
+                    , timestamp  ∷ Maybe DateTime }
 instance showDebt ∷ Show Debt where
   show (Debt fd) = show fd.debt <> ": " <> show fd.debtor <> " " <> show fd.creditor
     <> " | " <> show fd.desc
@@ -144,25 +158,30 @@ instance eqDebt ∷ Eq Debt where
     (fd1.debtor == fd2.debtor) && (fd1.creditor == fd2.creditor) && (fd1.debt == fd2.debt)
 
 rawToDebt ∷ RawDebt → Debt
-rawToDebt rd = Debt { debtId: DebtId rd.id
-                    , debtor: FoundationId rd.debtor
-                    , creditor: FoundationId rd.creditor
-                    , toConfirm: FoundationId rd.confirmerId
-                    , debt: mkMoney rd.amount (fromIsoCode rd.currency)
-                    , desc: rd.desc }
+rawToDebt rd =
+  Debt { debtId: DebtId rd.id
+       , debtor: FoundationId rd.debtor
+       , creditor: FoundationId rd.creditor
+       , toConfirm: FoundationId rd.confirmerId
+       , debt: mkMoney rd.amount (fromIsoCode rd.currency)
+       , desc: rd.desc
+       , timestamp: toDateTime <$> instant (Milliseconds rd.timestamp)}
 
 rawConfirmedToDebt ∷ RawConfirmed → Debt
-rawConfirmedToDebt rd = Debt { debtId: NoDebtId
-                             , debtor: fiMkId rd.debtor
-                             , creditor: fiMkId rd.creditor
-                             , toConfirm: fiBlankId
-                             , debt: mkMoney rd.amount (fromIsoCode rd.currency)
-                             , desc: rd.desc }
+rawConfirmedToDebt rd =
+  Debt { debtId: NoDebtId
+       , debtor: fiMkId rd.debtor
+       , creditor: fiMkId rd.creditor
+       , toConfirm: fiBlankId
+       , debt: mkMoney rd.amount (fromIsoCode rd.currency)
+       , desc: rd.desc
+       , timestamp: toDateTime <$> instant (Milliseconds rd.timestamp) }
 
 mkDebt ∷ FoundationId → FoundationId → FoundationId → Money → DebtId → Description
        → Debt
 mkDebt d c toC amount dId desc = Debt { debtor: d, creditor: c, debt: amount
-                                  , debtId: dId, desc: desc, toConfirm: toC}
+                                  , debtId: dId, desc: desc, toConfirm: toC
+                                  , timestamp: zeroDate }
 zeroDebt ∷ Currency → FoundationId → FoundationId → FoundationId → Debt
 zeroDebt cur debtor creditor toConfirm = mkDebt debtor creditor toConfirm (mkMoney 0.0 cur) NoDebtId ""
 debtMoney ∷ Debt → Money
@@ -204,17 +223,21 @@ type RawDebt = { id          ∷ Number
                , amount      ∷ Number
                , desc        ∷ String
                , debtor      ∷ StringId
-               , creditor    ∷ StringId }
+               , creditor    ∷ StringId
+               , timestamp   ∷ Number }
 
 type RawConfirmed = { currency    ∷ String
                     , amount      ∷ Number
                     , desc        ∷ String
                     , debtor      ∷ StringId
-                    , creditor    ∷ StringId }
+                    , creditor    ∷ StringId
+                    , timestamp   ∷ Number }
 
 type RawBalance = { counterParty ∷ StringId
                   , amount       ∷ Number
-                  , currency     ∷ String }
+                  , currency     ∷ String
+                  , totalDebts   ∷ Number
+                  , mostRecent   ∷ Number }
 
 type RawFriendship = { friendId     ∷ StringId
                      , confirmerId  ∷ StringId }
