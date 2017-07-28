@@ -10481,7 +10481,7 @@ var PS = {};
                                   if (dType instanceof Credit) {
                                       return Network_Eth_FriendInDebt_Types.debtSetDebtor(debt)(Network_Eth_Foundation.fiMkId(v));
                                   };
-                                  throw new Error("Failed pattern match at Debts line 580, column 41 - line 582, column 59: " + [ dType.constructor.name ]);
+                                  throw new Error("Failed pattern match at Debts line 589, column 41 - line 591, column 59: " + [ dType.constructor.name ]);
                               };
                           };
                       };
@@ -10504,7 +10504,7 @@ var PS = {};
                               if (debtType instanceof Credit) {
                                   return InputCredit.create;
                               };
-                              throw new Error("Failed pattern match at Debts line 552, column 21 - line 553, column 58: " + [ debtType.constructor.name ]);
+                              throw new Error("Failed pattern match at Debts line 561, column 21 - line 562, column 58: " + [ debtType.constructor.name ]);
                           })();
                           var d = (function () {
                               if (debtType instanceof Debt) {
@@ -10513,7 +10513,7 @@ var PS = {};
                               if (debtType instanceof Credit) {
                                   return Data_Maybe.fromMaybe(Network_Eth_FriendInDebt_Types.zeroDebt(cur)(v.value0)(myId)(v.value0))(maybeDebt);
                               };
-                              throw new Error("Failed pattern match at Debts line 549, column 15 - line 551, column 81: " + [ debtType.constructor.name ]);
+                              throw new Error("Failed pattern match at Debts line 558, column 15 - line 560, column 81: " + [ debtType.constructor.name ]);
                           })();
                           return Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("createDebt col row") ])([ Halogen_HTML_Elements.input([ Halogen_HTML_Properties.type_(Halogen_HTML_Core.inputTypeIsProp)(DOM_HTML_Indexed_InputType.InputNumber.value), Halogen_HTML_Properties.class_("debt-amount col-2"), Halogen_HTML_Properties.value(noDecimals(Network_Eth_FriendInDebt_Types.formatMoney(Network_Eth_FriendInDebt_Types.debtMoney(d)))), Halogen_HTML_Events.onValueInput(Halogen_HTML_Events.input(function (val) {
                               return handler(amount(d)(val)(cur));
@@ -10525,7 +10525,7 @@ var PS = {};
                               return handler(Network_Eth_FriendInDebt_Types.setDesc(d)(Data_String.take(32)(val)));
                           })), Halogen_HTML_Properties.value(Data_String.take(32)(Network_Eth_FriendInDebt_Types.getDesc(d))) ]), Halogen_HTML_Elements.button([ Halogen_HTML_Events.onClick(Halogen_HTML_Events.input_(AddDebt.create(d))), Halogen_HTML_Properties.disabled(Network_Eth_FriendInDebt_Types.debtAmount(d) === 0.0), Halogen_HTML_Properties.class_("create-debt-button col-2") ])([ Halogen_HTML_Core.text("Send Debt") ]) ]);
                       };
-                      throw new Error("Failed pattern match at Debts line 546, column 3 - line 576, column 11: " + [ v.constructor.name ]);
+                      throw new Error("Failed pattern match at Debts line 555, column 3 - line 585, column 11: " + [ v.constructor.name ]);
                   };
               };
           };
@@ -10542,7 +10542,7 @@ var PS = {};
           if (!isItMe) {
               return Halogen_HTML_Elements.a([ Halogen_HTML_Properties.class_("expandable-id"), Halogen_HTML_Properties.href("#"), Halogen_HTML_Events.onClick(Halogen_HTML_Events.input_(ShowItemizedDebtFor.create(new Data_Maybe.Just(idToDisplay)))) ])([ Halogen_HTML_Core.text(Data_Show.show(Network_Eth_Foundation.showFoundationId)(idToDisplay)) ]);
           };
-          throw new Error("Failed pattern match at Debts line 461, column 6 - line 463, column 167: " + [ isItMe.constructor.name ]);
+          throw new Error("Failed pattern match at Debts line 470, column 6 - line 472, column 167: " + [ isItMe.constructor.name ]);
       };
   };
   var handleFIDCall = function (dictBind) {
@@ -10566,10 +10566,10 @@ var PS = {};
                                   if (v instanceof Data_Either.Right) {
                                       return Control_Applicative.pure((dictMonadEff.Monad0()).Applicative0())(v.value0);
                                   };
-                                  throw new Error("Failed pattern match at Debts line 600, column 7 - line 603, column 30: " + [ v.constructor.name ]);
+                                  throw new Error("Failed pattern match at Debts line 609, column 7 - line 612, column 30: " + [ v.constructor.name ]);
                               });
                           };
-                          throw new Error("Failed pattern match at Debts line 594, column 3 - line 603, column 30: " + [ errorBus.constructor.name ]);
+                          throw new Error("Failed pattern match at Debts line 603, column 3 - line 612, column 30: " + [ errorBus.constructor.name ]);
                       };
                   };
               };
@@ -10651,14 +10651,14 @@ var PS = {};
       return [ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("row friend-details align-items-center") ])([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col") ])([ Halogen_HTML_Core.text("Sent Friend Request to:" + Data_Show.show(Network_Eth_Foundation.showFoundationId)(friend)) ]) ]) ];
   };
   var displayFriendLi = function (v) {
-      return Halogen_HTML_Elements.li([ Halogen_HTML_Properties.class_("friend-item col-4") ])([ Halogen_HTML_Elements.div([  ])([ UI_IconGenerator.generatedIcon(Data_Show.show(Network_Eth_Foundation.showFoundationId)(v.value0))(v.value1), Halogen_HTML_Core.text(Data_Show.show(Network_Eth_Foundation.showFoundationId)(v.value0)) ]) ]);
+      return Halogen_HTML_Elements.li([ Halogen_HTML_Properties.class_("friend-item row") ])([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col-3") ])([ UI_IconGenerator.generatedIcon(Data_Show.show(Network_Eth_Foundation.showFoundationId)(v.value0))(v.value1) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col-9 name-portion") ])([ Halogen_HTML_Core.text(Data_Show.show(Network_Eth_Foundation.showFoundationId)(v.value0)) ]) ]);
   };
   var displayFriendGroup = function (group) {
       var innerArr = Data_NonEmpty.oneOf(Control_Alternative.alternativeArray)(group);
       var initial = Data_Maybe.fromMaybe("")(Control_Bind.bind(Data_Maybe.bindMaybe)(Data_Array.head(innerArr))(function (v) {
           return Control_Applicative.pure(Data_Maybe.applicativeMaybe)(Network_Eth_Foundation.initial(v.value0));
       }));
-      return Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("row justify-content-end initial-group") ])(Data_Semigroup.append(Data_Semigroup.semigroupArray)([ Halogen_HTML_Elements.h6([ Halogen_HTML_Properties.class_("initial-label") ])([ Halogen_HTML_Core.text(initial) ]) ])(Data_Functor.map(Data_Functor.functorArray)(displayFriendLi)(innerArr)));
+      return Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("row initial-group") ])([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col-1") ])([ Halogen_HTML_Elements.h6([ Halogen_HTML_Properties.class_("initial-label") ])([ Halogen_HTML_Core.text(initial) ]) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col") ])(Data_Functor.map(Data_Functor.functorArray)(displayFriendLi)(innerArr)) ]);
   };
   var groupFriendLiByInitial = function (friendsWithGradients) {
       var orderedFriends = Data_Array.sortBy(function (v) {

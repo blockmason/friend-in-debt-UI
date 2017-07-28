@@ -298,14 +298,23 @@ displayFriendGroup group =
       (Tuple fid1 gradient) ← head innerArr
       pure $ F.initial fid1
 
- in HH.div [HP.class_ $ HH.ClassName "row justify-content-end initial-group"] $ append
-           [HH.h6 [HP.class_ $ HH.ClassName "initial-label"] [HH.text initial]]
-           $ displayFriendLi <$> innerArr
+ in HH.div [HP.class_ $ HH.ClassName "row initial-group"]
+           [
+             HH.div [HP.class_ $ HH.ClassName "col-1"]
+                    [HH.h6 [HP.class_ $ HH.ClassName "initial-label"] [HH.text initial]]
+            , HH.div [HP.class_ $ HH.ClassName "col"]
+                     $ displayFriendLi <$> innerArr
+            ]
 
 displayFriendLi ∷ (Tuple F.FoundationId ICON.GradientCss) → H.ComponentHTML Query
 displayFriendLi (Tuple fid gradient) =
-  HH.li [HP.class_ $ HH.ClassName "friend-item col-4"]
-  [HH.div [][ICON.generatedIcon (show fid) gradient, HH.text $ show fid]]
+  HH.li [HP.class_ $ HH.ClassName "friend-item row"]
+  [
+    HH.div [HP.class_ $ HH.ClassName "col-3"]
+      [ICON.generatedIcon (show fid) gradient]
+    , HH.div [HP.class_ $ HH.ClassName "col-9 name-portion"]
+      [HH.text $ show fid]
+  ]
 
 -- Balance List
 

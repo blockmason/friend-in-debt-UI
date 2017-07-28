@@ -315,21 +315,21 @@ html {
   padding: 10px;
 }
 
-.all-friends-container .friend-item > div {
-  margin-bottom: 10px;
-  border-radius: 5px;
-  height: 80px;
-  overflow: hidden;
-  background-color: white;
-  text-align: center;
-  box-shadow: 4px -10px 17px 5px rgba(0,0,0,0.3);
-  transition: 0.3s ease;
+.all-friends-container .friend-item {
+  border-bottom: 1px solid #ddd;
+  width: 100%;
+  text-transform: lowercase;
+  font-weight: 100;
+  line-height: 3em;
 }
 
-.all-friends-container .friend-item > div:hover {
-  transform: perspective(1000px) rotateX(10deg);
+.all-friends-container .friend-item:last-child {
+  border-bottom: none;
 }
 
+.friend-item .name-portion {
+  text-align: left;
+}
 
 .all-friends-container .generated-icon {
   border-radius: 50%;
@@ -342,31 +342,22 @@ html {
   margin: 10px auto;
 }
 
-.friend-item:hover {
-  background: rgba(0,0,0,0.05);
-}
-
-.friend-item div {
-  display: block;
-  width: 100%;
-  text-transform: lowercase;
-  font-weight: 100;
-}
-
 h6.initial-label {
   width: 100%;
-  padding-left: 1em;
   font-size: 20px;
-  background-color: rgba(0,0,0,0.1);
   text-transform: uppercase;
-  margin-bottom: 1em;
-  color: white;
+  color: #333;
 }
 
 .initial-group {
   margin: 0 0 10px 0;
   border-radius: 5px;
-  background-color: rgba(255,255,255,0.3);
+  overflow: hidden;
+  background-color: white;
+  text-align: center;
+  box-shadow: 4px -10px 17px 5px rgba(0,0,0,0.3);
+  transition: 0.3s ease;
+  padding: 20px 5px;
 }
 
 /*itemized debts page */
