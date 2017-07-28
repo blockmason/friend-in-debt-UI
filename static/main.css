@@ -17,7 +17,7 @@ html {
   max-width: 600px;
   box-shadow: 0 0 5px 5px rgba(0,0,0,0.3);
   height: 100vh;
-  overflow: hidden;
+  overflow-y: scroll;
 }
 
 /* loading overlays */
@@ -206,7 +206,6 @@ html {
 
 
 .show-itemized-debt .all-friends-container,
-.show-itemized-debt .all-balances-container,
 .show-itemized-debt .all-settings-container,
 .show-itemized-debt .all-pending-debts-container,
 .show-itemized-debt .create-debt-container,
@@ -335,43 +334,93 @@ html {
 }
 
 /*itemized debts page */
-.itemized-debts-for-friend ul {
-    list-style: none;
-    padding: 0;
+.show-itemized-debt .balance-row.expand-itemized {
+  height: auto;
 }
 
-.itemized-debts-for-friend .debt-amount {
-  border-bottom: 1px solid #aaa;
-  border-top: 1px solid #aaa;
-  margin-top: 10px;
-  width: 100%;
-  margin-left: 0;
-  padding: 5px;
-  height: 4em;
-  line-height: 3em;
-  border-radius: 5px;
+.show-itemized-debt .expand-itemized .debt-details {
+    display: none;
 }
 
-.itemized-debt-amount span:first-child {
-    line-height: 1em;
-    max-width: 50%;
-    float: left;
-    max-height: 3em;
-    overflow: hidden;
+.show-itemized-debt .expand-itemized .debt-excerpt {
+    display: none;
 }
 
-.itemized-debt-amount span:last-child {
-  float: right;
+.itemized-debts > .row {
+  padding: 10px;
+}
+
+.itemized-debts .row:first-child {
+  padding-bottom: 0;
+  border-bottom: 1px solid #ddd;
+  width: 90%;
+  margin: auto;
   font-weight: 100;
-  border-left: 1px dotted #aaa;
-  font-size: 30px;
-  padding-left: 5px;
+}
+
+.itemized-debts .row:nth-child(2) {
+  padding-top: 0;
+  width: 90%;
+  margin: auto;
+  font-weight: 500;
+}
+
+.debt-timeline {
+  margin-bottom: 2em;
+}
+
+.timeline-event {
+  border-left: 1px solid #aaa;
+  padding: 10px 2em;
+  margin-left: 5em;
+  font-size: 10px;
+  width: 100%;
+}
+
+.timeline-event:before {
+  content: '';
+  border: 3px solid #03a9f4;
+  background: white;
+  border-radius: 50%;
+  height: 30px;
+  width: 30px;
+  display: block;
+  position: absolute;
+  left: 4.5em;
+}
+
+.show-balances .itemized-debts {
+  display: none;
+}
+
+.show-itemized-debt .balance-row.hide-itemized:nth-child(odd) {
+  margin-top: 0;
+  margin-bottom:0;
+  height: 0;
+  opacity: 0;
+  transform: perspective(1600px) rotateX(-90deg) translateY(20px);
+}
+
+.show-itemized-debt .balance-row.hide-itemized:nth-child(even) {
+  margin-top: 0;
+  margin-bottom:0;
+  height: 0;
+  transform: perspective(1600px) rotateX(90deg) translateY(20px);
+  opacity: 0;
+}
+
+.show-itemized-debt .balance-row.expand-itemized {
+  height: auto;
+  opacity: 1;
+  transform: perspective(0) rotateX(0);
+  margin: auto;
 }
 
 /* balance page */
 .all-balances-container ul {
   list-style: none;
   padding: 1em;
+  overflow: hidden;
 }
 
 .balance-row {
@@ -380,11 +429,11 @@ html {
   border-radius: 5px;
   overflow: hidden;
   margin-bottom: 10px;
+  transition: all 0.7s ease;
 }
 
-.balance-row:hover {
-  transform: rotateX(15deg) translateY(-5px);
-  box-shadow: 6px 5px 4px 0px rgba(0,0,0,0.9);
+.balance-row:hover .highlight {
+  filter: brightness(1.1);
 }
 
 .balance-row .highlight {
