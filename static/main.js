@@ -4566,11 +4566,16 @@ var PS = {};
   };
 
 
+
   var confirmedFriends2Js = function(friends) {
+      var friendList = [];
       for (var  i=0; i < friends.length; i++ ) {
-          friends[i] = b2s(friends[i]);
+          var friend = {
+              friendId: b2s(friends[i])
+          };
+          friendList.push(friend);
       }
-      return friends;
+      return friendList;
   };
 
   var pendingFriends2Js = function(friends) {
@@ -4608,7 +4613,8 @@ var PS = {};
                        amount: debts[1][i].toNumber(),
                        desc: b2s(debts[2][i]),
                        debtor: b2s(debts[3][i]),
-                       creditor: b2s(debts[4][i])  };
+                       creditor: b2s(debts[4][i]),
+                       timestamp: debts[5][i].toNumber() };
           debtList.push(debt);
       }
       return debtList;
@@ -4619,7 +4625,9 @@ var PS = {};
       for (var  i=0; i < debts[0].length; i++ ) {
           var debt = { currency: b2s(debts[0][i]),
                        amount: debts[1][i].toNumber(),
-                       counterParty: b2s(debts[2][i]) };
+                       counterParty: b2s(debts[2][i]),
+                       totalDebts: debts[3][i].toNumber(),
+                       mostRecent: debts[4][i].toNumber() };
           balanceList.push(debt);
       }
       return balanceList;
@@ -4634,6 +4642,7 @@ var PS = {};
           s += char;
       }
       return s;
+
   };
 })(PS["Network.Eth.FriendInDebt"] = PS["Network.Eth.FriendInDebt"] || {});
 (function(exports) {

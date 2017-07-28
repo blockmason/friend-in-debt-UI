@@ -228,11 +228,16 @@ var errTx = function() {
 };
 
 
+
 var confirmedFriends2Js = function(friends) {
+    var friendList = [];
     for ( var i=0; i < friends.length; i++ ) {
-        friends[i] = b2s(friends[i]);
+        var friend = {
+            friendId: b2s(friends[i])
+        };
+        friendList.push(friend);
     }
-    return friends;
+    return friendList;
 };
 
 var pendingFriends2Js = function(friends) {
@@ -270,7 +275,8 @@ var confirmedDebts2Js = function(debts) {
                      amount: debts[1][i].toNumber(),
                      desc: b2s(debts[2][i]),
                      debtor: b2s(debts[3][i]),
-                     creditor: b2s(debts[4][i])  };
+                     creditor: b2s(debts[4][i]),
+                     timestamp: debts[5][i].toNumber() };
         debtList.push(debt);
     }
     return debtList;
@@ -281,7 +287,9 @@ var debtBalances2Js = function(debts) {
     for ( var i=0; i < debts[0].length; i++ ) {
         var debt = { currency: b2s(debts[0][i]),
                      amount: debts[1][i].toNumber(),
-                     counterParty: b2s(debts[2][i]) };
+                     counterParty: b2s(debts[2][i]),
+                     totalDebts: debts[3][i].toNumber(),
+                     mostRecent: debts[4][i].toNumber() };
         balanceList.push(debt);
     }
     return balanceList;
@@ -296,4 +304,5 @@ var b2s = function(bytes) {
         s += char;
     }
     return s;
+
 };
