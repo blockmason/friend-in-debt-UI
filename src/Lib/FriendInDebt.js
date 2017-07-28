@@ -262,7 +262,8 @@ var pendingDebts2Js = function(debts) {
                      amount: debts[3][i].toNumber(),
                      desc: b2s(debts[4][i]),
                      debtor: b2s(debts[5][i]),
-                     creditor: b2s(debts[6][i])  };
+                     creditor: b2s(debts[6][i]),
+                     timestamp: 0.0 };
         debtList.push(debt);
     }
     return debtList;
