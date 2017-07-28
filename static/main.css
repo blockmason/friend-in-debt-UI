@@ -305,32 +305,68 @@ html {
 
 /*friend page*/
 
-.all-friends-container .friend-row {
-  border-bottom: 1px solid #aaa;
-  border-top: 1px solid #aaa;
+.all-friends-container {
   margin-top: 10px;
-  width: 100%;
-  margin-left: 0;
-  padding: 5px;
-  height: 3em;
-  line-height: 2em;
-  border-radius: 5px;
+  overflow: hidden;
 }
 
-.friend-row:hover {
+.all-friends-container ul{
+  list-style: none;
+  padding: 10px;
+}
+
+.all-friends-container .friend-item > div {
+  margin-bottom: 10px;
+  border-radius: 5px;
+  height: 80px;
+  overflow: hidden;
+  background-color: white;
+  text-align: center;
+  box-shadow: 4px -10px 17px 5px rgba(0,0,0,0.3);
+  transition: 0.3s ease;
+}
+
+.all-friends-container .friend-item > div:hover {
+  transform: perspective(1000px) rotateX(10deg);
+}
+
+
+.all-friends-container .generated-icon {
+  border-radius: 50%;
+  height: 2em;
+  width: 2em;
+  text-align: center;
+  line-height: 2em;
+  text-transform: capitalize;
+  color: white;
+  margin: 10px auto;
+}
+
+.friend-item:hover {
   background: rgba(0,0,0,0.05);
 }
 
-.friend-row a {
+.friend-item div {
   display: block;
   width: 100%;
-  color: #333;
-  text-decoration: none;
+  text-transform: lowercase;
+  font-weight: 100;
 }
 
-.friend-row a:visited {
-  color: #333;
-  text-decoration: none;
+h6.initial-label {
+  width: 100%;
+  padding-left: 1em;
+  font-size: 20px;
+  background-color: rgba(0,0,0,0.1);
+  text-transform: uppercase;
+  margin-bottom: 1em;
+  color: white;
+}
+
+.initial-group {
+  margin: 0 0 10px 0;
+  border-radius: 5px;
+  background-color: rgba(255,255,255,0.3);
 }
 
 /*itemized debts page */

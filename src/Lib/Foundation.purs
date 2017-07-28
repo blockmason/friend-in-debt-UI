@@ -4,10 +4,11 @@ module Network.Eth.Foundation
        , fiGetId
        , fiBlankId
        , fiMkId
+       , initial
        ) where
 
 import Prelude
-import Data.String                 (localeCompare)
+import Data.String                 (toLower, take, localeCompare)
 
 newtype FoundationId = FoundationId String
 instance showFoundationId ∷ Show FoundationId where
@@ -19,3 +20,7 @@ instance ordFoundationId ∷ Ord FoundationId where
 fiMkId str = (FoundationId str)
 fiGetId (FoundationId fi) = fi
 fiBlankId = (FoundationId "")
+
+initial ∷ FoundationId → String
+initial fid =
+  take 1 $ toLower $ show fid

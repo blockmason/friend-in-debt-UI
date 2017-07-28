@@ -1062,7 +1062,7 @@ var gradients = [
 
 var generateGradientFromColors = function(colors) {
   var colorStr = colors.reverse().join(', ');
-  var firstPart = 'background: linear-gradient(to bottom, ';
+  var firstPart = 'background: linear-gradient(to top, ';
   var lastPart = '); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */';
   return firstPart + colorStr + lastPart;
 };
@@ -1070,7 +1070,6 @@ var generateGradientFromColors = function(colors) {
 exports.randomGradientImpl = function(unit) {
   return function() {
     var gradient = gradients[Math.floor(Math.random()*gradients.length)];
-    console.log(gradient);
     return generateGradientFromColors(gradient.colors);
   };
 };

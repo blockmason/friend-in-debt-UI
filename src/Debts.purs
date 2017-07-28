@@ -11,7 +11,8 @@ import Data.Int (toNumber, decimal, fromStringAs)
 import Data.Number as N
 import Data.String as S
 import Data.Map    as M
-import Data.Array (length, filter, zip, fromFoldable)
+import Data.Array (length, filter, zip, fromFoldable, groupBy, sortBy)
+import Data.NonEmpty
 
 import Halogen as H
 import Halogen.HTML as HH
@@ -89,27 +90,27 @@ component =
 
   render ∷ State → H.ComponentHTML Query
   render state =
-    if state.loading
-    then HH.span_ [ HH.h6_ [ HH.text "Loading debt info..." ]
-                  , HH.img [ HP.src "loading.gif"
-                           , HP.width 25 ] ]
-    else
+    -- if state.loading
+    -- then HH.span_ [ HH.h6_ [ HH.text "Loading debt info..." ]
+    --               , HH.img [ HP.src "loading.gif"
+    --                        , HP.width 25 ] ]
+    -- else
       HH.div
       [ HP.class_ $ HH.ClassName "page-container col-12" ]
-      $ append [
+      [
       HH.div
         [ HP.class_ $ HH.ClassName "all-friends-container" ]
         [
           HH.ul
           [ HP.class_ $ HH.ClassName "col" ]
-          $ displayFriendLi <$> (zip state.friends state.gradients)
+          $ groupFriendLiByInitial (zip state.friends state.gradients)
         ]
       , HH.div
         [ HP.class_ $ HH.ClassName "all-balances-container" ]
         [
           HH.ul
           [ HP.class_ $ HH.ClassName "col-12" ]
-          $ (displayBalanceLi state.myId) <$> [mockBalance, mockBalance, mockBalance, mockBalance, mockBalance, mockBalance]
+          $ (displayBalanceLi state) <$> [mockBalance2, mockBalance2, mockBalance2, mockBalance, mockBalance2, mockBalance2]
         ]
       , HH.div
         [ HP.class_ $ HH.ClassName "all-pending-debts-container" ]
@@ -173,11 +174,17 @@ component =
           pure next
     HandleInput input next → do
       state <- H.get
-      -- gradients <- H.liftEff $ sequence $ ICON.randomGradient <$> state.friends
-      gradients <- H.liftEff $ sequence $ (const ICON.randomGradient) <$> mockFriends
-      H.modify (_ { errorBus = input, gradients = gradients, friends = mockFriends })
-      -- H.modify (_ { errorBus = input, gradients = gradients })
-      pure next
+      case (length state.gradients) of
+        0 → do
+          -- gradients <- H.liftEff $ sequence $ ICON.randomGradient <$> state.friends
+          gradients <- H.liftEff $ sequence $ (const ICON.randomGradient) <$> mockFriends
+          H.modify (_ { errorBus = input, gradients = gradients, friends = mockFriends })
+          -- H.modify (_ { errorBus = input, gradients = gradients })
+          pure next
+
+        _ → do
+          H.modify (_ { errorBus = input, friends = mockFriends })
+          pure next
     AddFriend eitherFriendId next → do
       s ← H.get
       hLog eitherFriendId
@@ -275,12 +282,30 @@ itemizedDebt fd =
   ]
 
 -- Friends List
+groupFriendLiByInitial ∷ Array (Tuple F.FoundationId ICON.GradientCss) → Array (H.ComponentHTML Query)
+groupFriendLiByInitial friendsWithGradients =
+  let
+    orderedFriends = sortBy (\(Tuple fid1 gradient) (Tuple fid2 gradient) → S.localeCompare (F.initial fid1) (F.initial fid2)) friendsWithGradients
+    friendGroups = groupBy (\(Tuple fid1 gradient) (Tuple fid2 gradient) → (F.initial fid1) == (F.initial fid2)) orderedFriends
+  in
+    displayFriendGroup <$> friendGroups
 
--- displayFriendLi ∷ Tuple(F.FoundationId ICON.GradientCss) → H.ComponentHTML Query
+displayFriendGroup ∷ NonEmpty Array (Tuple F.FoundationId ICON.GradientCss) → H.ComponentHTML Query
+displayFriendGroup group =
+ let
+  innerArr = oneOf group
+  initial = fromMaybe "" $ do
+      (Tuple fid1 gradient) ← head innerArr
+      pure $ F.initial fid1
+
+ in HH.div [HP.class_ $ HH.ClassName "row justify-content-end initial-group"] $ append
+           [HH.h6 [HP.class_ $ HH.ClassName "initial-label"] [HH.text initial]]
+           $ displayFriendLi <$> innerArr
+
+displayFriendLi ∷ (Tuple F.FoundationId ICON.GradientCss) → H.ComponentHTML Query
 displayFriendLi (Tuple fid gradient) =
-  HH.li [HP.class_ $ HH.ClassName "friend-row row"]
-  [HH.a [HP.href "#", HE.onClick $ HE.input_ $ ShowItemizedDebtFor $ Just fid]
-        [ICON.generatedIcon (show fid) gradient, HH.text $ show fid]]
+  HH.li [HP.class_ $ HH.ClassName "friend-item col-4"]
+  [HH.div [][ICON.generatedIcon (show fid) gradient, HH.text $ show fid]]
 
 -- Balance List
 
