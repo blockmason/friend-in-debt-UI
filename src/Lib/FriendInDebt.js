@@ -1,34 +1,33 @@
-v"use strict";
-//requires web3, FriendInDebt, FriendInDebtNS, Friendships configs
+"use strict";
+//requires web3, Debt, Friend configs
 
-var FriendInDebt;
-var Friendships;
+var Debt;
+var Friend;
 
-var fidAbi;
-var fidContract;
-var fidContractAddress;
+var debtAbi;
+var debtContract;
+var debtContractAddress;
 
-var friendshipsAbi;
-var friendshipsContract;
-var friendshipsContractAddress;
+var friendAbi;
+var friendContract;
+var friendContractAddress;
 
 var myAddress;
 
 exports.initImpl = function(dummyVal) {
     return function() {
-        fidAbi = web3.eth.contract(friendInDebtConfig.abi);
-        fidContract = fidAbi.at(friendInDebtConfig.address);
-        fidContractAddress = friendInDebtConfig.address;
+        debtAbi = web3.eth.contract(debtConfig.abi);
+        debtContract = debtAbi.at(debtConfig.address);
+        debtContractAddress = debtConfig.address;
 
-        friendshipsAbi = web3.eth.contract(friendshipsConfig.abi);
-        friendshipsContract = friendshipAbi.at(friendshipsConfig.address);
-        friendshipsContractAddress = friendshipsConfig.address;
+        friendAbi = web3.eth.contract(friendConfig.abi);
+        friendContract = friendAbi.at(friendConfig.address);
+        friendContractAddress = friendConfig.address;
 
-
-        FriendInDebt = TruffleContract(friendInDebtConfig);
-        FriendInDebt.setProvider(web3.currentProvider);
-        Friendships = TruffleContract(friendshipsConfig);
-        Friendships.setProvider(web3.currentProvider);
+        Debt = TruffleContract(debtConfig);
+        Debt.setProvider(web3.currentProvider);
+        Friend = TruffleContract(friendConfig);
+        Friend.setProvider(web3.currentProvider);
     };
 };
 
@@ -41,7 +40,7 @@ exports.currentUserImpl = function(dummyVal) {
 
 exports.getMyFoundationIdImpl = function(callback) {
     return function() {
-        FriendInDebt.deployed().then(function(instance) {
+        Debt.deployed().then(function(instance) {
             return instance.getMyFoundationId.call();
         }).then(function(res) {
             callback(b2s(res.valueOf()))();
@@ -53,7 +52,7 @@ exports.getMyFoundationIdImpl = function(callback) {
 exports.friendsImpl = function(callback) {
     return function(foundationId) {
         return function() {
-            Friendships.deployed().then(function(instance) {
+            Friend.deployed().then(function(instance) {
                 return instance.confirmedFriends.call(foundationId);
             }).then(function(res) {
                 callback(confirmedFriends2Js(res.valueOf()))();
@@ -65,7 +64,7 @@ exports.friendsImpl = function(callback) {
 exports.pendingFriendshipsImpl = function(callback) {
     return function(foundationId) {
         return function() {
-            Friendships.deployed().then(function(instance) {
+            Friend.deployed().then(function(instance) {
                 return instance.pendingFriends.call(foundationId);
             }).then(function(res) {
                 callback(pendingFriends2Js(res.valueOf()))();
@@ -78,8 +77,8 @@ exports.createFriendshipImpl = function(callback) {
     return function(myId) {
         return function(friendId) {
             return function() {
-                var data = friendshipsContract.createFriendship.getData(myId, friendId);
-                sendFriendshipsTx(data, 0, callback);
+                var data = friendContract.createFriendship.getData(myId, friendId);
+                sendFriendTx(data, 0, callback);
             };
         };
     };
@@ -89,8 +88,8 @@ exports.confirmFriendshipImpl = function(callback) {
     return function(myId) {
         return function(friendId) {
             return function() {
-                var data = friendshipsContract.addFriend.getData(myId, friendId);
-                sendFriendshipsTx(data, 0, callback);
+                var data = friendContract.addFriend.getData(myId, friendId);
+                sendFriendTx(data, 0, callback);
             };
         };
     };
@@ -100,8 +99,8 @@ exports.deleteFriendshipImpl = function(callback) {
     return function(myId) {
         return function(friendId) {
             return function() {
-                var data = friendshipsContract.deleteFriend.getData(myId, friendId);
-                sendFriendshipsTx(data, 0, callback);
+                var data = friendContract.deleteFriend.getData(myId, friendId);
+                sendFriendTx(data, 0, callback);
             };
         };
     };
@@ -116,8 +115,8 @@ exports.newPendingDebtImpl = function(callback) {
                 return function(currencyCode) {
                     return function(desc) {
                         return function() {
-                            var data = fidContract.newDebt(debtor, creditor, currencyCode, amount, desc);
-                            sendFIDTx(data, 0, callback);
+                            var data = debtContract.newDebt(debtor, creditor, currencyCode, amount, desc);
+                            sendDebtTx(data, 0, callback);
                         };
                     };
                 };
@@ -129,7 +128,7 @@ exports.newPendingDebtImpl = function(callback) {
 exports.debtBalancesImpl = function(callback) {
     return function(foundationId) {
         return function() {
-            FriendInDebt.deployed().then(function(instance) {
+            Debt.deployed().then(function(instance) {
                 return instance.confirmedDebtBalances.call(foundationId);
             }).then(function(res) {
                 callback(debtBalances2Js(res.valueOf()))();
@@ -141,7 +140,7 @@ exports.debtBalancesImpl = function(callback) {
 exports.pendingDebtsImpl = function(callback) {
     return function(foundationId) {
         return function() {
-            FriendInDebt.deployed().then(function(instance) {
+            Debt.deployed().then(function(instance) {
                 return instance.pendingDebts.call(foundationId);
             }).then(function(res) {
                 callback(pendingDebts2Js(res.valueOf()))();
@@ -154,7 +153,7 @@ exports.itemizedDebtsImpl = function(callback) {
     return function(myId) {
         return function(friendId) {
             return function() {
-                FriendInDebt.deployed().then(function(instance) {
+                Debt.deployed().then(function(instance) {
                     return instance.confirmedDebts.call(myId, friendId);
                 }).then(function(res) {
                     callback(confirmedDebts2Js(res.valueOf()))();
@@ -169,8 +168,8 @@ exports.confirmDebtImpl = function(callback) {
         return function(friendId) {
             return function(debtId) {
                 return function() {
-                    var data = fidContract.confirmDebt(debtor, creditor, debtId);
-                    sendFIDTx(data, 0, callback);
+                    var data = debtContract.confirmDebt(debtor, creditor, debtId);
+                    sendDebtTx(data, 0, callback);
                 };
             };
         };
@@ -182,8 +181,8 @@ exports.rejectDebtImpl = function(callback) {
         return function(friendId) {
             return function(debtId) {
                 return function() {
-                    var data = fidContract.rejectDebt(debtor, creditor, debtId);
-                    sendFIDTx(data, 0, callback);
+                    var data = debtContract.rejectDebt(debtor, creditor, debtId);
+                    sendDebtTx(data, 0, callback);
                 };
             };
         };
@@ -191,9 +190,9 @@ exports.rejectDebtImpl = function(callback) {
 };
 
 //helper functions
-var sendFIDTx = function(data, value, callback) {
+var sendDebtTx = function(data, value, callback) {
     web3.eth.sendTransaction(
-        {to: fidContractAddress,
+        {to: debtContractAddress,
          from: myAddress,
          data: data,
          value: value},
@@ -205,9 +204,9 @@ var sendFIDTx = function(data, value, callback) {
         });
 };
 
-var sendFriendshipsTx = function(data, value, callback) {
+var sendFriendTx = function(data, value, callback) {
     web3.eth.sendTransaction(
-        {to: friendshipsContractAddress,
+        {to: friendContractAddress,
          from: myAddress,
          data: data,
          value: value},
