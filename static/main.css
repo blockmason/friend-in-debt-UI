@@ -331,6 +331,10 @@ html {
   text-align: left;
 }
 
+.friend-item:first-child {
+  margin-top: -10px;
+}
+
 .all-friends-container .generated-icon {
   border-radius: 50%;
   height: 2em;

@@ -11,7 +11,7 @@ import Data.Int (toNumber, decimal, fromStringAs)
 import Data.Number as N
 import Data.String as S
 import Data.Map    as M
-import Data.Array (length, filter, zip, fromFoldable, groupBy, sortBy)
+import Data.Array (length, filter, zip, fromFoldable, groupBy, sortBy, find)
 import Data.NonEmpty
 
 import Halogen as H
@@ -38,6 +38,7 @@ data Query a
 
 type Input = ContainerMsgBus
 type Message = String
+newtype FriendBundle = FriendBundle { id ∷ F.FoundationId, gradient ∷ ICON.GradientCss, balance ∷ Maybe F.Balance }
 
 type State = { friends             ∷ Array F.FoundationId
              , gradients           ∷ Array ICON.GradientCss
@@ -103,7 +104,7 @@ component =
         [
           HH.ul
           [ HP.class_ $ HH.ClassName "col" ]
-          $ groupFriendLiByInitial (zip state.friends state.gradients)
+          $ groupFriendLiByInitial $ prepareFriendBundles state
         ]
       , HH.div
         [ HP.class_ $ HH.ClassName "all-balances-container" ]
@@ -282,21 +283,30 @@ itemizedDebt fd =
   ]
 
 -- Friends List
-groupFriendLiByInitial ∷ Array (Tuple F.FoundationId ICON.GradientCss) → Array (H.ComponentHTML Query)
-groupFriendLiByInitial friendsWithGradients =
+
+findBalanceFor ∷ F.FoundationId → Array F.Balance → Maybe F.Balance
+findBalanceFor fid balances =
+  find (\(F.Balance balance) → balance.debtor == fid || balance.creditor == fid) balances
+
+prepareFriendBundles ∷ State → Array FriendBundle
+prepareFriendBundles state =
+  (\(Tuple fid1 gradient) → FriendBundle {id: fid1, gradient: gradient, balance: findBalanceFor fid1 state.balances}) <$> (zip state.friends state.gradients)
+
+groupFriendLiByInitial ∷ Array FriendBundle → Array (H.ComponentHTML Query)
+groupFriendLiByInitial friendBundles =
   let
-    orderedFriends = sortBy (\(Tuple fid1 gradient) (Tuple fid2 gradient) → S.localeCompare (F.initial fid1) (F.initial fid2)) friendsWithGradients
-    friendGroups = groupBy (\(Tuple fid1 gradient) (Tuple fid2 gradient) → (F.initial fid1) == (F.initial fid2)) orderedFriends
+    orderedFriends = sortBy (\(FriendBundle bundle1) (FriendBundle bundle2) → S.localeCompare (F.initial bundle1.id) (F.initial bundle2.id)) friendBundles
+    friendGroups = groupBy (\(FriendBundle bundle1) (FriendBundle bundle2) → (F.initial bundle1.id) == (F.initial bundle2.id)) orderedFriends
   in
     displayFriendGroup <$> friendGroups
 
-displayFriendGroup ∷ NonEmpty Array (Tuple F.FoundationId ICON.GradientCss) → H.ComponentHTML Query
+displayFriendGroup ∷ NonEmpty Array FriendBundle → H.ComponentHTML Query
 displayFriendGroup group =
  let
   innerArr = oneOf group
   initial = fromMaybe "" $ do
-      (Tuple fid1 gradient) ← head innerArr
-      pure $ F.initial fid1
+      (FriendBundle bundle1) ← head innerArr
+      pure $ F.initial bundle1.id
 
  in HH.div [HP.class_ $ HH.ClassName "row initial-group"]
            [
@@ -306,15 +316,22 @@ displayFriendGroup group =
                      $ displayFriendLi <$> innerArr
             ]
 
-displayFriendLi ∷ (Tuple F.FoundationId ICON.GradientCss) → H.ComponentHTML Query
-displayFriendLi (Tuple fid gradient) =
-  HH.li [HP.class_ $ HH.ClassName "friend-item row"]
-  [
-    HH.div [HP.class_ $ HH.ClassName "col-3"]
-      [ICON.generatedIcon (show fid) gradient]
-    , HH.div [HP.class_ $ HH.ClassName "col-9 name-portion"]
-      [HH.text $ show fid]
-  ]
+displayFriendLi ∷ FriendBundle → H.ComponentHTML Query
+displayFriendLi (FriendBundle bundle1) =
+  let balance = fromMaybe "" $ do
+                (F.Balance bal) ← bundle1.balance
+                pure $ show $ F.numAmount bal.amount
+
+  in HH.li [HP.class_ $ HH.ClassName "friend-item row"]
+    [
+      HH.div [HP.class_ $ HH.ClassName "col-3"]
+        [ICON.generatedIcon (show bundle1.id) bundle1.gradient]
+      , HH.div [HP.class_ $ HH.ClassName "col-9 name-portion"]
+        [
+          HH.text $ show bundle1.id,
+          HH.text balance
+        ]
+    ]
 
 -- Balance List
 
