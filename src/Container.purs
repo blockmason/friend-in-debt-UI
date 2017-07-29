@@ -65,18 +65,18 @@ ui =
 
     render ∷ State → H.ParentHTML Query ChildQuery ChildSlot (FIDMonad eff)
     render state =
-      HH.div [ HP.id_ "container", HP.class_ (HH.ClassName $ "container-fluid " <> state.currentScreen) ]
+      HH.div [ HP.id_ "container", HP.class_ (HH.ClassName $ "container " <> state.currentScreen <> (if state.loading then " loading" else "")) ]
       [ promptMetamask state.loggedIn
       , loadingOverlay state.loading
-      , HH.div [ HP.id_ "home-bar", HP.class_ (HH.ClassName "row home-bar")]
-        [
-          HH.a [HP.href "#", HP.class_ (HH.ClassName "col home"), HE.onClick $ HE.input_ $ SetScreen "show-balances"] [
-                HH.img [HP.src "http://blockmason.io/assets/img/friends_in_debt_logo.svg"], HH.text "Friend in Debt"]
-        ]
       , HH.div [ HP.id_ "back-nav-bar", HP.class_ (HH.ClassName "row back-nav-bar")]
         [
           HH.a [HP.href "#", HP.class_ (HH.ClassName "close-pop-button"), HE.onClick $ HE.input_ $ ShowPreviousScreen]
           [HH.i [ HP.class_ (HH.ClassName "fa fa-chevron-left")][], HH.text " Back"]
+        ]
+      , HH.div [ HP.id_ "home-bar", HP.class_ (HH.ClassName "row home-bar")]
+        [
+          HH.a [HP.href "#", HP.class_ (HH.ClassName "col home"), HE.onClick $ HE.input_ $ SetScreen "show-balances"] [
+                HH.img [HP.src "http://blockmason.io/assets/img/friends_in_debt_logo.svg"], HH.text "Friend in Debt"]
         ]
       , HH.div [ HP.id_ "header", HP.class_ (HH.ClassName "row")]
         [

@@ -75,7 +75,7 @@ cDecimals (Currency c) = c.decimals
 cDecimals _            = 0
 
 instance showCurrency ∷ Show Currency where
-  show (Currency c) = c.isoCode <> ", decimals: " <> show c.decimals
+  show (Currency c) = c.isoCode
   show InvalidCurrency = "InvalidCurrency"
 instance eqCurrency ∷ Eq Currency where
   eq (Currency c1) (Currency c2)     = c1.isoCode == c2.isoCode

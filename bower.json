@@ -24,6 +24,7 @@
     "purescript-js-timers": "^3.0.0",
     "purescript-math": "^2.0.0",
     "purescript-numbers": "^5.0.0",
-    "purescript-tuples": "^4.1.0"
+    "purescript-tuples": "^4.1.0",
+    "purescript-nonempty": "^4.0.0"
   }
 }
