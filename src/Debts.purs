@@ -104,64 +104,23 @@ component =
       HH.div
       [ HP.class_ $ HH.ClassName "page-container col-12" ]
       [
-      HH.div
-        [ HP.class_ $ HH.ClassName "all-friends-container" ]
-        [
-          HH.ul
-          [ HP.class_ $ HH.ClassName "col" ]
-          $ groupFriendLiByInitial $ prepareFriendBundles state
-        ]
-      , HH.div
-        [ HP.class_ $ HH.ClassName "all-balances-container" ]
-        [
-          HH.ul
-          [ HP.class_ $ HH.ClassName "col-12" ]
-          $ (displayBalanceLi state) <$> [mockBalance2, mockBalance2, mockBalance2, mockBalance, mockBalance2, mockBalance2]
-        ]
-      , HH.div
-        [ HP.class_ $ HH.ClassName "all-pending-debts-container" ]
-        [
-          displaySentFriendsList state.pendingFriendsSent
-        , displayTodoFriendsList state.pendingFriendsTodo
-        , (displaySentDebtsList state.myId) state.pendingSent
-        , (displayTodoList state.myId) state.pendingTodo
-        ]
-      , HH.div
-        [ HP.class_ $ HH.ClassName "all-settings-container" ]
-        [
-          HH.div
-            [HP.class_ $ HH.ClassName "row default-currency-container"]
-            [
-              (HH.text  $ "Default Currency:  "),
-              HH.span [] [ HH.text $ show state.defaultCurrency ]
-            ]
-          , HH.div
-            [HP.class_ $ HH.ClassName "row foundation-id-container"]
-            [
-              (HH.text  $ "My Foundation ID:  "),
-              HH.span [] [ HH.text $ show state.myId ]
-            ]
-        ]
-      , HH.div
-        [ HP.class_ $ HH.ClassName "add-friend-name-change-container" ]
-        [
-          HH.div
-            [ HP.class_ $ HH.ClassName "add-friend-container" ]
-            [
-              addFriendWidget state
-            ]
-        ]
-      , HH.div
-        [ HP.class_ $ HH.ClassName "create-debt-container" ]
-        [
-          HH.h5_ [ HH.text "Create Debt" ]
-        , HH.ul_ [
-            HH.li [ HP.class_ $ HH.ClassName "row create-debt-card" ]
-            [inputDebt state.defaultCurrency state.myId state.friends state.newDebt]
-        , HH.li [ HP.class_ $ HH.ClassName "row create-debt-card" ]
-            [inputCredit state.defaultCurrency state.myId state.friends state.newCredit]
-        ]
-        ]
+        page R.FriendsScreen $
+             HH.ul [ HP.class_ $ HH.ClassName "col" ]
+             $ groupFriendLiByInitial $ prepareFriendBundles state
+
+      , page R.BalancesScreen $
+             HH.ul
+             [ HP.class_ $ HH.ClassName "col-12" ]
+             $ (displayBalanceLi state) <$> [mockBalance2, mockBalance2, mockBalance2, mockBalance, mockBalance2, mockBalance2]
+      , page R.PendingScreen $ pendingPage state
+      , page R.SettingsScreen $ settingsPage state
+      , page R.AddFriendScreen $
+              HH.div
+                [ HP.class_ $ HH.ClassName "add-friend-container" ]
+                [
+                  addFriendWidget state
+                ]
+      , page R.CreateDebtScreen $ createDebtModal state
       ]
 
   eval ∷ Query ~> H.ComponentDSL State Query Message (FIDMonad eff)
@@ -252,6 +211,61 @@ loadFriendsAndDebts errorBus = do
               , balances = balances
               , loading = false
               })
+
+-- structural components
+
+page ∷ R.Screen → H.ComponentHTML Query → H.ComponentHTML Query
+page screen child =
+  HH.div
+    [HP.class_ (HH.ClassName $ R.getContainerNameFor screen)]
+    [child]
+
+-- pages
+
+createDebtModal ∷ State → H.ComponentHTML Query
+createDebtModal state =
+  HH.div
+    [ HP.class_ $ HH.ClassName "create-debt-container" ]
+    [
+      HH.h5_ [ HH.text "Create Debt" ]
+    , HH.ul_ [
+        HH.li [ HP.class_ $ HH.ClassName "row create-debt-card" ]
+          [inputDebt state.defaultCurrency state.myId state.friends state.newDebt]
+      , HH.li [ HP.class_ $ HH.ClassName "row create-debt-card" ]
+          [inputCredit state.defaultCurrency state.myId state.friends state.newCredit]
+      ]
+    ]
+
+settingsPage ∷ State → H.ComponentHTML Query
+settingsPage state =
+    HH.ul
+    [ HP.class_ $ HH.ClassName "col-12" ]
+    [
+      HH.div
+        [HP.class_ $ HH.ClassName "row default-currency-container"]
+        [
+          (HH.text  $ "Default Currency:  "),
+          HH.span [] [ HH.text $ show state.defaultCurrency ]
+        ]
+      , HH.div
+        [HP.class_ $ HH.ClassName "row foundation-id-container"]
+        [
+          (HH.text  $ "My Foundation ID:  "),
+          HH.span [] [ HH.text $ show state.myId ]
+        ]
+    ]
+
+pendingPage ∷ State → H.ComponentHTML Query
+pendingPage state =
+     HH.div
+    [ HP.class_ $ HH.ClassName "" ]
+    [
+      displaySentFriendsList state.pendingFriendsSent
+    , displayTodoFriendsList state.pendingFriendsTodo
+    , (displaySentDebtsList state.myId) state.pendingSent
+    , (displayTodoList state.myId) state.pendingTodo
+    ]
+
 
 -- Itemized Debts for Friend Page
 displayItemizedDebtTimeline :: Maybe F.FoundationId → DebtsMap → F.FoundationId → H.ComponentHTML Query
