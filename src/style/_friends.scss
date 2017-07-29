@@ -1,0 +1,59 @@
+
+.all-friends-container {
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.all-friends-container ul{
+  list-style: none;
+  padding: 10px;
+}
+
+.all-friends-container .friend-item {
+  border-bottom: 1px solid #ddd;
+  width: 100%;
+  text-transform: lowercase;
+  font-weight: 100;
+  line-height: 3em;
+}
+
+.all-friends-container .friend-item:last-child {
+  border-bottom: none;
+}
+
+.friend-item .name-portion {
+  text-align: left;
+}
+
+.friend-item:first-child {
+  margin-top: -10px;
+}
+
+.all-friends-container .generated-icon {
+  border-radius: 50%;
+  height: 2em;
+  width: 2em;
+  text-align: center;
+  line-height: 2em;
+  text-transform: capitalize;
+  color: white;
+  margin: 10px auto;
+}
+
+h6.initial-label {
+  width: 100%;
+  font-size: 20px;
+  text-transform: uppercase;
+  color: #333;
+}
+
+.initial-group {
+  margin: 0 0 10px 0;
+  border-radius: 5px;
+  overflow: hidden;
+  background-color: white;
+  text-align: center;
+  box-shadow: 4px -10px 17px 5px rgba(0,0,0,0.3);
+  transition: 0.3s ease;
+  padding: 20px 5px;
+}

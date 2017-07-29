@@ -1,0 +1,67 @@
+.all-balances-container ul {
+  list-style: none;
+  padding: 1em;
+  overflow: hidden;
+}
+
+.balance-row {
+  height: 140px;
+  background: white;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 10px;
+  transition: all 0.7s ease;
+}
+
+.balance-row:hover .highlight {
+  filter: brightness(1.1);
+}
+
+.balance-row .highlight {
+  background: orange;
+  flex: 0 0 2.333333%;
+}
+
+.balance-row small {
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 9px;
+  color: #B8B8B8;
+}
+
+.balance-row .debt-amount {
+  font-size: 24px;
+  font-weight: 100;
+}
+
+.balance-row .thin-item {
+  /* date: */
+  font-weight: 100;
+  font-size: 11px;
+  color: #000000;
+}
+
+.row.thin-item-row {
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
+}
+
+.debt-excerpt {
+    padding-left: 30px;
+    border-right: 1px solid #ddd;
+}
+
+.debt-relationship {
+  margin-top: 10px;
+}
+
+.debt-relationship .row:first-child {
+  border-bottom: 1px dotted #ddd;
+}
+
+.label-row {
+    position: absolute;
+    bottom: 30px;
+    width: 100%;
+}

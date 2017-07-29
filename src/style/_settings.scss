@@ -1,0 +1,16 @@
+.default-currency-container, .foundation-id-container {
+  height: 50px;
+  padding: 10px 10px 0 30px;
+  border-bottom: 1px solid #aaa;
+  border-top: 1px solid #aaa;
+  border-radius: 5px;
+  margin: 10px 0;
+}
+
+.default-currency-container span, .foundation-id-container span {
+  margin-left: 10px;
+  font-weight: 100;
+  display: block;
+  float: right;
+  font-size: 17px;
+}

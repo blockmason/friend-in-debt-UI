@@ -1,189 +1,197 @@
 @import url("http://fonts.googleapis.com/css?family=Lato:100,300,400,700,900");
-
 /* general */
 body {
   height: 100%;
   color: #444;
   font-family: "Lato", Arial, sans-serif;
-  background-color: #444;
-}
+  background-color: #444; }
 
 html {
-  height: 100%;
-}
+  height: 100%; }
 
 .container {
   background-image: linear-gradient(-180deg, #0F2422 0%, #1C4737 100%);
   max-width: 600px;
-  box-shadow: 0 0 5px 5px rgba(0,0,0,0.3);
+  box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.3);
   height: 100vh;
-  overflow-y: scroll;
-}
+  overflow-y: scroll; }
+
+.active {
+  display: visible; }
+
+.inActive {
+  display: none; }
 
 /* loading overlays */
 #metamaskOverlay {
-    padding: 20px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 2000px;
-    width: 100%;
-    background-color: black;
-    color: white;
-    z-index: 100;
-}
+  padding: 20px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 2000px;
+  width: 100%;
+  background-color: black;
+  color: white;
+  z-index: 100; }
 
 #loadingOverlay {
-    padding: 20px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 2000px;
-    width: 100%;
-    color: white;
-    z-index: 99;
-}
+  padding: 20px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 2000px;
+  width: 100%;
+  color: white;
+  z-index: 99; }
 
 .container.loading .page-container {
-    filter: progid:DXImageTransform.Microsoft.Blur(PixelRadius='3');
-    -webkit-filter: url(#blur-filter);
-    filter: url(#blur-filter);
-    -webkit-filter: blur(3px);
-    filter: blur(3px);
-}
+  filter: progid:DXImageTransform.Microsoft.Blur(PixelRadius='3');
+  -webkit-filter: url(#blur-filter);
+  filter: url(#blur-filter);
+  -webkit-filter: blur(3px);
+  filter: blur(3px); }
 
 #debtLoadingOverlay {
-    padding: 20px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 2000px;
-    width: 100%;
-    background-color: black;
-    color: white;
-    z-index: 99;
-}
+  padding: 20px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 2000px;
+  width: 100%;
+  background-color: black;
+  color: white;
+  z-index: 99; }
 
-.active {
-    display: visible;
-}
+.create-debt-container ul {
+  padding: 0;
+  list-style: none; }
 
-.inActive {
-    display: none;
-}
+.createDebt input, .add-friend-container input,
+.name-change-container input {
+  background: transparent;
+  border: 1px dotted white;
+  border-radius: 5px;
+  margin: 0 5px 0 0; }
 
-.expandable-id {
-  border-bottom: 1px dotted #aaa;
-  transition: all 0.5s;
-}
+.createDebt button, .add-friend-container button,
+.name-change-container button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 0;
+  border-radius: 5px;
+  margin: 0 5px 0 0;
+  box-shadow: 0 1px 1px 1px rgba(0, 0, 0, 0.1); }
 
-.expandable-id:before {
-  content: '⇢';
-  margin-left: -1em;
-  opacity: 0;
-  transition: all 0.5s;
-}
-.expandable-id:hover:before {
-  margin-left: 0;
-  opacity: 1;
-}
+.createDebt button .confirmation-amount {
+  display: inline-block; }
+
+.create-debt-card, .addFriend {
+  margin: 10px;
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+  padding: 10px;
+  border-radius: 5px; }
+
+.create-debt-card input, .addFriend input {
+  color: black;
+  background: white;
+  border: 1px solid #333;
+  border-radius: 5px; }
+
+/* add friend page*/
+.addFriend {
+  width: 100%;
+  margin: auto; }
+
+.addFriend small {
+  text-transform: uppercase; }
+
+.addFriend input {
+  margin-bottom: 10px;
+  color: #333; }
+
+.addFriend button:hover {
+  background-color: #2196f3;
+  color: white; }
 
 .back-nav-bar, #header {
-  background: #2196f3;
-}
+  background: #2196f3; }
+
 /* home bar*/
 .home-bar img {
-  height: 30px;
-}
+  height: 30px; }
 
 .home-bar {
-    background: #111;
-    box-shadow: inset 0 -4px 7px -1px rgba(0,0,0,0.3);
-    transition: all 1s;
-    height: 0;
-    opacity: 0;
-    padding-left: 10px;
-}
+  background: #111;
+  box-shadow: inset 0 -4px 7px -1px rgba(0, 0, 0, 0.3);
+  transition: all 1s;
+  height: 0;
+  opacity: 0;
+  padding-left: 10px; }
 
 .home-bar a {
   padding: 10px 10px 10px 0;
   color: white;
   text-transform: uppercase;
   font-weight: 100;
-  text-decoration: none;
-}
+  text-decoration: none; }
 
 /* header */
-
 #header {
   font-weight: 100;
-  border-bottom: 1px solid white;
-}
+  border-bottom: 1px solid white; }
 
 #header a {
   padding-top: 20px;
   text-transform: uppercase;
-  background: rgba(255,255,255,0.1);
-  color: rgba(255,255,255,0.7);
-  border-right: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
   font-size: 15px;
   font-weight: 300;
-  transition: all 0.5s;
-}
+  transition: all 0.5s; }
 
 #header a:hover {
   text-decoration: none;
-  background: rgba(0,0,0,0.1)
-}
+  background: rgba(0, 0, 0, 0.1); }
 
 #header a.active {
   padding-top: 10px;
   color: white;
   text-decoration: none;
-  background: rgba(0,0,0,0.7);
-  box-shadow:  9px 1px 5px -1px rgba(0,0,0,0.2);
+  background: rgba(0, 0, 0, 0.7);
+  box-shadow: 9px 1px 5px -1px rgba(0, 0, 0, 0.2);
   font-weight: 500;
-  line-height: 10px;
-}
+  line-height: 10px; }
 
 /* back navigation */
-
 #back-nav-bar {
-  background: rgba(0,0,0,0.5);
-}
+  background: rgba(0, 0, 0, 0.5); }
 
 #back-nav-bar:hover {
-  background: #2196f3;
-}
+  background: #2196f3; }
 
 .close-pop-button {
   color: white;
   width: 100%;
-  padding: 10px;
-}
+  padding: 10px; }
 
 .close-pop-button:hover {
   color: white;
-  text-decoration: none;
-}
+  text-decoration: none; }
 
 .create-debt-bar, .add-friend-bar {
   background: #505050;
   padding: 10px;
-  box-shadow: 0 7px 9px -3px rgba(0,0,0,0.2);
+  box-shadow: 0 7px 9px -3px rgba(0, 0, 0, 0.2);
   position: relative;
-  top: -1px;
-}
+  top: -1px; }
 
 .create-debt-bar a, .add-friend-bar a {
   color: white;
-  width: 100%;
-}
+  width: 100%; }
 
 .create-debt-bar a:hover, .add-friend-bar a:hover {
   color: white;
-  text-decoration: none;
-}
+  text-decoration: none; }
 
 /*navigation*/
 .create-debt-container,
@@ -201,9 +209,7 @@ html {
 .add-friend-bar,
 .all-settings-container {
   transition: all 0.5s;
-  transform: translateX(0);
-}
-
+  transform: translateX(0); }
 
 .show-itemized-debt .all-friends-container,
 .show-itemized-debt .all-settings-container,
@@ -212,9 +218,11 @@ html {
 .show-itemized-debt .add-friend-name-change-container,
 .show-itemized-debt .add-friend-bar,
 .show-itemized-debt #header,
-.show-itemized-debt .create-debt-bar  {
-  transform: translateX(-3000px); height: 0; margin: 0; padding: 0;
-}
+.show-itemized-debt .create-debt-bar {
+  transform: translateX(-3000px);
+  height: 0;
+  margin: 0;
+  padding: 0; }
 
 .show-balances .create-debt-container,
 .show-balances .add-friend-name-change-container,
@@ -224,13 +232,14 @@ html {
 .show-balances .itemized-debts-for-friend,
 .show-balances .back-nav-bar,
 .show-balances .add-friend-bar {
-  transform: translateX(-3000px); height: 0; margin: 0; padding: 0;
-}
+  transform: translateX(-3000px);
+  height: 0;
+  margin: 0;
+  padding: 0; }
 
 .show-balances .home-bar {
   height: 50px;
-  opacity: 1;
-}
+  opacity: 1; }
 
 .show-friends .create-debt-container,
 .show-friends .add-friend-container,
@@ -244,8 +253,10 @@ html {
 .show-friends .add-friend-name-change-container,
 .show-friends .back-nav-bar,
 .show-friends .create-debt-bar {
-  transform: translateX(-3000px); height: 0; margin: 0; padding: 0;
-}
+  transform: translateX(-3000px);
+  height: 0;
+  margin: 0;
+  padding: 0; }
 
 .show-pending .create-debt-container,
 .show-pending .add-friend-container,
@@ -260,8 +271,10 @@ html {
 .show-pending .back-nav-bar,
 .show-pending .create-debt-bar,
 .show-pending .add-friend-bar {
-  transform: translateX(-3000px); height: 0; margin: 0; padding: 0;
-}
+  transform: translateX(-3000px);
+  height: 0;
+  margin: 0;
+  padding: 0; }
 
 .show-settings .create-debt-container,
 .show-settings .add-friend-container,
@@ -276,8 +289,10 @@ html {
 .show-settings .back-nav-bar,
 .show-settings .create-debt-bar,
 .show-settings .add-friend-bar {
-  transform: translateX(-3000px); height: 0; margin: 0; padding: 0;
-}
+  transform: translateX(-3000px);
+  height: 0;
+  margin: 0;
+  padding: 0; }
 
 .show-create-debt .all-friends-container,
 .show-create-debt .all-balances-container,
@@ -287,9 +302,11 @@ html {
 .show-create-debt .add-friend-name-change-container,
 .show-create-debt .add-friend-bar,
 .show-create-debt #header,
-.show-create-debt .create-debt-bar  {
-  transform: translateX(-3000px); height: 0; margin: 0; padding: 0;
-}
+.show-create-debt .create-debt-bar {
+  transform: translateX(-3000px);
+  height: 0;
+  margin: 0;
+  padding: 0; }
 
 .show-add-friend .all-friends-container,
 .show-add-friend .all-balances-container,
@@ -299,114 +316,102 @@ html {
 .show-add-friend .create-debt-container,
 .show-add-friend .add-friend-bar,
 .show-add-friend #header,
-.show-add-friend .create-debt-bar  {
-  transform: translateX(-3000px); height: 0; margin: 0; padding: 0;
-}
+.show-add-friend .create-debt-bar {
+  transform: translateX(-3000px);
+  height: 0;
+  margin: 0;
+  padding: 0; }
 
-/*friend page*/
-
-.all-friends-container {
-  margin-top: 10px;
-  overflow: hidden;
-}
-
-.all-friends-container ul{
+.all-balances-container ul {
   list-style: none;
-  padding: 10px;
-}
+  padding: 1em;
+  overflow: hidden; }
 
-.all-friends-container .friend-item {
-  border-bottom: 1px solid #ddd;
-  width: 100%;
-  text-transform: lowercase;
-  font-weight: 100;
-  line-height: 3em;
-}
-
-.all-friends-container .friend-item:last-child {
-  border-bottom: none;
-}
-
-.friend-item .name-portion {
-  text-align: left;
-}
-
-.friend-item:first-child {
-  margin-top: -10px;
-}
-
-.all-friends-container .generated-icon {
-  border-radius: 50%;
-  height: 2em;
-  width: 2em;
-  text-align: center;
-  line-height: 2em;
-  text-transform: capitalize;
-  color: white;
-  margin: 10px auto;
-}
-
-h6.initial-label {
-  width: 100%;
-  font-size: 20px;
-  text-transform: uppercase;
-  color: #333;
-}
-
-.initial-group {
-  margin: 0 0 10px 0;
+.balance-row {
+  height: 140px;
+  background: white;
   border-radius: 5px;
   overflow: hidden;
-  background-color: white;
-  text-align: center;
-  box-shadow: 4px -10px 17px 5px rgba(0,0,0,0.3);
-  transition: 0.3s ease;
-  padding: 20px 5px;
-}
+  margin-bottom: 10px;
+  transition: all 0.7s ease; }
 
-/*itemized debts page */
+.balance-row:hover .highlight {
+  filter: brightness(1.1); }
+
+.balance-row .highlight {
+  background: orange;
+  flex: 0 0 2.333333%; }
+
+.balance-row small {
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 9px;
+  color: #B8B8B8; }
+
+.balance-row .debt-amount {
+  font-size: 24px;
+  font-weight: 100; }
+
+.balance-row .thin-item {
+  /* date: */
+  font-weight: 100;
+  font-size: 11px;
+  color: #000000; }
+
+.row.thin-item-row {
+  position: absolute;
+  bottom: 10px;
+  width: 100%; }
+
+.debt-excerpt {
+  padding-left: 30px;
+  border-right: 1px solid #ddd; }
+
+.debt-relationship {
+  margin-top: 10px; }
+
+.debt-relationship .row:first-child {
+  border-bottom: 1px dotted #ddd; }
+
+.label-row {
+  position: absolute;
+  bottom: 30px;
+  width: 100%; }
+
 .show-itemized-debt .balance-row.expand-itemized {
-  height: auto;
-}
+  height: auto; }
 
 .show-itemized-debt .expand-itemized .debt-details {
-    display: none;
-}
+  display: none; }
 
 .show-itemized-debt .expand-itemized .debt-excerpt {
-    display: none;
-}
+  display: none; }
 
 .itemized-debts > .row {
-  padding: 10px;
-}
+  padding: 10px; }
 
 .itemized-debts .row:first-child {
   padding-bottom: 0;
   border-bottom: 1px solid #ddd;
   width: 90%;
   margin: auto;
-  font-weight: 100;
-}
+  font-weight: 100; }
 
 .itemized-debts .row:nth-child(2) {
   padding-top: 0;
   width: 90%;
   margin: auto;
-  font-weight: 500;
-}
+  font-weight: 500; }
 
 .debt-timeline {
-  margin-bottom: 2em;
-}
+  margin-bottom: 2em; }
 
 .timeline-event {
   border-left: 1px solid #aaa;
   padding: 10px 2em;
   margin-left: 5em;
   font-size: 10px;
-  width: 100%;
-}
+  width: 100%; }
 
 .timeline-event:before {
   content: '';
@@ -417,138 +422,108 @@ h6.initial-label {
   width: 30px;
   display: block;
   position: absolute;
-  left: 4.5em;
-}
+  left: 4.5em; }
 
 .show-balances .itemized-debts {
-  display: none;
-}
+  display: none; }
 
 .show-itemized-debt .balance-row.hide-itemized:nth-child(odd) {
   margin-top: 0;
-  margin-bottom:0;
+  margin-bottom: 0;
   height: 0;
   opacity: 0;
-  transform: perspective(1600px) rotateX(-90deg) translateY(20px);
-}
+  transform: perspective(1600px) rotateX(-90deg) translateY(20px); }
 
 .show-itemized-debt .balance-row.hide-itemized:nth-child(even) {
   margin-top: 0;
-  margin-bottom:0;
+  margin-bottom: 0;
   height: 0;
   transform: perspective(1600px) rotateX(90deg) translateY(20px);
-  opacity: 0;
-}
+  opacity: 0; }
 
 .show-itemized-debt .balance-row.expand-itemized {
   height: auto;
   opacity: 1;
   transform: perspective(0) rotateX(0);
-  margin: auto;
-}
+  margin: auto; }
 
-/* balance page */
-.all-balances-container ul {
+.all-friends-container {
+  margin-top: 10px;
+  overflow: hidden; }
+
+.all-friends-container ul {
   list-style: none;
-  padding: 1em;
-  overflow: hidden;
-}
+  padding: 10px; }
 
-.balance-row {
-  height: 140px;
-  background: white;
+.all-friends-container .friend-item {
+  border-bottom: 1px solid #ddd;
+  width: 100%;
+  text-transform: lowercase;
+  font-weight: 100;
+  line-height: 3em; }
+
+.all-friends-container .friend-item:last-child {
+  border-bottom: none; }
+
+.friend-item .name-portion {
+  text-align: left; }
+
+.friend-item:first-child {
+  margin-top: -10px; }
+
+.all-friends-container .generated-icon {
+  border-radius: 50%;
+  height: 2em;
+  width: 2em;
+  text-align: center;
+  line-height: 2em;
+  text-transform: capitalize;
+  color: white;
+  margin: 10px auto; }
+
+h6.initial-label {
+  width: 100%;
+  font-size: 20px;
+  text-transform: uppercase;
+  color: #333; }
+
+.initial-group {
+  margin: 0 0 10px 0;
   border-radius: 5px;
   overflow: hidden;
-  margin-bottom: 10px;
-  transition: all 0.7s ease;
-}
+  background-color: white;
+  text-align: center;
+  box-shadow: 4px -10px 17px 5px rgba(0, 0, 0, 0.3);
+  transition: 0.3s ease;
+  padding: 20px 5px; }
 
-.balance-row:hover .highlight {
-  filter: brightness(1.1);
-}
-
-.balance-row .highlight {
-  background: orange;
-  flex: 0 0 2.333333%;
-}
-
-.balance-row small {
-  font-weight: 500;
-  text-transform: uppercase;
-  font-size: 9px;
-  color: #B8B8B8;
-}
-
-.balance-row .debt-amount {
-  font-size: 24px;
-  font-weight: 100;
-}
-
-.balance-row .thin-item {
-  /* date: */
-  font-weight: 100;
-  font-size: 11px;
-  color: #000000;
-}
-
-.row.thin-item-row {
-    position: absolute;
-    bottom: 10px;
-    width: 100%;
-}
-
-.debt-excerpt {
-    padding-left: 30px;
-    border-right: 1px solid #ddd;
-}
-
-.debt-relationship {
-  margin-top: 10px;
-}
-
-.debt-relationship .row:first-child {
-  border-bottom: 1px dotted #ddd;
-}
-
-.label-row {
-    position: absolute;
-    bottom: 30px;
-    width: 100%;
-}
-/* pending debts page */
 .all-pending-debts-container ul {
   list-style: none;
-  padding: 0;
-}
+  padding: 0; }
 
 .all-pending-debts-container .sent-debt-row, .all-pending-debts-container .sent-friend-row {
   height: 90px;
-  background: rgba(0,0,0,0.1);
+  background: rgba(0, 0, 0, 0.1);
   border-radius: 5px;
-  margin: 10px;
-}
+  margin: 10px; }
 
 .all-pending-debts-container .sent-friend-row {
-  height: 50px;
-}
+  height: 50px; }
 
 .all-pending-debts-container .todo-debt-row {
   height: 130px;
-  background: rgba(0,0,0,0.1);
+  background: rgba(0, 0, 0, 0.1);
   border-radius: 5px;
-  margin: 10px;
-}
+  margin: 10px; }
 
 .all-pending-debts-container .action-buttons, .all-pending-debts-container .debt-details, .all-pending-debts-container .friend-details {
-  width: 100%;
-}
+  width: 100%; }
 
 .all-pending-debts-container .card-title {
   font-size: 18px;
   font-weight: 100;
   text-transform: uppercase;
-  margin-left: 10px;
-}
+  margin-left: 10px; }
 
 .btn-cancel, .btn-confirm {
   background: none;
@@ -556,96 +531,28 @@ h6.initial-label {
   color: #333;
   text-align: center;
   width: 100%;
-  border: 1px solid rgba(0,0,0,0.1);
-  background: rgba(0,0,0,0.1);
-  border-radius: 5px;
-}
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 5px; }
 
 .action-buttons {
-  margin-left: 0;
-}
+  margin-left: 0; }
 
 .debt-details, .friend-details {
   margin: 0;
-  font-size: 12px;
-}
+  font-size: 12px; }
 
-/* settings page */
 .default-currency-container, .foundation-id-container {
   height: 50px;
   padding: 10px 10px 0 30px;
   border-bottom: 1px solid #aaa;
   border-top: 1px solid #aaa;
   border-radius: 5px;
-  margin: 10px 0;
-}
+  margin: 10px 0; }
 
 .default-currency-container span, .foundation-id-container span {
   margin-left: 10px;
   font-weight: 100;
   display: block;
   float: right;
-  font-size: 17px;
-}
-
-/*create debt*/
-
-.create-debt-container ul {
-  padding: 0;
-  list-style: none;
-}
-
-.createDebt input, .add-friend-container input,
-.name-change-container input{
-  background: transparent;
-  border: 1px dotted white;
-  border-radius: 5px;
-  margin: 0 5px 0 0;
-}
-
-.createDebt button, .add-friend-container button,
-.name-change-container button{
-  background: rgba(255,255,255, 0.1);
-  border: 0;
-  border-radius: 5px;
-  margin: 0 5px 0 0;
-  box-shadow: 0 1px 1px 1px rgba(0,0,0,0.1);
-}
-
-.createDebt button .confirmation-amount {
-  display: inline-block;
-}
-
-.create-debt-card, .addFriend {
-  margin: 10px;
-  box-shadow: 0 2px 2px 0 rgba(0,0,0,.14), 0 3px 1px -2px rgba(0,0,0,.2), 0 1px 5px 0 rgba(0,0,0,.12);
-  padding: 10px;
-  border-radius: 5px;
-}
-
-.create-debt-card input, .addFriend input {
-  color: black;
-  background: white;
-  border: 1px solid #333;
-  border-radius: 5px;
-}
-
-/* add friend page*/
-
-.addFriend {
-  width: 100%;
-  margin: auto;
-}
-.addFriend small {
-  text-transform: uppercase;
-}
-
-.addFriend input {
-  margin-bottom: 10px;
-  color: #333;
-}
-
-.addFriend button:hover {
-  background-color: #2196f3;
-  color: white;
-}
+  font-size: 17px; }
