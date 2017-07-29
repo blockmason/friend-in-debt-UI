@@ -1,118 +1,152 @@
+$routes: (
+  BalancesScreen: balances-screen,
+  FriendsScreen: friends-screen,
+  PendingScreen: pending-screen,
+  SettingsScreen: settings-screen,
+  AddFriendScreen: add-friend-screen,
+  CreateDebtScreen: create-debt-screen,
+  ItemizedDebtsScreen: itemized-debts-screen
+);
 
-/*navigation*/
-.create-debt-container,
-.add-friend-container,
-.itemized-debts-for-friend,
-.all-balances-container,
-.all-pending-debts-container,
-.all-friends-container,
-.name-change-container,
-.confirm-debts-container,
-.current-debts-container,
-.add-friend-name-change-container,
-.back-nav-bar,
-.create-debt-bar,
-.add-friend-bar,
-.all-settings-container {
-  transition: all 0.5s;
-  transform: translateX(0);
+// Base Transitions
+@each $route, $name in $routes {
+  .#{$name}-container {
+    transition: all 0.5s;
+    transform: translateX(0);
+  }
+}
+
+// generates the hide/show rules for each page. assumes that when one page is active, no other page is.
+@each $route, $name in $routes {
+  .show-#{$name} {
+    @each $_route, $_name in $routes {
+      .#{$_name}-container {
+        transform: translateX(-3000px); height: 0; margin: 0; padding: 0;
+      }
+
+      .#{$name}-container {
+        transform: none;
+      }
+    }
+  }
 }
 
 
-.show-itemized-debt .all-friends-container,
-.show-itemized-debt .all-settings-container,
-.show-itemized-debt .all-pending-debts-container,
-.show-itemized-debt .create-debt-container,
-.show-itemized-debt .add-friend-name-change-container,
-.show-itemized-debt .add-friend-bar,
-.show-itemized-debt #header,
-.show-itemized-debt .create-debt-bar  {
-  transform: translateX(-3000px); height: 0; margin: 0; padding: 0;
-}
 
-.show-balances .create-debt-container,
-.show-balances .add-friend-name-change-container,
-.show-balances .all-settings-container,
-.show-balances .all-pending-debts-container,
-.show-balances .all-friends-container,
-.show-balances .itemized-debts-for-friend,
-.show-balances .back-nav-bar,
-.show-balances .add-friend-bar {
-  transform: translateX(-3000px); height: 0; margin: 0; padding: 0;
-}
-
-.show-balances .home-bar {
-  height: 50px;
-  opacity: 1;
-}
-
-.show-friends .create-debt-container,
-.show-friends .add-friend-container,
-.show-friends .itemized-debts-for-friend,
-.show-friends .all-balances-container,
-.show-friends .all-settings-container,
-.show-friends .all-pending-debts-container,
-.show-friends .name-change-container,
-.show-friends .confirm-debts-container,
-.show-friends .current-debts-container,
-.show-friends .add-friend-name-change-container,
-.show-friends .back-nav-bar,
-.show-friends .create-debt-bar {
-  transform: translateX(-3000px); height: 0; margin: 0; padding: 0;
-}
-
-.show-pending .create-debt-container,
-.show-pending .add-friend-container,
-.show-pending .itemized-debts-for-friend,
-.show-pending .all-balances-container,
-.show-pending .all-settings-container,
-.show-pending .all-friends-container,
-.show-pending .name-change-container,
-.show-pending .confirm-debts-container,
-.show-pending .current-debts-container,
-.show-pending .add-friend-name-change-container,
-.show-pending .back-nav-bar,
-.show-pending .create-debt-bar,
-.show-pending .add-friend-bar {
-  transform: translateX(-3000px); height: 0; margin: 0; padding: 0;
-}
-
-.show-settings .create-debt-container,
-.show-settings .add-friend-container,
-.show-settings .itemized-debts-for-friend,
-.show-settings .all-balances-container,
-.show-settings .all-pending-debts-container,
-.show-settings .all-friends-container,
-.show-settings .name-change-container,
-.show-settings .confirm-debts-container,
-.show-settings .current-debts-container,
-.show-settings .add-friend-name-change-container,
-.show-settings .back-nav-bar,
-.show-settings .create-debt-bar,
-.show-settings .add-friend-bar {
-  transform: translateX(-3000px); height: 0; margin: 0; padding: 0;
-}
-
-.show-create-debt .all-friends-container,
-.show-create-debt .all-balances-container,
-.show-create-debt .all-settings-container,
-.show-create-debt .all-pending-debts-container,
-.show-create-debt .itemized-debts-for-friend,
-.show-create-debt .add-friend-name-change-container,
-.show-create-debt .add-friend-bar,
-.show-create-debt #header,
-.show-create-debt .create-debt-bar  {
-  transform: translateX(-3000px); height: 0; margin: 0; padding: 0;
-}
-
-.show-add-friend .all-friends-container,
-.show-add-friend .all-balances-container,
-.show-add-friend .all-settings-container,
-.show-add-friend .all-pending-debts-container,
-.show-add-friend .itemized-debts-for-friend,
-.show-add-friend .create-debt-container,
-.show-add-friend .add-friend-bar,
-.show-add-friend #header,
-.show-add-friend .create-debt-bar  {
-  transform: translateX(-3000px); height: 0; margin: 0; padding: 0;
-}
+// /*navigation*/
+// .create-debt-container,
+// .add-friend-container,
+// .itemized-debts-for-friend,
+// .all-balances-container,
+// .all-pending-debts-container,
+// .all-friends-container,
+// .name-change-container,
+// .confirm-debts-container,
+// .current-debts-container,
+// .add-friend-name-change-container,
+// .back-nav-bar,
+// .create-debt-bar,
+// .add-friend-bar,
+// .all-settings-container {
+//   transition: all 0.5s;
+//   transform: translateX(0);
+// }
+//
+//
+// .show-itemized-debt .all-friends-container,
+// .show-itemized-debt .all-settings-container,
+// .show-itemized-debt .all-pending-debts-container,
+// .show-itemized-debt .create-debt-container,
+// .show-itemized-debt .add-friend-name-change-container,
+// .show-itemized-debt .add-friend-bar,
+// .show-itemized-debt #header,
+// .show-itemized-debt .create-debt-bar  {
+//   transform: translateX(-3000px); height: 0; margin: 0; padding: 0;
+// }
+//
+// .show-balances .create-debt-container,
+// .show-balances .add-friend-name-change-container,
+// .show-balances .all-settings-container,
+// .show-balances .all-pending-debts-container,
+// .show-balances .all-friends-container,
+// .show-balances .itemized-debts-for-friend,
+// .show-balances .back-nav-bar,
+// .show-balances .add-friend-bar {
+//   transform: translateX(-3000px); height: 0; margin: 0; padding: 0;
+// }
+//
+// .show-balances .home-bar {
+//   height: 50px;
+//   opacity: 1;
+// }
+//
+// .show-friends .create-debt-container,
+// .show-friends .add-friend-container,
+// .show-friends .itemized-debts-for-friend,
+// .show-friends .all-balances-container,
+// .show-friends .all-settings-container,
+// .show-friends .all-pending-debts-container,
+// .show-friends .name-change-container,
+// .show-friends .confirm-debts-container,
+// .show-friends .current-debts-container,
+// .show-friends .add-friend-name-change-container,
+// .show-friends .back-nav-bar,
+// .show-friends .create-debt-bar {
+//   transform: translateX(-3000px); height: 0; margin: 0; padding: 0;
+// }
+//
+// .show-pending .create-debt-container,
+// .show-pending .add-friend-container,
+// .show-pending .itemized-debts-for-friend,
+// .show-pending .all-balances-container,
+// .show-pending .all-settings-container,
+// .show-pending .all-friends-container,
+// .show-pending .name-change-container,
+// .show-pending .confirm-debts-container,
+// .show-pending .current-debts-container,
+// .show-pending .add-friend-name-change-container,
+// .show-pending .back-nav-bar,
+// .show-pending .create-debt-bar,
+// .show-pending .add-friend-bar {
+//   transform: translateX(-3000px); height: 0; margin: 0; padding: 0;
+// }
+//
+// .show-settings .create-debt-container,
+// .show-settings .add-friend-container,
+// .show-settings .itemized-debts-for-friend,
+// .show-settings .all-balances-container,
+// .show-settings .all-pending-debts-container,
+// .show-settings .all-friends-container,
+// .show-settings .name-change-container,
+// .show-settings .confirm-debts-container,
+// .show-settings .current-debts-container,
+// .show-settings .add-friend-name-change-container,
+// .show-settings .back-nav-bar,
+// .show-settings .create-debt-bar,
+// .show-settings .add-friend-bar {
+//   transform: translateX(-3000px); height: 0; margin: 0; padding: 0;
+// }
+//
+// .show-create-debt .all-friends-container,
+// .show-create-debt .all-balances-container,
+// .show-create-debt .all-settings-container,
+// .show-create-debt .all-pending-debts-container,
+// .show-create-debt .itemized-debts-for-friend,
+// .show-create-debt .add-friend-name-change-container,
+// .show-create-debt .add-friend-bar,
+// .show-create-debt #header,
+// .show-create-debt .create-debt-bar  {
+//   transform: translateX(-3000px); height: 0; margin: 0; padding: 0;
+// }
+//
+// .show-add-friend .all-friends-container,
+// .show-add-friend .all-balances-container,
+// .show-add-friend .all-settings-container,
+// .show-add-friend .all-pending-debts-container,
+// .show-add-friend .itemized-debts-for-friend,
+// .show-add-friend .create-debt-container,
+// .show-add-friend .add-friend-bar,
+// .show-add-friend #header,
+// .show-add-friend .create-debt-bar  {
+//   transform: translateX(-3000px); height: 0; margin: 0; padding: 0;
+// }
