@@ -11,7 +11,8 @@ import Data.Int (toNumber, decimal, fromStringAs)
 import Data.Number as N
 import Data.String as S
 import Data.Map    as M
-import Data.Array (length, filter, zip, fromFoldable)
+import Data.Array (length, filter, zip, fromFoldable, groupBy, sortBy, find)
+import Data.NonEmpty
 
 import Halogen as H
 import Halogen.HTML as HH
@@ -21,6 +22,7 @@ import Halogen.HTML.Events as HE
 import FriendInDebt.Blockchain          (handleCall, handleTx, hasNetworkError)
 import Network.Eth.FriendInDebt         as F
 import Network.Eth                      as E
+import UI.IconGenerator as ICON
 
 data Query a
   = RefreshDebts a
@@ -35,11 +37,14 @@ data Query a
   | ShowItemizedDebtFor (Maybe F.FoundationId) a
 
 type Input = ContainerMsgBus
+
 data Message
   = ScreenChange String
   | NewTX E.TX
+newtype FriendBundle = FriendBundle { id ∷ F.FoundationId, gradient ∷ ICON.GradientCss, balance ∷ Maybe F.Balance }
 
 type State = { friends             ∷ Array F.FoundationId
+             , gradients           ∷ Array ICON.GradientCss
              , pendingFriendsTodo  ∷ Array F.FoundationId
              , pendingFriendsSent  ∷ Array F.FoundationId
              , balances            ∷ Array F.Balance
@@ -69,6 +74,7 @@ component =
 
   initialState ∷ Input → State
   initialState input = { friends: []
+                       , gradients: []
                        , pendingFriendsTodo: []
                        , pendingFriendsSent: []
                        , balances: []
@@ -88,27 +94,27 @@ component =
 
   render ∷ State → H.ComponentHTML Query
   render state =
-    if state.loading
-    then HH.span_ [ HH.h6_ [ HH.text "Loading debt info..." ]
-                  , HH.img [ HP.src "loading.gif"
-                           , HP.width 25 ] ]
-    else
+    -- if state.loading
+    -- then HH.span_ [ HH.h6_ [ HH.text "Loading debt info..." ]
+    --               , HH.img [ HP.src "loading.gif"
+    --                        , HP.width 25 ] ]
+    -- else
       HH.div
       [ HP.class_ $ HH.ClassName "page-container col-12" ]
-      $ append [
+      [
       HH.div
         [ HP.class_ $ HH.ClassName "all-friends-container" ]
         [
           HH.ul
           [ HP.class_ $ HH.ClassName "col" ]
-          $ (displayFriendLi ∘ F.fiGetId) <$> state.friends
+          $ groupFriendLiByInitial $ prepareFriendBundles state
         ]
       , HH.div
         [ HP.class_ $ HH.ClassName "all-balances-container" ]
         [
           HH.ul
           [ HP.class_ $ HH.ClassName "col-12" ]
-          $ (displayBalanceLi state.myId) <$> state.balances
+          $ (displayBalanceLi state) <$> [mockBalance2, mockBalance2, mockBalance2, mockBalance, mockBalance2, mockBalance2]
         ]
       , HH.div
         [ HP.class_ $ HH.ClassName "all-pending-debts-container" ]
@@ -122,15 +128,15 @@ component =
         [ HP.class_ $ HH.ClassName "all-settings-container" ]
         [
           HH.div
-            [HP.class_ $ HH.ClassName "col default-currency-container"]
+            [HP.class_ $ HH.ClassName "row default-currency-container"]
             [
-              (HH.text  $ "Default Currency: "),
+              (HH.text  $ "Default Currency:  "),
               HH.span [] [ HH.text $ show state.defaultCurrency ]
             ]
           , HH.div
-            [HP.class_ $ HH.ClassName "col foundation-id-container"]
+            [HP.class_ $ HH.ClassName "row foundation-id-container"]
             [
-              (HH.text  $ "My Foundation ID: "),
+              (HH.text  $ "My Foundation ID:  "),
               HH.span [] [ HH.text $ show state.myId ]
             ]
         ]
@@ -154,25 +160,36 @@ component =
             [inputCredit state.defaultCurrency state.myId state.friends state.newCredit]
         ]
         ]
-      ] $
-      (itemizedDebtsForFriendContainer state.showItemizedDebtFor state.itemizedDebts) <$> state.friends
+      ]
 
   eval ∷ Query ~> H.ComponentDSL State Query Message (FIDMonad eff)
   eval = case _ of
     ShowItemizedDebtFor maybeFriend next → do
+      H.raise $ ScreenChange "show-itemized-debt"
+
       case maybeFriend of
         Nothing → pure next
         Just f  → do
           s ← H.get
-          H.modify (_ { loading = true })
+          H.modify (_ { loading = true, showItemizedDebtFor = maybeFriend })
           idebts ← handleCall s.errorBus [] (F.itemizedDebts f)
-          H.modify (_ { showItemizedDebtFor = maybeFriend, loading = false
+          H.modify (_ { loading = false
                       , itemizedDebts = M.insert f idebts s.itemizedDebts })
-          H.raise $ ScreenChange "show-itemized-debt"
           pure next
+
     HandleInput input next → do
-      H.modify (_ { errorBus = input })
-      pure next
+      state <- H.get
+      case (length state.gradients) of
+        0 → do
+          -- gradients <- H.liftEff $ sequence $ ICON.randomGradient <$> state.friends
+          gradients <- H.liftEff $ sequence $ (const ICON.randomGradient) <$> mockFriends
+          H.modify (_ { errorBus = input, gradients = gradients, friends = mockFriends })
+          -- H.modify (_ { errorBus = input, gradients = gradients })
+          pure next
+
+        _ → do
+          H.modify (_ { errorBus = input, friends = mockFriends })
+          pure next
     AddFriend eitherFriendId next → do
       s ← H.get
       hLog eitherFriendId
@@ -235,43 +252,122 @@ loadFriendsAndDebts errorBus = do
               })
 
 -- Itemized Debts for Friend Page
-itemizedDebtsForFriendContainer :: Maybe F.FoundationId → DebtsMap → F.FoundationId → H.ComponentHTML Query
-itemizedDebtsForFriendContainer friendToShow debtsMap curFriend =
+displayItemizedDebtTimeline :: Maybe F.FoundationId → DebtsMap → F.FoundationId → H.ComponentHTML Query
+displayItemizedDebtTimeline friendToShow debtsMap curFriend =
   case friendToShow of
     Just f →
       HH.div
-      [ HP.class_ $ HH.ClassName $ "itemized-debts-for-friend", HP.attr (HH.AttrName "style") $ if (curFriend == f) then "display: block" else "display: none" ]
-      [ HH.h5_ [ HH.text $ "History with " <> show f <> ":" ],
-        HH.ul_ $ itemizedDebtLi <$> (fromMaybe [] $ M.lookup f debtsMap)]
+        [ HP.class_ $ HH.ClassName $ "col itemized-debts"]
+        [
+          HH.div [HP.class_ $ HH.ClassName "row"][HH.text "Debt History:"],
+          HH.div [HP.class_ $ HH.ClassName "row"][HH.h6_ [HH.text $ show f]],
+          HH.ul [HP.class_ $ HH.ClassName "row debt-timeline"]
+            $ itemizedDebtLi <$> fakeDebts
+        ]
+        -- HH.ul_ $ itemizedDebtLi <$> (fromMaybe [] $ M.lookup f debtsMap)]
     Nothing → HH.div_ [ HH.text "" ]
 
 itemizedDebtLi ∷ F.Debt → H.ComponentHTML Query
 itemizedDebtLi fd =
-  HH.li [HP.class_ $ HH.ClassName $ moneyClass fd] $
-  itemizedDebt fd
+  HH.li [HP.class_ $ HH.ClassName "timeline-event"] $ itemizedDebt fd
 
 itemizedDebt :: F.Debt → Array (H.ComponentHTML Query)
 itemizedDebt fd =
-  [HH.div [HP.class_ $ HH.ClassName "itemized-debt-amount"][descSpan fd, debtAmountSpan fd]]
+  [
+    HH.div [HP.class_ $ HH.ClassName "event-description"][descSpan fd],
+    HH.div [HP.class_ $ HH.ClassName "event-amount"][debtAmountSpan fd]
+  ]
 
 -- Friends List
 
-displayFriendLi ∷ String → H.ComponentHTML Query
-displayFriendLi n =
-  HH.li [HP.class_ $ HH.ClassName "friend-row row"]
-  [HH.a [HP.href "#", HE.onClick $ HE.input_ $ ShowItemizedDebtFor $ Just (F.fiMkId n)]
-   [HH.text n]]
+findBalanceFor ∷ F.FoundationId → Array F.Balance → Maybe F.Balance
+findBalanceFor fid balances =
+  find (\(F.Balance balance) → balance.debtor == fid || balance.creditor == fid) balances
+
+prepareFriendBundles ∷ State → Array FriendBundle
+prepareFriendBundles state =
+  (\(Tuple fid1 gradient) → FriendBundle {id: fid1, gradient: gradient, balance: findBalanceFor fid1 state.balances}) <$> (zip state.friends state.gradients)
+
+groupFriendLiByInitial ∷ Array FriendBundle → Array (H.ComponentHTML Query)
+groupFriendLiByInitial friendBundles =
+  let
+    orderedFriends = sortBy (\(FriendBundle bundle1) (FriendBundle bundle2) → S.localeCompare (F.initial bundle1.id) (F.initial bundle2.id)) friendBundles
+    friendGroups = groupBy (\(FriendBundle bundle1) (FriendBundle bundle2) → (F.initial bundle1.id) == (F.initial bundle2.id)) orderedFriends
+  in
+    displayFriendGroup <$> friendGroups
+
+displayFriendGroup ∷ NonEmpty Array FriendBundle → H.ComponentHTML Query
+displayFriendGroup group =
+ let
+  innerArr = oneOf group
+  initial = fromMaybe "" $ do
+      (FriendBundle bundle1) ← head innerArr
+      pure $ F.initial bundle1.id
+
+ in HH.div [HP.class_ $ HH.ClassName "row initial-group"]
+           [
+             HH.div [HP.class_ $ HH.ClassName "col-1"]
+                    [HH.h6 [HP.class_ $ HH.ClassName "initial-label"] [HH.text initial]]
+            , HH.div [HP.class_ $ HH.ClassName "col"]
+                     $ displayFriendLi <$> innerArr
+            ]
+
+displayFriendLi ∷ FriendBundle → H.ComponentHTML Query
+displayFriendLi (FriendBundle bundle1) =
+  let balance = fromMaybe "" $ do
+                (F.Balance bal) ← bundle1.balance
+                pure $ show $ F.numAmount bal.amount
+
+  in HH.li [HP.class_ $ HH.ClassName "friend-item row"]
+    [
+      HH.div [HP.class_ $ HH.ClassName "col-3"]
+        [ICON.generatedIcon (show bundle1.id) bundle1.gradient]
+      , HH.div [HP.class_ $ HH.ClassName "col-9 name-portion"]
+        [
+          HH.text $ show bundle1.id,
+          HH.text balance
+        ]
+    ]
 
 -- Balance List
 
-displayBalanceLi :: F.FoundationId → F.Balance → H.ComponentHTML Query
-displayBalanceLi (me)(F.Balance bal) =
-  HH.li [HP.class_ $ HH.ClassName "balance-row row align-items-center"]
-  [
-    HH.div [HP.class_ $ HH.ClassName "col creditor"][idSpan me bal.creditor],
-    HH.div [HP.class_ $ HH.ClassName "col debtor"][idSpan me bal.debtor],
-    HH.div [HP.class_ $ HH.ClassName "col amount"][verboseMoneySpan bal.amount]
-  ]
+displayBalanceLi :: State → F.Balance → H.ComponentHTML Query
+displayBalanceLi state (F.Balance bal) =
+  let debtsMap = state.itemizedDebts
+      me       = state.myId
+      curFriend= if bal.creditor == me then bal.debtor else bal.creditor
+      status   = if bal.creditor == me then "Holds debts from:" else "Is owing..."
+      friendToShow = state.showItemizedDebtFor
+      expandClass = (\f → if f == curFriend then "expand-itemized" else "hide-itemized") <$> friendToShow
+  in
+    HH.li [HP.class_ $ HH.ClassName $ "balance-row row " <> fromMaybe "" expandClass,
+           HE.onClick $ HE.input_ $ ShowItemizedDebtFor $ Just bal.creditor]
+    $ [
+      HH.div [HP.class_ $ HH.ClassName "highlight"][],
+      HH.div [HP.class_ $ HH.ClassName "col-4 debt-excerpt"][
+        HH.div [HP.class_ $ HH.ClassName "row debt-amount"][moneySpan bal.amount],
+        HH.div [HP.class_ $ HH.ClassName "row label-row"][HH.small_[HH.text "last"]],
+        HH.div [HP.class_ $ HH.ClassName "row thin-item-row"]
+          [
+            HH.span [HP.class_ $ HH.ClassName "thin-item"][HH.text "2017/07/01"]
+          ]
+      ],
+      HH.div [HP.class_ $ HH.ClassName "col debt-details"][
+        HH.div [HP.class_ $ HH.ClassName "col debt-relationship"][
+          HH.div [HP.class_ $ HH.ClassName "row"][HH.text status],
+          HH.div [HP.class_ $ HH.ClassName "row"][HH.h6_ [HH.text $ show bal.creditor]]
+        ],
+        HH.div [HP.class_ $ HH.ClassName "row label-row"][
+          HH.div [HP.class_ $ HH.ClassName "col-6"][HH.small_[HH.text "currency"]],
+          HH.div [HP.class_ $ HH.ClassName "col-6"][HH.small_[HH.text "debts"]]
+        ],
+        HH.div [HP.class_ $ HH.ClassName "row thin-item-row"][
+          HH.div [HP.class_ $ HH.ClassName "col thin-item"][currencySpan bal.amount],
+          HH.div [HP.class_ $ HH.ClassName "col thin-item"][HH.text $ "314" <> "debts"]
+        ]
+      ],
+      (displayItemizedDebtTimeline friendToShow debtsMap curFriend)
+    ]
 
 -- Pending Friendships
 displaySentFriendsList :: Array F.FoundationId → H.ComponentHTML Query
@@ -386,20 +482,19 @@ idSpan me idToDisplay =
   let isItMe = me == idToDisplay
   in case isItMe of
     true → HH.text $ "Me"
-    false → HH.a [HP.href "#", HE.onClick $ HE.input_ $ ShowItemizedDebtFor $ Just idToDisplay] [HH.text $ show idToDisplay]
+    false → HH.a [HP.class_ $ HH.ClassName "expandable-id", HP.href "#", HE.onClick $ HE.input_ $ ShowItemizedDebtFor $ Just idToDisplay] [HH.text $ show idToDisplay]
 
 descSpan ∷ F.Debt → H.ComponentHTML Query
 descSpan (F.Debt fd) =
   HH.span [] [ HH.text $ fd.desc ]
 
-currencySpan ∷ F.Debt → H.ComponentHTML Query
-currencySpan (F.Debt fd) =
-  let (F.Money d) = fd.debt
-  in HH.span [] [ HH.text $ show d.currency ]
+currencySpan ∷ F.Money → H.ComponentHTML Query
+currencySpan (F.Money m) =
+  HH.span [HP.class_ $ HH.ClassName "currency-span"] [ HH.text $ show m.currency ]
 
-moneySpan ∷ F.Debt → H.ComponentHTML Query
-moneySpan (F.Debt fd) =
-  HH.span [] [ HH.text $ show $ fd.debt ]
+moneySpan ∷ F.Money → H.ComponentHTML Query
+moneySpan (F.Money m) =
+  HH.span [HP.class_ $ HH.ClassName "money-span"] [ HH.text $ "$" <> (show $ m.amount) ]
 
 debtAmountSpan ∷ F.Debt → H.ComponentHTML Query
 debtAmountSpan (F.Debt fd) =
@@ -407,7 +502,10 @@ debtAmountSpan (F.Debt fd) =
 
 verboseMoneySpan :: F.Money → H.ComponentHTML Query
 verboseMoneySpan m =
-  HH.span [] [ HH.text $ show m ]
+  HH.span [] [
+    currencySpan m,
+    moneySpan m
+  ]
 
 moneyClass ∷ F.Debt → String
 moneyClass fd = "debt-amount"
@@ -430,16 +528,18 @@ confirmFriendshipButton friend =
 
 addFriendWidget ∷ State → H.ComponentHTML Query
 addFriendWidget state =
-  HH.div [ HP.class_ $ HH.ClassName "addFriend row col" ]
+  HH.div [ HP.class_ $ HH.ClassName "addFriend" ]
   [
+    HH.small_ [HH.text "Friend's FoundationID"],
     HH.input [ HP.type_ HP.InputText
              , HP.value $ inputVal state.newFriend
-             , HP.class_ $ HH.ClassName "col"
+             , HP.class_ $ HH.ClassName "form-control"
+             , HP.placeholder $ "johndoe"
              , HE.onValueInput
                (HE.input (\val → InputFriend val))
              ]
   , HH.button [ HE.onClick $ HE.input_ $ AddFriend state.newFriend
-              , HP.class_ $ HH.ClassName "col-2"]
+              , HP.class_ $ HH.ClassName "form-control"]
     [ HH.text "Add Friend by FoundationId" ]
   ]
   where inputVal = either id show
@@ -494,3 +594,45 @@ inputCredit = inputFDebt Credit
 
 numberFromString ∷ String → Number
 numberFromString s = fromMaybe (toNumber 0) (N.fromString s)
+
+mockFriendNames :: Array String
+mockFriendNames = ["bob", "tim", "kevin"]
+
+mockFriends :: Array F.FoundationId
+mockFriends = [F.FoundationId "jaredbowie", F.FoundationId "TimTime", F.FoundationId "chinmich", F.FoundationId "tom", F.FoundationId "aki", F.FoundationId "brad"]
+
+mockNameMap :: NameMap
+mockNameMap = M.insert (F.FoundationId "bob") "Bob Brown" $ M.empty
+
+fakeDebt :: F.Debt
+fakeDebt = mockDebt $ F.FoundationId "bob"
+
+fakeDebts :: Array F.Debt
+fakeDebts = [fakeDebt, fakeDebt]
+
+mockMe :: F.FoundationId
+mockMe = (F.FoundationId "lukezhang")
+
+fakeFriend :: F.FoundationId
+fakeFriend = (F.FoundationId "jaredbowie")
+
+fakeFriend2 :: F.FoundationId
+fakeFriend2 = (F.FoundationId "timtime")
+--
+--
+-- mockDebtMap :: DebtsMap
+-- mockDebtMap = M.insert (F.FoundationId "bob") fakeDebt $ M.empty
+
+mockBalance :: F.Balance
+mockBalance = F.Balance { debtor: mockMe, creditor: fakeFriend, amount: F.Money {amount: 5.0, currency: F.cUSD}, totalDebts: 13, mostRecent: Nothing}
+
+mockBalance2 :: F.Balance
+mockBalance2 = F.Balance { debtor: mockMe, creditor: fakeFriend2, amount: F.Money {amount: 15.0, currency: F.cUSD}, totalDebts: 13, mostRecent: Nothing}
+
+mockPendingDebts :: F.PendingDebts
+mockPendingDebts = F.PD {sent: [fakeDebt], todo: [fakeDebt]}
+
+mockFoundationId :: F.FoundationId
+mockFoundationId = F.FoundationId "snoopy"
+mockDebt :: F.FoundationId -> F.Debt
+mockDebt fid = F.mkDebt mockFoundationId fid fid (F.moneyFromDecString "2.0" F.cUSD) F.NoDebtId "Dinner @ KRBB"
