@@ -24,6 +24,8 @@ import Network.Eth.FriendInDebt         as F
 import Network.Eth                      as E
 import UI.IconGenerator as ICON
 
+import FriendInDebt.Routes              as R
+
 data Query a
   = RefreshDebts a
   | HandleInput Input a
@@ -39,7 +41,7 @@ data Query a
 type Input = ContainerMsgBus
 
 data Message
-  = ScreenChange String
+  = ScreenChange R.Screen
   | NewTX E.TX
 newtype FriendBundle = FriendBundle { id ∷ F.FoundationId, gradient ∷ ICON.GradientCss, balance ∷ Maybe F.Balance }
 
@@ -165,7 +167,7 @@ component =
   eval ∷ Query ~> H.ComponentDSL State Query Message (FIDMonad eff)
   eval = case _ of
     ShowItemizedDebtFor maybeFriend next → do
-      H.raise $ ScreenChange "show-itemized-debt"
+      H.raise $ ScreenChange R.ItemizedDebtsScreen
 
       case maybeFriend of
         Nothing → pure next

@@ -11,6 +11,7 @@ import Control.Monad.Aff (delay, launchAff)
 import Control.Monad.Eff.Timer (setInterval)
 import Data.Time.Duration (Milliseconds(..))
 import Data.Int (toNumber)
+import Data.Array as A
 
 import Halogen as H
 import Halogen.HTML as HH
@@ -25,20 +26,22 @@ import Network.Eth.Metamask     as MM
 import Network.Eth              as E
 import Network.Eth.FriendInDebt as F
 
+import FriendInDebt.Routes      as R
+
 data Query a
   = Init a
   | HandleMsg ContainerMsg a
   | RefreshMetamask a
-  | SetScreen String a
-  | ShowPreviousScreen a
+  | SetScreen R.Screen a
+  | PreviousScreen a
   | DebtViewMsg D.Message a
 
 type State = { loggedIn ∷ Boolean
              , loading  ∷ Boolean
              , errorBus ∷ ContainerMsgBus
              , txs      ∷ Array E.TX
-             , currentScreen ∷ String
-             , previousScreen ∷ String }
+             , currentScreen ∷ R.Screen
+             , history ∷ Array R.Screen }
 
 type ChildQuery = Coproduct1 D.Query
 type ChildSlot = Either1 Unit
@@ -60,41 +63,41 @@ ui =
                    , loading: true
                    , errorBus: Nothing
                    , txs: []
-                   , currentScreen: "show-balances"
-                   , previousScreen: "show-balances"}
+                   , currentScreen: R.BalancesScreen
+                   , history: []}
 
     render ∷ State → H.ParentHTML Query ChildQuery ChildSlot (FIDMonad eff)
     render state =
-      HH.div [ HP.id_ "container", HP.class_ (HH.ClassName $ "container " <> state.currentScreen <> (if state.loading then " loading" else "")) ]
+      HH.div [ HP.id_ "container", HP.class_ (HH.ClassName $ "container " <> (R.getRouteNameFor state.currentScreen)  <> (if state.loading then " loading" else "")) ]
       [ promptMetamask state.loggedIn
       , loadingOverlay state.loading
       , HH.div [ HP.id_ "back-nav-bar", HP.class_ (HH.ClassName "row back-nav-bar")]
         [
-          HH.a [HP.href "#", HP.class_ (HH.ClassName "close-pop-button"), HE.onClick $ HE.input_ $ ShowPreviousScreen]
+          HH.a [HP.href "#", HP.class_ (HH.ClassName "close-pop-button"), HE.onClick $ HE.input_ $ PreviousScreen]
           [HH.i [ HP.class_ (HH.ClassName "fa fa-chevron-left")][], HH.text " Back"]
         ]
-      , HH.div [ HP.id_ "home-bar", HP.class_ (HH.ClassName "row home-bar")]
-        [
-          HH.a [HP.href "#", HP.class_ (HH.ClassName "col home"), HE.onClick $ HE.input_ $ SetScreen "show-balances"] [
-                HH.img [HP.src "http://blockmason.io/assets/img/friends_in_debt_logo.svg"], HH.text "Friend in Debt"]
-        ]
-      , HH.div [ HP.id_ "header", HP.class_ (HH.ClassName "row")]
-        [
-          HH.a [HP.href "#", HP.class_ (HH.ClassName $ "col-3 " <> if state.currentScreen == "show-balances" then "active" else ""), HE.onClick $ HE.input_ $ SetScreen "show-balances"] [ HH.text "Balances"],
-          HH.a [HP.href "#", HP.class_ (HH.ClassName $ "col-3 " <> if state.currentScreen == "show-friends" then "active" else "" ), HE.onClick $ HE.input_ $ SetScreen "show-friends"] [ HH.text "Friends"],
-          HH.a [HP.href "#", HP.class_ (HH.ClassName $ "col-3 " <> if state.currentScreen == "show-pending" then "active" else ""), HE.onClick $ HE.input_ $ SetScreen "show-pending"] [ HH.text "Pending"],
-          HH.a [HP.href "#", HP.class_ (HH.ClassName $ "col-3 " <> if state.currentScreen == "show-settings" then "active" else ""), HE.onClick $ HE.input_ $ SetScreen "show-settings"] [ HH.text "Settings"]
-        ]
-      , HH.div [ HP.class_ (HH.ClassName "row create-debt-bar") ]
-      [
-        HH.a [HP.href "#", HP.class_ (HH.ClassName ""), HE.onClick $ HE.input_ $ SetScreen "show-create-debt"] [
-        HH.i [ HP.class_ (HH.ClassName "fa fa-plus-circle")][], HH.text " Create Debt"]
-      ]
-      , HH.div [ HP.class_ (HH.ClassName "row add-friend-bar") ]
-      [
-        HH.a [HP.href "#", HP.class_ (HH.ClassName ""), HE.onClick $ HE.input_ $ SetScreen "show-add-friend"] [
-        HH.i [ HP.class_ (HH.ClassName "fa fa-plus-circle")][], HH.text " Add Friend"]
-      ]
+      -- , HH.div [ HP.id_ "home-bar", HP.class_ (HH.ClassName "row home-bar")]
+      --   [
+      --     HH.a [HP.href "#", HP.class_ (HH.ClassName "col home"), HE.onClick $ HE.input_ $ SetScreen "show-balances"] [
+      --           HH.img [HP.src "http://blockmason.io/assets/img/friends_in_debt_logo.svg"], HH.text "Friend in Debt"]
+      --   ]
+      -- , HH.div [ HP.id_ "header", HP.class_ (HH.ClassName "row")]
+      --   [
+      --     HH.a [HP.href "#", HP.class_ (HH.ClassName $ "col-3 " <> if state.currentScreen == "show-balances" then "active" else ""), HE.onClick $ HE.input_ $ SetScreen "show-balances"] [ HH.text "Balances"],
+      --     HH.a [HP.href "#", HP.class_ (HH.ClassName $ "col-3 " <> if state.currentScreen == "show-friends" then "active" else "" ), HE.onClick $ HE.input_ $ SetScreen "show-friends"] [ HH.text "Friends"],
+      --     HH.a [HP.href "#", HP.class_ (HH.ClassName $ "col-3 " <> if state.currentScreen == "show-pending" then "active" else ""), HE.onClick $ HE.input_ $ SetScreen "show-pending"] [ HH.text "Pending"],
+      --     HH.a [HP.href "#", HP.class_ (HH.ClassName $ "col-3 " <> if state.currentScreen == "show-settings" then "active" else ""), HE.onClick $ HE.input_ $ SetScreen "show-settings"] [ HH.text "Settings"]
+      --   ]
+      -- , HH.div [ HP.class_ (HH.ClassName "row create-debt-bar") ]
+      -- [
+      --   HH.a [HP.href "#", HP.class_ (HH.ClassName ""), HE.onClick $ HE.input_ $ SetScreen "show-create-debt"] [
+      --   HH.i [ HP.class_ (HH.ClassName "fa fa-plus-circle")][], HH.text " Create Debt"]
+      -- ]
+      -- , HH.div [ HP.class_ (HH.ClassName "row add-friend-bar") ]
+      -- [
+      --   HH.a [HP.href "#", HP.class_ (HH.ClassName ""), HE.onClick $ HE.input_ $ SetScreen "show-add-friend"] [
+      --   HH.i [ HP.class_ (HH.ClassName "fa fa-plus-circle")][], HH.text " Add Friend"]
+      -- ]
       , HH.div [ HP.class_ (HH.ClassName "row")]
         [
           HH.slot' CP.cp1 unit D.component state.errorBus $ HE.input DebtViewMsg
@@ -126,21 +129,21 @@ ui =
       RefreshMetamask next → do
         refreshMetamask
         pure next
-      SetScreen className next → do
-        H.modify (\state -> state {previousScreen = state.currentScreen})
-        H.modify (_ {currentScreen = className})
+      SetScreen screen next → do
+        H.modify (\state → state {history = append [state.currentScreen] state.history })
+        H.modify (_ {currentScreen = screen})
         pure next
       DebtViewMsg msg next →
         case msg of
           D.ScreenChange screen → do
-            H.modify (\state -> state {previousScreen = state.currentScreen})
-            H.modify (_ {currentScreen = screen })
+            H.modify (\state → state {history = append [state.currentScreen] state.history })
+            H.modify (_ {currentScreen = screen})
             pure next
           D.NewTX newTx → do
             H.modify (\s → s { txs = s.txs <> [newTx] })
             pure next
-      ShowPreviousScreen next → do
-        H.modify (\state -> state {currentScreen = state.previousScreen})
+      PreviousScreen next → do
+        H.modify (\state → state {currentScreen = (fromMaybe R.BalancesScreen $ A.head state.history), history = (fromMaybe [] $ A.tail state.history)})
         pure next
 
 loadingOverlay ∷ ∀ p i. Boolean → H.HTML p i
