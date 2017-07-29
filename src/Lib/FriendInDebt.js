@@ -231,9 +231,7 @@ var errTx = function() {
 var confirmedFriends2Js = function(friends) {
     var friendList = [];
     for ( var i=0; i < friends.length; i++ ) {
-        var friend = {
-            friendId: b2s(friends[i])
-        };
+        var friend = b2s(friends[i]);
         friendList.push(friend);
     }
     return friendList;
