@@ -76,17 +76,11 @@ ui =
           HH.a [HP.href "#", HP.class_ (HH.ClassName "close-pop-button"), HE.onClick $ HE.input_ $ PreviousScreen]
           [HH.i [ HP.class_ (HH.ClassName "fa fa-chevron-left")][], HH.text " Back"]
         ]
+        , menu state.currentScreen
       -- , HH.div [ HP.id_ "home-bar", HP.class_ (HH.ClassName "row home-bar")]
       --   [
       --     HH.a [HP.href "#", HP.class_ (HH.ClassName "col home"), HE.onClick $ HE.input_ $ SetScreen "show-balances"] [
       --           HH.img [HP.src "http://blockmason.io/assets/img/friends_in_debt_logo.svg"], HH.text "Friend in Debt"]
-      --   ]
-      -- , HH.div [ HP.id_ "header", HP.class_ (HH.ClassName "row")]
-      --   [
-      --     HH.a [HP.href "#", HP.class_ (HH.ClassName $ "col-3 " <> if state.currentScreen == "show-balances" then "active" else ""), HE.onClick $ HE.input_ $ SetScreen "show-balances"] [ HH.text "Balances"],
-      --     HH.a [HP.href "#", HP.class_ (HH.ClassName $ "col-3 " <> if state.currentScreen == "show-friends" then "active" else "" ), HE.onClick $ HE.input_ $ SetScreen "show-friends"] [ HH.text "Friends"],
-      --     HH.a [HP.href "#", HP.class_ (HH.ClassName $ "col-3 " <> if state.currentScreen == "show-pending" then "active" else ""), HE.onClick $ HE.input_ $ SetScreen "show-pending"] [ HH.text "Pending"],
-      --     HH.a [HP.href "#", HP.class_ (HH.ClassName $ "col-3 " <> if state.currentScreen == "show-settings" then "active" else ""), HE.onClick $ HE.input_ $ SetScreen "show-settings"] [ HH.text "Settings"]
       --   ]
       -- , HH.div [ HP.class_ (HH.ClassName "row create-debt-bar") ]
       -- [
@@ -197,3 +191,22 @@ mkFriends = do
   _ ← H.liftAff $ F.runMonadF $ F.createFriendship (F.FoundationId "timtime")
   _ ← H.liftAff $ F.runMonadF $ F.confirmFriendship (F.FoundationId "timgalebach")
   pure unit
+
+menu ∷ ∀ p. R.Screen → H.HTML p Query
+menu currentScreen =
+  HH.div
+    [ HP.class_ (HH.ClassName "header-menu row")]
+    [
+        menuItem R.BalancesScreen currentScreen
+      , menuItem R.FriendsScreen currentScreen
+      , menuItem R.PendingScreen currentScreen
+      , menuItem R.SettingsScreen currentScreen
+    ]
+
+menuItem ∷ ∀ p. R.Screen → R.Screen → H.HTML p Query
+menuItem screen currentScreen =
+  HH.a
+  [HP.href "#",
+        HP.class_ (HH.ClassName $ "col-3 " <> if screen == currentScreen then "active" else ""),
+        HE.onClick $ HE.input_ $ SetScreen screen]
+  [ HH.text $ R.getMenuNameFor screen]

@@ -1,4 +1,4 @@
-.back-nav-bar, #header {
+.back-nav-bar, .header-menu {
   background: #2196f3;
 }
 /* home bar*/
@@ -25,12 +25,12 @@
 
 /* header */
 
-#header {
+.header-menu {
   font-weight: 100;
   border-bottom: 1px solid white;
 }
 
-#header a {
+.header-menu a {
   padding-top: 20px;
   text-transform: uppercase;
   background: rgba(255,255,255,0.1);
@@ -41,12 +41,12 @@
   transition: all 0.5s;
 }
 
-#header a:hover {
+.header-menu a:hover {
   text-decoration: none;
   background: rgba(0,0,0,0.1)
 }
 
-#header a.active {
+.header-menu a.active {
   padding-top: 10px;
   color: white;
   text-decoration: none;
