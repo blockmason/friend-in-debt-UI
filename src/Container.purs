@@ -84,12 +84,12 @@ ui =
       --   ]
       , HH.div [ HP.class_ (HH.ClassName "row create-debt-bar") ]
       [
-        HH.a [HP.href "#", HP.class_ (HH.ClassName ""), HE.onClick $ HE.input_ $ SetScreen "show-create-debt"] [
+        HH.a [HP.href "#", HP.class_ (HH.ClassName ""), HE.onClick $ HE.input_ $ SetScreen R.CreateDebtScreen] [
         HH.i [ HP.class_ (HH.ClassName "fa fa-plus-circle")][], HH.text " Create Debt"]
       ]
       , HH.div [ HP.class_ (HH.ClassName "row add-friend-bar") ]
       [
-        HH.a [HP.href "#", HP.class_ (HH.ClassName ""), HE.onClick $ HE.input_ $ SetScreen "show-add-friend"] [
+        HH.a [HP.href "#", HP.class_ (HH.ClassName ""), HE.onClick $ HE.input_ $ SetScreen R.AddFriendScreen] [
         HH.i [ HP.class_ (HH.ClassName "fa fa-plus-circle")][], HH.text " Add Friend"]
       ]
       , HH.div [ HP.class_ (HH.ClassName "row")]

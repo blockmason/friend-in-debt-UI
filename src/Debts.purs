@@ -384,11 +384,11 @@ displayBalanceLi state (F.Balance bal) =
 
 -- Pending Friendships
 displaySentFriendsList :: Array F.FoundationId → H.ComponentHTML Query
-displaySentFriendsList friends = HH.ul_ $ displaySentFriendLi <$> friends
+displaySentFriendsList friends = HH.ul [HP.class_ $ HH.ClassName "col"] $ displaySentFriendLi <$> friends
 
 displaySentFriendLi ∷ F.FoundationId → H.ComponentHTML Query
 displaySentFriendLi friend =
-  HH.li [HP.class_ $ HH.ClassName "sent-friend-row row align-items-center"] $
+  HH.li [HP.class_ $ HH.ClassName "sent-friend-row row"] $
     append
       (cardHeader "Waiting for response:")
       (displaySentFriend friend)
@@ -396,14 +396,19 @@ displaySentFriendLi friend =
 displaySentFriend :: F.FoundationId → Array (H.ComponentHTML Query)
 displaySentFriend friend =
     [
-      HH.div [HP.class_ $ HH.ClassName "row friend-details align-items-center"]
+      HH.div [HP.class_ $ HH.ClassName "col friend-details"]
       [
-        HH.div [HP.class_ $ HH.ClassName "col"][HH.text $ "Sent Friend Request to:" <> show friend]
+        HH.div [HP.class_ $ HH.ClassName "request-details"]
+        [
+          HH.span_ [HH.text "Friend Request To"],
+          HH.span_ [HH.text $ show friend],
+          HH.span_ [HH.text "2017/07/29 15:35"]
+        ]
       ]
     ]
 
 displayTodoFriendsList :: Array F.FoundationId → H.ComponentHTML Query
-displayTodoFriendsList friends = HH.ul_ $ displayTodoFriendLi <$> friends
+displayTodoFriendsList friends = HH.ul [HP.class_ $ HH.ClassName "col"] $ displayTodoFriendLi <$> friends
 
 displayTodoFriendLi ∷  F.FoundationId → H.ComponentHTML Query
 displayTodoFriendLi friend =
@@ -414,16 +419,21 @@ displayTodoFriendLi friend =
       (displayTodoFriend friend))
   [
     HH.div [HP.class_ $ HH.ClassName "row action-buttons row align-items-center"][
-      HH.div [HP.class_ $ HH.ClassName "col"][confirmFriendshipButton friend]
+      HH.div [HP.class_ $ HH.ClassName "col-1"][confirmFriendshipButton friend]
     ]
   ]
 
 displayTodoFriend ::  F.FoundationId → Array (H.ComponentHTML Query)
 displayTodoFriend friend =
     [
-      HH.div [HP.class_ $ HH.ClassName "row friend-details row align-items-center"]
+      HH.div [HP.class_ $ HH.ClassName "col friend-details"]
       [
-        HH.div [HP.class_ $ HH.ClassName "col"][HH.text $ "Friend Request From:" <> show friend]
+        HH.div [HP.class_ $ HH.ClassName "request-details"]
+        [
+          HH.span_ [HH.text "Friend Request From"],
+          HH.span_ [HH.text $ show friend],
+          HH.span_ [HH.text "2017/07/29 15:35"]
+        ]
       ]
     ]
 
@@ -537,7 +547,7 @@ confirmFriendshipButton :: F.FoundationId -> H.ComponentHTML Query
 confirmFriendshipButton friend =
   HH.button [ HE.onClick $ HE.input_ $ AddFriend $ Right friend
             , HP.class_ $ HH.ClassName "confirm-friend-button"]
-            [ HH.text "Confirm Friendship" ]
+            [ HH.i [HP.class_ $ HH.ClassName "fa fa-check"][] ]
 
 addFriendWidget ∷ State → H.ComponentHTML Query
 addFriendWidget state =

@@ -1,16 +1,19 @@
-.default-currency-container, .foundation-id-container {
-  height: 50px;
-  padding: 10px 10px 0 30px;
-  border-bottom: 1px solid #aaa;
-  border-top: 1px solid #aaa;
-  border-radius: 5px;
-  margin: 10px 0;
-}
+.settings-screen-container {
+  ul > div {
+    height: 4.5em;
+    background: white;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    transition: all 0.7s ease;
+    padding: 10px 30px;
+    font-weight: 300;
+  }
 
-.default-currency-container span, .foundation-id-container span {
-  margin-left: 10px;
-  font-weight: 100;
-  display: block;
-  float: right;
-  font-size: 17px;
+  span {
+    display: block;
+    width: 100%;
+    font-weight: 500;
+
+  }
 }

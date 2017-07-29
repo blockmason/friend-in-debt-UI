@@ -22,6 +22,9 @@ html {
 .inActive {
   display: none; }
 
+.page-container {
+  margin-top: 10px; }
+
 /* loading overlays */
 #metamaskOverlay {
   padding: 20px;
@@ -830,62 +833,53 @@ html {
     transition: 0.3s ease;
     padding: 20px 5px; }
 
-.all-pending-debts-container ul {
-  list-style: none;
-  padding: 0; }
-
-.all-pending-debts-container .sent-debt-row, .all-pending-debts-container .sent-friend-row {
-  height: 90px;
-  background: rgba(0, 0, 0, 0.1);
+.pending-screen-container li {
+  height: 5em;
+  background: white;
   border-radius: 5px;
-  margin: 10px; }
+  overflow: hidden;
+  margin-bottom: 10px;
+  transition: all 0.7s ease;
+  padding: 10px 30px; }
 
-.all-pending-debts-container .sent-friend-row {
-  height: 50px; }
-
-.all-pending-debts-container .todo-debt-row {
-  height: 130px;
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 5px;
-  margin: 10px; }
-
-.all-pending-debts-container .action-buttons, .all-pending-debts-container .debt-details, .all-pending-debts-container .friend-details {
-  width: 100%; }
-
-.all-pending-debts-container .card-title {
+.pending-screen-container .card-title {
   font-size: 18px;
   font-weight: 100;
-  text-transform: uppercase;
-  margin-left: 10px; }
+  border-right: 1px solid #eee;
+  line-height: 3em;
+  padding-right: 1em;
+  margin-right: 1em; }
 
-.btn-cancel, .btn-confirm {
-  background: none;
-  border: none;
-  color: #333;
-  text-align: center;
-  width: 100%;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 5px; }
-
-.action-buttons {
-  margin-left: 0; }
-
-.debt-details, .friend-details {
-  margin: 0;
-  font-size: 12px; }
-
-.default-currency-container, .foundation-id-container {
-  height: 50px;
-  padding: 10px 10px 0 30px;
-  border-bottom: 1px solid #aaa;
-  border-top: 1px solid #aaa;
-  border-radius: 5px;
-  margin: 10px 0; }
-
-.default-currency-container span, .foundation-id-container span {
-  margin-left: 10px;
-  font-weight: 100;
+.pending-screen-container .request-details span:first-child {
+  font-size: 10px;
   display: block;
-  float: right;
-  font-size: 17px; }
+  border-bottom: 1px solid #eee;
+  text-transform: uppercase; }
+
+.pending-screen-container .request-details span:last-child {
+  display: block;
+  font-size: 9px;
+  font-weight: 100; }
+
+.pending-screen-container .confirm-friend-button {
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 5px; }
+  .pending-screen-container .confirm-friend-button:hover {
+    background: #8bc34a;
+    color: white; }
+
+.settings-screen-container ul > div {
+  height: 4.5em;
+  background: white;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 10px;
+  transition: all 0.7s ease;
+  padding: 10px 30px;
+  font-weight: 300; }
+
+.settings-screen-container span {
+  display: block;
+  width: 100%;
+  font-weight: 500; }

@@ -1,53 +1,46 @@
-.all-pending-debts-container ul {
-  list-style: none;
-  padding: 0;
-}
+.pending-screen-container {
+  li {
+    height: 5em;
+    background: white;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    transition: all 0.7s ease;
+    padding: 10px 30px;
+  }
 
-.all-pending-debts-container .sent-debt-row, .all-pending-debts-container .sent-friend-row {
-  height: 90px;
-  background: rgba(0,0,0,0.1);
-  border-radius: 5px;
-  margin: 10px;
-}
+  .card-title {
+    font-size: 18px;
+    font-weight: 100;
+    border-right: 1px solid #eee;
+    line-height: 3em;
+    padding-right: 1em;
+    margin-right: 1em;
+  }
 
-.all-pending-debts-container .sent-friend-row {
-  height: 50px;
-}
+  .request-details {
+    span:first-child {
+      font-size: 10px;
+      display: block;
+      border-bottom: 1px solid #eee;
+      text-transform: uppercase;
+    }
 
-.all-pending-debts-container .todo-debt-row {
-  height: 130px;
-  background: rgba(0,0,0,0.1);
-  border-radius: 5px;
-  margin: 10px;
-}
+    span:last-child {
+      display: block;
+      font-size: 9px;
+      font-weight: 100;
+    }
+  }
 
-.all-pending-debts-container .action-buttons, .all-pending-debts-container .debt-details, .all-pending-debts-container .friend-details {
-  width: 100%;
-}
+  .confirm-friend-button {
+    background: none;
+    border: 1px solid #ddd;
+    border-radius: 5px;
 
-.all-pending-debts-container .card-title {
-  font-size: 18px;
-  font-weight: 100;
-  text-transform: uppercase;
-  margin-left: 10px;
-}
-
-.btn-cancel, .btn-confirm {
-  background: none;
-  border: none;
-  color: #333;
-  text-align: center;
-  width: 100%;
-  border: 1px solid rgba(0,0,0,0.1);
-  background: rgba(0,0,0,0.1);
-  border-radius: 5px;
-}
-
-.action-buttons {
-  margin-left: 0;
-}
-
-.debt-details, .friend-details {
-  margin: 0;
-  font-size: 12px;
+    &:hover {
+      background: #8bc34a;
+      color: white;
+    }
+  }
 }
