@@ -82,16 +82,16 @@ ui =
       --     HH.a [HP.href "#", HP.class_ (HH.ClassName "col home"), HE.onClick $ HE.input_ $ SetScreen "show-balances"] [
       --           HH.img [HP.src "http://blockmason.io/assets/img/friends_in_debt_logo.svg"], HH.text "Friend in Debt"]
       --   ]
-      -- , HH.div [ HP.class_ (HH.ClassName "row create-debt-bar") ]
-      -- [
-      --   HH.a [HP.href "#", HP.class_ (HH.ClassName ""), HE.onClick $ HE.input_ $ SetScreen "show-create-debt"] [
-      --   HH.i [ HP.class_ (HH.ClassName "fa fa-plus-circle")][], HH.text " Create Debt"]
-      -- ]
-      -- , HH.div [ HP.class_ (HH.ClassName "row add-friend-bar") ]
-      -- [
-      --   HH.a [HP.href "#", HP.class_ (HH.ClassName ""), HE.onClick $ HE.input_ $ SetScreen "show-add-friend"] [
-      --   HH.i [ HP.class_ (HH.ClassName "fa fa-plus-circle")][], HH.text " Add Friend"]
-      -- ]
+      , HH.div [ HP.class_ (HH.ClassName "row create-debt-bar") ]
+      [
+        HH.a [HP.href "#", HP.class_ (HH.ClassName ""), HE.onClick $ HE.input_ $ SetScreen "show-create-debt"] [
+        HH.i [ HP.class_ (HH.ClassName "fa fa-plus-circle")][], HH.text " Create Debt"]
+      ]
+      , HH.div [ HP.class_ (HH.ClassName "row add-friend-bar") ]
+      [
+        HH.a [HP.href "#", HP.class_ (HH.ClassName ""), HE.onClick $ HE.input_ $ SetScreen "show-add-friend"] [
+        HH.i [ HP.class_ (HH.ClassName "fa fa-plus-circle")][], HH.text " Add Friend"]
+      ]
       , HH.div [ HP.class_ (HH.ClassName "row")]
         [
           HH.slot' CP.cp1 unit D.component state.errorBus $ HE.input DebtViewMsg

@@ -111,7 +111,7 @@ component =
       , page R.BalancesScreen $
              HH.ul
              [ HP.class_ $ HH.ClassName "col-12" ]
-             $ (displayBalanceLi state) <$> [mockBalance2, mockBalance2, mockBalance2, mockBalance, mockBalance2, mockBalance2]
+             $ (displayBalanceLi state) <$> state.balances
       , page R.PendingScreen $ pendingPage state
       , page R.SettingsScreen $ settingsPage state
       , page R.AddFriendScreen $
@@ -142,14 +142,12 @@ component =
       state <- H.get
       case (length state.gradients) of
         0 → do
-          -- gradients <- H.liftEff $ sequence $ ICON.randomGradient <$> state.friends
-          gradients <- H.liftEff $ sequence $ (const ICON.randomGradient) <$> mockFriends
-          H.modify (_ { errorBus = input, gradients = gradients, friends = mockFriends })
-          -- H.modify (_ { errorBus = input, gradients = gradients })
+          gradients <- H.liftEff $ sequence $ (const ICON.randomGradient) <$> state.friends
+          H.modify (_ { errorBus = input, gradients = gradients })
           pure next
 
         _ → do
-          H.modify (_ { errorBus = input, friends = mockFriends })
+          H.modify (_ { errorBus = input })
           pure next
     AddFriend eitherFriendId next → do
       s ← H.get
@@ -278,9 +276,8 @@ displayItemizedDebtTimeline friendToShow debtsMap curFriend =
           HH.div [HP.class_ $ HH.ClassName "row"][HH.text "Debt History:"],
           HH.div [HP.class_ $ HH.ClassName "row"][HH.h6_ [HH.text $ show f]],
           HH.ul [HP.class_ $ HH.ClassName "row debt-timeline"]
-            $ itemizedDebtLi <$> fakeDebts
+            $ itemizedDebtLi <$> (fromMaybe [] $ M.lookup f debtsMap)
         ]
-        -- HH.ul_ $ itemizedDebtLi <$> (fromMaybe [] $ M.lookup f debtsMap)]
     Nothing → HH.div_ [ HH.text "" ]
 
 itemizedDebtLi ∷ F.Debt → H.ComponentHTML Query
@@ -610,45 +607,45 @@ inputCredit = inputFDebt Credit
 
 numberFromString ∷ String → Number
 numberFromString s = fromMaybe (toNumber 0) (N.fromString s)
-
-mockFriendNames :: Array String
-mockFriendNames = ["bob", "tim", "kevin"]
-
-mockFriends :: Array F.FoundationId
-mockFriends = [F.FoundationId "jaredbowie", F.FoundationId "TimTime", F.FoundationId "chinmich", F.FoundationId "tom", F.FoundationId "aki", F.FoundationId "brad"]
-
-mockNameMap :: NameMap
-mockNameMap = M.insert (F.FoundationId "bob") "Bob Brown" $ M.empty
-
-fakeDebt :: F.Debt
-fakeDebt = mockDebt $ F.FoundationId "bob"
-
-fakeDebts :: Array F.Debt
-fakeDebts = [fakeDebt, fakeDebt]
-
-mockMe :: F.FoundationId
-mockMe = (F.FoundationId "lukezhang")
-
-fakeFriend :: F.FoundationId
-fakeFriend = (F.FoundationId "jaredbowie")
-
-fakeFriend2 :: F.FoundationId
-fakeFriend2 = (F.FoundationId "timtime")
 --
+-- mockFriendNames :: Array String
+-- mockFriendNames = ["bob", "tim", "kevin"]
 --
--- mockDebtMap :: DebtsMap
--- mockDebtMap = M.insert (F.FoundationId "bob") fakeDebt $ M.empty
-
-mockBalance :: F.Balance
-mockBalance = F.Balance { debtor: mockMe, creditor: fakeFriend, amount: F.Money {amount: 5.0, currency: F.cUSD}, totalDebts: 13, mostRecent: Nothing}
-
-mockBalance2 :: F.Balance
-mockBalance2 = F.Balance { debtor: mockMe, creditor: fakeFriend2, amount: F.Money {amount: 15.0, currency: F.cUSD}, totalDebts: 13, mostRecent: Nothing}
-
-mockPendingDebts :: F.PendingDebts
-mockPendingDebts = F.PD {sent: [fakeDebt], todo: [fakeDebt]}
-
-mockFoundationId :: F.FoundationId
-mockFoundationId = F.FoundationId "snoopy"
-mockDebt :: F.FoundationId -> F.Debt
-mockDebt fid = F.mkDebt mockFoundationId fid fid (F.moneyFromDecString "2.0" F.cUSD) F.NoDebtId "Dinner @ KRBB"
+-- mockFriends :: Array F.FoundationId
+-- mockFriends = [F.FoundationId "jaredbowie", F.FoundationId "TimTime", F.FoundationId "chinmich", F.FoundationId "tom", F.FoundationId "aki", F.FoundationId "brad"]
+--
+-- mockNameMap :: NameMap
+-- mockNameMap = M.insert (F.FoundationId "bob") "Bob Brown" $ M.empty
+--
+-- fakeDebt :: F.Debt
+-- fakeDebt = mockDebt $ F.FoundationId "bob"
+--
+-- fakeDebts :: Array F.Debt
+-- fakeDebts = [fakeDebt, fakeDebt]
+--
+-- mockMe :: F.FoundationId
+-- mockMe = (F.FoundationId "lukezhang")
+--
+-- fakeFriend :: F.FoundationId
+-- fakeFriend = (F.FoundationId "jaredbowie")
+--
+-- fakeFriend2 :: F.FoundationId
+-- fakeFriend2 = (F.FoundationId "timtime")
+-- --
+-- --
+-- -- mockDebtMap :: DebtsMap
+-- -- mockDebtMap = M.insert (F.FoundationId "bob") fakeDebt $ M.empty
+--
+-- mockBalance :: F.Balance
+-- mockBalance = F.Balance { debtor: mockMe, creditor: fakeFriend, amount: F.Money {amount: 5.0, currency: F.cUSD}, totalDebts: 13, mostRecent: Nothing}
+--
+-- mockBalance2 :: F.Balance
+-- mockBalance2 = F.Balance { debtor: mockMe, creditor: fakeFriend2, amount: F.Money {amount: 15.0, currency: F.cUSD}, totalDebts: 13, mostRecent: Nothing}
+--
+-- mockPendingDebts :: F.PendingDebts
+-- mockPendingDebts = F.PD {sent: [fakeDebt], todo: [fakeDebt]}
+--
+-- mockFoundationId :: F.FoundationId
+-- mockFoundationId = F.FoundationId "snoopy"
+-- mockDebt :: F.FoundationId -> F.Debt
+-- mockDebt fid = F.mkDebt mockFoundationId fid fid (F.moneyFromDecString "2.0" F.cUSD) F.NoDebtId "Dinner @ KRBB"
