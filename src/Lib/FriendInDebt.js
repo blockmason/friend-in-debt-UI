@@ -77,7 +77,7 @@ exports.createFriendshipImpl = function(callback) {
     return function(myId) {
         return function(friendId) {
             return function() {
-                var data = friendContract.createFriendship.getData(myId, friendId);
+                var data = friendContract.addFriend.getData(myId, friendId);
                 sendFriendTx(data, 0, callback);
             };
         };

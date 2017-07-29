@@ -87,7 +87,6 @@ foreign import pendingDebtsImpl ∷ DebtLookupFn
 foreign import itemizedDebtsImpl ∷ DebtLookupFn'
 
 --
-
 checkAndInit ∷ MonadF Unit
 checkAndInit = do
   loggedIn ← liftEff (MM.loggedIn <$> MM.checkStatus)
