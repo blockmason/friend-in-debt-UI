@@ -662,6 +662,12 @@ html {
 .show-itemized-debts-screen .itemized-debts-screen-container {
   transform: none; }
 
+.show-itemized-debts-screen .balances-screen-container {
+  transform: none;
+  height: auto;
+  margin: 0;
+  padding: 0; }
+
 .all-balances-container ul {
   list-style: none;
   padding: 1em;
@@ -718,14 +724,31 @@ html {
   bottom: 30px;
   width: 100%; }
 
-.show-itemized-debt .balance-row.expand-itemized {
+.show-itemized-debts-screen .balance-row.expand-itemized {
   height: auto; }
 
-.show-itemized-debt .expand-itemized .debt-details {
+.show-itemized-debts-screen .expand-itemized .debt-details, .show-itemized-debts-screen .expand-itemized .debt-excerpt {
   display: none; }
 
-.show-itemized-debt .expand-itemized .debt-excerpt {
-  display: none; }
+.show-itemized-debts-screen .balance-row.hide-itemized:nth-child(odd) {
+  margin-top: 0;
+  margin-bottom: 0;
+  height: 0;
+  opacity: 0;
+  transform: perspective(1600px) rotateX(-90deg) translateY(20px); }
+
+.show-itemized-debts-screen .balance-row.hide-itemized:nth-child(even) {
+  margin-top: 0;
+  margin-bottom: 0;
+  height: 0;
+  transform: perspective(1600px) rotateX(90deg) translateY(20px);
+  opacity: 0; }
+
+.show-itemized-debts-screen .balance-row.expand-itemized {
+  height: auto;
+  opacity: 1;
+  transform: perspective(0) rotateX(0);
+  margin: auto; }
 
 .itemized-debts > .row {
   padding: 10px; }
@@ -752,40 +775,19 @@ html {
   margin-left: 5em;
   font-size: 10px;
   width: 100%; }
+  .timeline-event:before {
+    content: '';
+    border: 3px solid #03a9f4;
+    background: white;
+    border-radius: 50%;
+    height: 30px;
+    width: 30px;
+    display: block;
+    position: absolute;
+    left: 4.5em; }
 
-.timeline-event:before {
-  content: '';
-  border: 3px solid #03a9f4;
-  background: white;
-  border-radius: 50%;
-  height: 30px;
-  width: 30px;
-  display: block;
-  position: absolute;
-  left: 4.5em; }
-
-.show-balances .itemized-debts {
+.show-balances-screen .itemized-debts {
   display: none; }
-
-.show-itemized-debt .balance-row.hide-itemized:nth-child(odd) {
-  margin-top: 0;
-  margin-bottom: 0;
-  height: 0;
-  opacity: 0;
-  transform: perspective(1600px) rotateX(-90deg) translateY(20px); }
-
-.show-itemized-debt .balance-row.hide-itemized:nth-child(even) {
-  margin-top: 0;
-  margin-bottom: 0;
-  height: 0;
-  transform: perspective(1600px) rotateX(90deg) translateY(20px);
-  opacity: 0; }
-
-.show-itemized-debt .balance-row.expand-itemized {
-  height: auto;
-  opacity: 1;
-  transform: perspective(0) rotateX(0);
-  margin: auto; }
 
 .friends-screen-container {
   margin-top: 10px; }
