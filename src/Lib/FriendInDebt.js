@@ -115,7 +115,7 @@ exports.newPendingDebtImpl = function(callback) {
                 return function(currencyCode) {
                     return function(desc) {
                         return function() {
-                            var data = debtContract.newDebt(debtor, creditor, currencyCode, amount, desc);
+                            var data = debtContract.newDebt.getData(debtor, creditor, currencyCode, amount, desc);
                             sendDebtTx(data, 0, callback);
                         };
                     };
