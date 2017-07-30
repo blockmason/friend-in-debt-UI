@@ -356,7 +356,7 @@ displayBalanceLi state (F.Balance bal) =
       expandClass = (\f → if f == curFriend then "expand-itemized" else "hide-itemized") <$> friendToShow
   in
     HH.li [HP.class_ $ HH.ClassName $ "balance-row row " <> fromMaybe "" expandClass,
-           HE.onClick $ HE.input_ $ ShowItemizedDebtFor $ Just bal.creditor]
+           HE.onClick $ HE.input_ $ ShowItemizedDebtFor $ Just curFriend]
     $ [
       HH.div [HP.class_ $ HH.ClassName "highlight"][],
       HH.div [HP.class_ $ HH.ClassName "col-4 debt-excerpt"][
@@ -370,7 +370,7 @@ displayBalanceLi state (F.Balance bal) =
       HH.div [HP.class_ $ HH.ClassName "col debt-details"][
         HH.div [HP.class_ $ HH.ClassName "col debt-relationship"][
           HH.div [HP.class_ $ HH.ClassName "row"][HH.text status],
-          HH.div [HP.class_ $ HH.ClassName "row"][HH.h6_ [HH.text $ show bal.creditor]]
+          HH.div [HP.class_ $ HH.ClassName "row"][HH.h6_ [HH.text $ show bal.debtor]]
         ],
         HH.div [HP.class_ $ HH.ClassName "row label-row"][
           HH.div [HP.class_ $ HH.ClassName "col-6"][HH.small_[HH.text "currency"]],
@@ -577,14 +577,14 @@ instance showDebtType :: Show DebtType where
 show debtType =
   case debtType of
     Debt → "Debt You Owe"
-    Credit → "Debt Owed By You"
+    Credit → "Debt Owed To You"
 
 data DebtType = Debt | Credit
 inputFDebt ∷ DebtType → F.Currency → F.FoundationId → Array F.FoundationId
           → Maybe F.Debt → H.ComponentHTML Query
 inputFDebt debtType cur myId friends maybeDebt =
   case head friends of
-    Nothing       → HH.div_ [ HH.text "No friends to debt" ]
+    Nothing       → HH.div_ []
     Just friendId →
       let d = case debtType of
             Debt   → fromMaybe (F.zeroDebt cur myId friendId friendId) maybeDebt
