@@ -67,40 +67,25 @@
 }
 
 .header-menu {
-  background: #2196f3;
-}
-/* header */
+  background: #ff5722;
+  padding: 1em;
+  box-shadow: 0 6px 5px 5px rgba(0,0,0,0.3);
 
-.header-menu {
-  font-weight: 100;
-  border-bottom: 1px solid white;
-}
+  a {
+    color: white;
+    text-transform: uppercase;
+    font-weight: 100;
+    text-decoration: none;
+    border-radius: 1em;
+    transition: 1s ease;
 
-.header-menu a {
-  padding-top: 20px;
-  text-transform: uppercase;
-  background: rgba(255,255,255,0.1);
-  color: rgba(255,255,255,0.7);
-  border-right: 1px solid rgba(255,255,255,0.2);
-  font-size: 15px;
-  font-weight: 300;
-  transition: all 0.5s;
-}
+    &.active {
+      background-color: #e03702;
 
-.header-menu a:hover {
-  text-decoration: none;
-  background: rgba(0,0,0,0.1)
+    }
+  }
 }
 
-.header-menu a.active {
-  padding-top: 10px;
-  color: white;
-  text-decoration: none;
-  background: rgba(0,0,0,0.7);
-  box-shadow:  9px 1px 5px -1px rgba(0,0,0,0.2);
-  font-weight: 500;
-  line-height: 10px;
-}
 
 @keyframes color-bubble {
   0%{color: #fff;}
