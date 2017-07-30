@@ -8,6 +8,12 @@ $routes: (
   ItemizedDebtsScreen: itemized-debts-screen
 );
 
+$modals: (
+  AddFriendScreen: add-friend-screen,
+  CreateDebtScreen: create-debt-screen,
+  ItemizedDebtsScreen: itemized-debts-screen
+);
+
 // Base Transitions
 @each $route, $name in $routes {
   .#{$name}-container {
@@ -27,6 +33,27 @@ $routes: (
       .#{$name}-container {
         transform: none;
       }
+    }
+
+    // don't show back section on main pages
+    .go-back-section {
+      margin-left: -34em;
+    }
+
+    .logo-section {
+      margin-left: 0;
+    }
+  }
+}
+
+@each $route, $name in $modals {
+  .show-#{$name} {
+    .go-back-section {
+      margin-left: 0;
+    }
+
+    .logo-section {
+      margin-left: -23em;
     }
   }
 }

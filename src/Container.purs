@@ -71,17 +71,8 @@ ui =
       HH.div [ HP.id_ "container", HP.class_ (HH.ClassName $ "container " <> (R.getRouteNameFor state.currentScreen)  <> (if state.loading then " loading" else "")) ]
       [ promptMetamask state.loggedIn
       , loadingOverlay state.loading
-      , HH.div [ HP.id_ "back-nav-bar", HP.class_ (HH.ClassName "row back-nav-bar")]
-        [
-          HH.a [HP.href "#", HP.class_ (HH.ClassName "close-pop-button"), HE.onClick $ HE.input_ $ PreviousScreen]
-          [HH.i [ HP.class_ (HH.ClassName "fa fa-chevron-left")][], HH.text " Back"]
-        ]
-        , menu state.currentScreen
-      -- , HH.div [ HP.id_ "home-bar", HP.class_ (HH.ClassName "row home-bar")]
-      --   [
-      --     HH.a [HP.href "#", HP.class_ (HH.ClassName "col home"), HE.onClick $ HE.input_ $ SetScreen "show-balances"] [
-      --           HH.img [HP.src "http://blockmason.io/assets/img/friends_in_debt_logo.svg"], HH.text "Friend in Debt"]
-      --   ]
+      , topBar state
+      , menu state.currentScreen
       , HH.div [ HP.class_ (HH.ClassName "row create-debt-bar") ]
       [
         HH.a [HP.href "#", HP.class_ (HH.ClassName ""), HE.onClick $ HE.input_ $ SetScreen R.CreateDebtScreen] [
@@ -212,6 +203,29 @@ mkFriends = do
   _ ← H.liftAff $ F.runMonadF $ F.confirmFriendship (F.FoundationId "timgalebach")
   pure unit
 
+topBar ∷ ∀ p. State → H.HTML p Query
+topBar state =
+  let processing = (A.length state.txs) /= 0
+  in
+    HH.div [ HP.class_ (HH.ClassName "row top-bar")]
+    [
+      HH.div [ HP.class_ (HH.ClassName "col logo-section")]
+      [
+        HH.img [HP.src "http://blockmason.io/assets/img/friends_in_debt_logo.svg"]
+        , HH.text "Friend in Debt"
+      ]
+      , HH.div [HP.class_ (HH.ClassName "col go-back-section")]
+        [
+          HH.a [HP.href "#", HP.class_ (HH.ClassName "close-pop-button"), HE.onClick $ HE.input_ $ PreviousScreen]
+          [HH.i [ HP.class_ (HH.ClassName "fa fa-chevron-left")][], HH.text " Back"]
+        ]
+      , HH.div [HP.class_ (HH.ClassName $ "col-4 align-self-end current-transactions" <> if processing then " processing" else "") ]
+        [
+          HH.i [HP.class_ (HH.ClassName "transaction-spinner")][],
+          HH.span_ [HH.text $ "Immortalizing " <> show (A.length state.txs) <> " items..."]
+        ]
+    ]
+
 menu ∷ ∀ p. R.Screen → H.HTML p Query
 menu currentScreen =
   HH.div
@@ -230,3 +244,7 @@ menuItem screen currentScreen =
         HP.class_ (HH.ClassName $ "col-3 " <> if screen == currentScreen then "active" else ""),
         HE.onClick $ HE.input_ $ SetScreen screen]
   [ HH.text $ R.getMenuNameFor screen]
+
+-- randomLoadingText ∷ String
+-- randomLoadingText =
+--   ["Interacting with Blockchain", "Waiting for Node Response", "Committing Data", "Transmitting", "Processing", "Waiting for Nodes"]
