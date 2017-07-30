@@ -140,7 +140,7 @@ loadingOverlay ∷ ∀ p i. Boolean → H.HTML p i
 loadingOverlay loading =
   HH.div [ HP.id_ "loadingOverlay"
          , if loading then HP.class_ (HH.ClassName "active")
-           else HP.class_ (HH.ClassName "active")]
+           else HP.class_ (HH.ClassName "in-active")]
   [
     HH.i [HP.class_ (HH.ClassName "loading-spinner")][],
     HH.h6_ [ HH.text "Loading..." ]
@@ -149,13 +149,14 @@ loadingOverlay loading =
 promptMetamask ∷ ∀ p. Boolean → H.HTML p Query
 promptMetamask loggedIn =
   HH.div [ HP.id_ "metamaskOverlay"
-         , if loggedIn then HP.class_ (HH.ClassName "inActive")
+         , if loggedIn then HP.class_ (HH.ClassName "in-active")
            else HP.class_ (HH.ClassName "active")]
-  [ HH.div_
-    [ HH.h6_ [ HH.text "Not logged in to Metamask." ]
+  [
+    HH.h6_ [ HH.text "Not logged in to Metamask." ]
     , HH.button [ HE.onClick $ HE.input_ $ RefreshMetamask
                 , HP.class_ $ HH.ClassName "btn-info"]
-      [ HH.text "Retry" ]]]
+      [ HH.i [HP.class_ (HH.ClassName "fa fa-refresh")][] ]
+  ]
 
 refreshMetamask ∷ ∀ e. H.ParentDSL State Query ChildQuery ChildSlot Void (FIDMonad e) Unit
 refreshMetamask = do

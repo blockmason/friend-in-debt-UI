@@ -12433,7 +12433,7 @@ var PS = {};
                               return Control_Applicative.pure(dictApplicative)(Data_Unit.unit);
                           });
                       };
-                      throw new Error("Failed pattern match at Container line 175, column 3 - line 179, column 16: " + [ maybeBus.constructor.name ]);
+                      throw new Error("Failed pattern match at Container line 176, column 3 - line 180, column 16: " + [ maybeBus.constructor.name ]);
                   };
               };
           };
@@ -12485,10 +12485,10 @@ var PS = {};
   var promptMetamask = function (loggedIn) {
       return Halogen_HTML_Elements.div([ Halogen_HTML_Properties.id_("metamaskOverlay"), (function () {
           if (loggedIn) {
-              return Halogen_HTML_Properties.class_("inActive");
+              return Halogen_HTML_Properties.class_("in-active");
           };
           return Halogen_HTML_Properties.class_("active");
-      })() ])([ Halogen_HTML_Elements.div_([ Halogen_HTML_Elements.h6_([ Halogen_HTML_Core.text("Not logged in to Metamask.") ]), Halogen_HTML_Elements.button([ Halogen_HTML_Events.onClick(Halogen_HTML_Events.input_(RefreshMetamask.create)), Halogen_HTML_Properties.class_("btn-info") ])([ Halogen_HTML_Core.text("Retry") ]) ]) ]);
+      })() ])([ Halogen_HTML_Elements.h6_([ Halogen_HTML_Core.text("Not logged in to Metamask.") ]), Halogen_HTML_Elements.button([ Halogen_HTML_Events.onClick(Halogen_HTML_Events.input_(RefreshMetamask.create)), Halogen_HTML_Properties.class_("btn-info") ])([ Halogen_HTML_Elements.i([ Halogen_HTML_Properties.class_("fa fa-refresh") ])([  ]) ]) ]);
   };
   var menuItem = function (screen) {
       return function (currentScreen) {
@@ -12509,7 +12509,7 @@ var PS = {};
           if (loading) {
               return Halogen_HTML_Properties.class_("active");
           };
-          return Halogen_HTML_Properties.class_("active");
+          return Halogen_HTML_Properties.class_("in-active");
       })() ])([ Halogen_HTML_Elements.i([ Halogen_HTML_Properties.class_("loading-spinner") ])([  ]), Halogen_HTML_Elements.h6_([ Halogen_HTML_Core.text("Loading...") ]) ]);
   };
   var checkMetamask = function (loggedIn) {
