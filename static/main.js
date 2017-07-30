@@ -11792,12 +11792,12 @@ var PS = {};
   };
   var displaySentDebt = function (me) {
       return function (fd) {
-          return [ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("row debt-details align-items-center") ])([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col creditor") ])([ idSpan(me)(fd.creditor) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col debtor") ])([ idSpan(me)(fd.debtor) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col desc") ])([ descSpan(fd) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col amount") ])([ debtAmountSpan(fd) ]) ]) ];
+          return [ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("row debt-details align-items-center") ])([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("debtor") ])([ idSpan(me)(fd.debtor) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("creditor") ])([ idSpan(me)(fd.creditor) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("desc") ])([ descSpan(fd) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("amount") ])([ debtAmountSpan(fd) ]) ]) ];
       };
   };
   var displayTodo = function (me) {
       return function (fd) {
-          return [ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("row debt-details row align-items-center") ])([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col-2 creditor") ])([ idSpan(me)(fd.creditor) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col-2 debtor") ])([ idSpan(me)(fd.debtor) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col-6 desc") ])([ descSpan(fd) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col-2 amount") ])([ debtAmountSpan(fd) ]) ]) ];
+          return [ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("row debt-details row align-items-center") ])([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("debtor") ])([ idSpan(me)(fd.debtor) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("creditor") ])([ idSpan(me)(fd.creditor) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("desc") ])([ descSpan(fd) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("amount") ])([ debtAmountSpan(fd) ]) ]) ];
       };
   };
   var itemizedDebt = function (fd) {
@@ -11852,7 +11852,7 @@ var PS = {};
       return Halogen_HTML_Elements.button([ Halogen_HTML_Events.onClick(Halogen_HTML_Events.input_(AddFriend.create(new Data_Either.Right(friend)))), Halogen_HTML_Properties.class_("confirm-friend-button") ])([ Halogen_HTML_Elements.i([ Halogen_HTML_Properties.class_("fa fa-check") ])([  ]) ]);
   };
   var confirmButton = function (fd) {
-      return Halogen_HTML_Elements.button([ Halogen_HTML_Properties.class_("btn-confirm"), Halogen_HTML_Events.onClick(Halogen_HTML_Events.input_(ConfirmPending.create(fd))) ])([ Halogen_HTML_Core.text("Confirm") ]);
+      return Halogen_HTML_Elements.button([ Halogen_HTML_Properties.class_("fa fa-check"), Halogen_HTML_Events.onClick(Halogen_HTML_Events.input_(ConfirmPending.create(fd))) ])([  ]);
   };
   var cardHeader = function (title) {
       return [ Halogen_HTML_Elements.h3([ Halogen_HTML_Properties.class_("row card-title") ])([ Halogen_HTML_Core.text(title) ]) ];
@@ -11864,7 +11864,7 @@ var PS = {};
   };
   var displaySentDebtsList = function (me) {
       return function (debts) {
-          return Halogen_HTML_Elements.ul_(Data_Functor.map(Data_Functor.functorArray)(displaySentDebtLi(me))(debts));
+          return Halogen_HTML_Elements.ul([ Halogen_HTML_Properties.class_("col") ])(Data_Functor.map(Data_Functor.functorArray)(displaySentDebtLi(me))(debts));
       };
   };
   var displaySentFriendLi = function (friend) {
@@ -11880,16 +11880,16 @@ var PS = {};
       return Halogen_HTML_Elements.ul([ Halogen_HTML_Properties.class_("col") ])(Data_Functor.map(Data_Functor.functorArray)(displayTodoFriendLi)(friends));
   };
   var cancelButton = function (fd) {
-      return Halogen_HTML_Elements.button([ Halogen_HTML_Properties.class_("btn-cancel"), Halogen_HTML_Events.onClick(Halogen_HTML_Events.input_(RejectPending.create(fd))) ])([ Halogen_HTML_Core.text("Cancel") ]);
+      return Halogen_HTML_Elements.button([ Halogen_HTML_Properties.class_("fa fa-close"), Halogen_HTML_Events.onClick(Halogen_HTML_Events.input_(RejectPending.create(fd))) ])([  ]);
   };
   var displayTodoLi = function (me) {
       return function (fd) {
-          return Halogen_HTML_Elements.li([ Halogen_HTML_Properties.class_("todo-debt-row row align-items-center") ])(Data_Semigroup.append(Data_Semigroup.semigroupArray)(Data_Semigroup.append(Data_Semigroup.semigroupArray)(cardHeader("To Confirm:"))(displayTodo(me)(fd)))([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("row action-buttons row align-items-center") ])([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col") ])([ cancelButton(fd) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col") ])([ confirmButton(fd) ]) ]) ]));
+          return Halogen_HTML_Elements.li([ Halogen_HTML_Properties.class_("todo-debt-row row align-items-center") ])(Data_Semigroup.append(Data_Semigroup.semigroupArray)(Data_Semigroup.append(Data_Semigroup.semigroupArray)(cardHeader("To Confirm:"))(displayTodo(me)(fd)))([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("row action-buttons row align-items-center") ])([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col-1") ])([ cancelButton(fd) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col-1") ])([ confirmButton(fd) ]) ]) ]));
       };
   };
   var displayTodoList = function (me) {
       return function (debts) {
-          return Halogen_HTML_Elements.ul_(Data_Functor.map(Data_Functor.functorArray)(displayTodoLi(me))(debts));
+          return Halogen_HTML_Elements.ul([ Halogen_HTML_Properties.class_("col") ])(Data_Functor.map(Data_Functor.functorArray)(displayTodoLi(me))(debts));
       };
   };
   var pendingPage = function (state) {

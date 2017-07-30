@@ -987,6 +987,8 @@ html {
   margin-bottom: 10px;
   transition: all 0.7s ease;
   padding: 10px 30px; }
+  .pending-screen-container li.todo-debt-row {
+    height: 8em; }
 
 .pending-screen-container .card-title {
   font-size: 18px;
@@ -1013,7 +1015,46 @@ html {
   border-radius: 5px; }
   .pending-screen-container .confirm-friend-button:hover {
     background: #8bc34a;
-    color: white; }
+    color: white;
+    border-color: white; }
+
+.pending-screen-container .debt-details .debtor {
+  font-size: 10px;
+  display: block;
+  border-bottom: 1px solid #eee;
+  text-transform: uppercase;
+  width: 100%; }
+  .pending-screen-container .debt-details .debtor:after {
+    content: ' owes'; }
+
+.pending-screen-container .debt-details .creditor {
+  font-size: 10px;
+  display: block;
+  text-transform: uppercase;
+  width: 100%; }
+
+.pending-screen-container .debt-details .amount {
+  position: absolute;
+  left: 1em;
+  top: 5em;
+  border-top: 1px solid #ddd; }
+  .pending-screen-container .debt-details .amount .currency-span {
+    font-size: 9px; }
+  .pending-screen-container .debt-details .amount .money-span {
+    font-weight: 100; }
+
+.pending-screen-container .todo-debt-row .action-buttons {
+  position: absolute;
+  right: 0; }
+
+.pending-screen-container .todo-debt-row button {
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 5px; }
+  .pending-screen-container .todo-debt-row button:hover {
+    background: #8bc34a;
+    color: white;
+    border-color: white; }
 
 .settings-screen-container ul > div {
   height: 4.5em;

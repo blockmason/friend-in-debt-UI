@@ -7,6 +7,10 @@
     margin-bottom: 10px;
     transition: all 0.7s ease;
     padding: 10px 30px;
+
+    &.todo-debt-row {
+      height: 8em;
+    }
   }
 
   .card-title {
@@ -41,6 +45,60 @@
     &:hover {
       background: #8bc34a;
       color: white;
+      border-color: white;
+    }
+  }
+
+  .debt-details {
+    .debtor {
+      font-size: 10px;
+      display: block;
+      border-bottom: 1px solid #eee;
+      text-transform: uppercase;
+      width: 100%;
+
+      &:after {
+        content: ' owes';
+      }
+    }
+
+    .creditor {
+      font-size: 10px;
+      display: block;
+      text-transform: uppercase;
+      width: 100%;
+    }
+
+    .amount {
+      position: absolute;
+      left: 1em;
+      top: 5em;
+      border-top: 1px solid #ddd;
+
+      .currency-span {
+        font-size: 9px;
+      }
+      .money-span {
+        font-weight: 100;
+      }
+    }
+  }
+
+  .todo-debt-row {
+    .action-buttons {
+      position: absolute;
+      right: 0;
+    }
+    button {
+      background: none;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+
+      &:hover {
+        background: #8bc34a;
+        color: white;
+        border-color: white;
+      }
     }
   }
 }

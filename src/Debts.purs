@@ -439,7 +439,7 @@ displayTodoFriend friend =
 
 -- Pending Debts List
 displaySentDebtsList :: F.FoundationId → Array F.Debt → H.ComponentHTML Query
-displaySentDebtsList me debts = HH.ul_ $ (displaySentDebtLi me) <$> debts
+displaySentDebtsList me debts = HH.ul [HP.class_ $ HH.ClassName "col"] $ (displaySentDebtLi me) <$> debts
 
 displaySentDebtLi ∷ F.FoundationId → F.Debt → H.ComponentHTML Query
 displaySentDebtLi me fd =
@@ -455,15 +455,15 @@ displaySentDebt me fd =
     [
       HH.div [HP.class_ $ HH.ClassName "row debt-details align-items-center"]
       [
-        HH.div [HP.class_ $ HH.ClassName "col creditor"][idSpan me fd'.creditor],
-        HH.div [HP.class_ $ HH.ClassName "col debtor"][idSpan me fd'.debtor],
-        HH.div [HP.class_ $ HH.ClassName "col desc"][descSpan fd],
-        HH.div [HP.class_ $ HH.ClassName "col amount"][debtAmountSpan fd]
+        HH.div [HP.class_ $ HH.ClassName "debtor"][idSpan me fd'.debtor],
+        HH.div [HP.class_ $ HH.ClassName "creditor"][idSpan me fd'.creditor],
+        HH.div [HP.class_ $ HH.ClassName "desc"][descSpan fd],
+        HH.div [HP.class_ $ HH.ClassName "amount"][debtAmountSpan fd]
       ]
     ]
 
 displayTodoList :: F.FoundationId → Array F.Debt → H.ComponentHTML Query
-displayTodoList me debts = HH.ul_ $ (displayTodoLi me) <$> debts
+displayTodoList me debts = HH.ul [HP.class_ $ HH.ClassName "col"] $ (displayTodoLi me) <$> debts
 
 displayTodoLi ∷  F.FoundationId → F.Debt → H.ComponentHTML Query
 displayTodoLi me fd =
@@ -474,8 +474,8 @@ displayTodoLi me fd =
       ((displayTodo me) fd))
   [
     HH.div [HP.class_ $ HH.ClassName "row action-buttons row align-items-center"][
-      HH.div [HP.class_ $ HH.ClassName "col"][cancelButton fd],
-      HH.div [HP.class_ $ HH.ClassName "col"][confirmButton fd]
+      HH.div [HP.class_ $ HH.ClassName "col-1"][cancelButton fd],
+      HH.div [HP.class_ $ HH.ClassName "col-1"][confirmButton fd]
     ]
   ]
 
@@ -486,10 +486,10 @@ displayTodo me fd =
     [
       HH.div [HP.class_ $ HH.ClassName "row debt-details row align-items-center"]
       [
-        HH.div [HP.class_ $ HH.ClassName "col-2 creditor"][idSpan me fd'.creditor],
-        HH.div [HP.class_ $ HH.ClassName "col-2 debtor"][idSpan me fd'.debtor],
-        HH.div [HP.class_ $ HH.ClassName "col-6 desc"][descSpan fd],
-        HH.div [HP.class_ $ HH.ClassName "col-2 amount"][debtAmountSpan fd]
+        HH.div [HP.class_ $ HH.ClassName "debtor"][idSpan me fd'.debtor],
+        HH.div [HP.class_ $ HH.ClassName "creditor"][idSpan me fd'.creditor],
+        HH.div [HP.class_ $ HH.ClassName "desc"][descSpan fd],
+        HH.div [HP.class_ $ HH.ClassName "amount"][debtAmountSpan fd]
       ]
     ]
 
@@ -534,14 +534,14 @@ moneyClass ∷ F.Debt → String
 moneyClass fd = "debt-amount"
 
 confirmButton ∷ F.Debt → H.ComponentHTML Query
-confirmButton fd = HH.button [ HP.class_ $ HH.ClassName "btn-confirm"
+confirmButton fd = HH.button [ HP.class_ $ HH.ClassName "fa fa-check"
                              , HE.onClick $ HE.input_ $ ConfirmPending fd]
-  [ HH.text "Confirm" ]
+                             []
 
 cancelButton ∷ F.Debt → H.ComponentHTML Query
-cancelButton fd = HH.button [ HP.class_ $ HH.ClassName "btn-cancel"
+cancelButton fd = HH.button [ HP.class_ $ HH.ClassName "fa fa-close"
                              , HE.onClick $ HE.input_ $ RejectPending fd]
-  [ HH.text "Cancel" ]
+                            []
 
 confirmFriendshipButton :: F.FoundationId -> H.ComponentHTML Query
 confirmFriendshipButton friend =
