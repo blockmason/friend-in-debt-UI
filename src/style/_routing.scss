@@ -61,3 +61,8 @@ $modals: (
 .show-itemized-debts-screen .balances-screen-container {
   transform: none; height: auto; margin: 0; padding: 0;
 }
+
+.show-balances-screen .add-friend-bar,
+.show-friends-screen .create-debt-bar {
+  display: none;
+}

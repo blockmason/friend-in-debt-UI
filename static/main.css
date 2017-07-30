@@ -176,6 +176,19 @@ html {
     .header-menu a.active {
       background-color: #e03702; }
 
+.create-debt-bar a, .add-friend-bar a {
+  position: fixed;
+  bottom: 1em;
+  right: 1em;
+  background: white;
+  height: 2em;
+  border-radius: 50%;
+  width: 2em;
+  padding: 0.5em 0 0 0.6em;
+  line-height: 1em; }
+  .create-debt-bar a:hover, .add-friend-bar a:hover {
+    box-shadow: 0 0px 2px 5px rgba(0, 0, 0, 0.3); }
+
 @keyframes color-bubble {
   0% {
     color: #fff; }
@@ -746,6 +759,10 @@ html {
   height: auto;
   margin: 0;
   padding: 0; }
+
+.show-balances-screen .add-friend-bar,
+.show-friends-screen .create-debt-bar {
+  display: none; }
 
 .all-balances-container ul {
   list-style: none;

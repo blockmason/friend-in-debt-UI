@@ -73,15 +73,15 @@ ui =
       , loadingOverlay state.loading
       , topBar state
       , menu state.currentScreen
-      , HH.div [ HP.class_ (HH.ClassName "row create-debt-bar") ]
+      , HH.div [ HP.class_ (HH.ClassName "create-debt-bar") ]
       [
         HH.a [HP.href "#", HP.class_ (HH.ClassName ""), HE.onClick $ HE.input_ $ SetScreen R.CreateDebtScreen] [
-        HH.i [ HP.class_ (HH.ClassName "fa fa-plus-circle")][], HH.text " Create Debt"]
+        HH.i [ HP.class_ (HH.ClassName "fa fa-plus")][]]
       ]
-      , HH.div [ HP.class_ (HH.ClassName "row add-friend-bar") ]
+      , HH.div [ HP.class_ (HH.ClassName "add-friend-bar") ]
       [
         HH.a [HP.href "#", HP.class_ (HH.ClassName ""), HE.onClick $ HE.input_ $ SetScreen R.AddFriendScreen] [
-        HH.i [ HP.class_ (HH.ClassName "fa fa-plus-circle")][], HH.text " Add Friend"]
+        HH.i [ HP.class_ (HH.ClassName "fa fa-plus")][]]
       ]
       , HH.div [ HP.class_ (HH.ClassName "row")]
         [
