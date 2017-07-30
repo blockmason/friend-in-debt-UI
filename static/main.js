@@ -11758,10 +11758,10 @@ var PS = {};
       return [ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col friend-details") ])([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("request-details") ])([ Halogen_HTML_Elements.span_([ Halogen_HTML_Core.text("Friend Request To") ]), Halogen_HTML_Elements.span_([ Halogen_HTML_Core.text(Data_Show.show(Network_Eth_Foundation.showFoundationId)(friend)) ]), Halogen_HTML_Elements.span_([ Halogen_HTML_Core.text("2017/07/29 15:35") ]) ]) ]) ];
   };
   var displayFriendLi = function (v) {
-      var balance = Data_Maybe.fromMaybe("")(Control_Bind.bind(Data_Maybe.bindMaybe)(v.balance)(function (v1) {
+      var balance = Data_Maybe.fromMaybe("0")(Control_Bind.bind(Data_Maybe.bindMaybe)(v.balance)(function (v1) {
           return Control_Applicative.pure(Data_Maybe.applicativeMaybe)(Data_Show.show(Data_Show.showNumber)(Network_Eth_FriendInDebt_Types.numAmount(v1.amount)));
       }));
-      return Halogen_HTML_Elements.li([ Halogen_HTML_Properties.class_("friend-item row") ])([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col-3") ])([ UI_IconGenerator.generatedIcon(Data_Show.show(Network_Eth_Foundation.showFoundationId)(v.id))(v.gradient) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col-9 name-portion") ])([ Halogen_HTML_Core.text(Data_Show.show(Network_Eth_Foundation.showFoundationId)(v.id)), Halogen_HTML_Core.text(balance) ]) ]);
+      return Halogen_HTML_Elements.li([ Halogen_HTML_Properties.class_("friend-item row") ])([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col-3") ])([ UI_IconGenerator.generatedIcon(Data_Show.show(Network_Eth_Foundation.showFoundationId)(v.id))(v.gradient) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col-9 name-portion") ])([ Halogen_HTML_Core.text(Data_Show.show(Network_Eth_Foundation.showFoundationId)(v.id)), Halogen_HTML_Elements.span_([ Halogen_HTML_Core.text("Balance: " + balance) ]) ]) ]);
   };
   var displayFriendGroup = function (group) {
       var innerArr = Data_NonEmpty.oneOf(Control_Alternative.alternativeArray)(group);

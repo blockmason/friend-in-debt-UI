@@ -12,7 +12,7 @@
     transition: all 0.7s ease;
     padding: 10px 30px;
 
-    &.todo-debt-row {
+    &.todo-debt-row, &.sent-debt-row {
       height: 7em;
     }
   }

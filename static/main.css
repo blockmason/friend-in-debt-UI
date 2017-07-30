@@ -1050,6 +1050,12 @@ html {
       margin-top: -10px; }
     .friends-screen-container .friend-item .name-portion {
       text-align: left; }
+      .friends-screen-container .friend-item .name-portion span:last-child {
+        display: block;
+        line-height: 1em;
+        font-weight: 500;
+        font-size: 9px;
+        margin-top: -1em; }
   .friends-screen-container .generated-icon {
     border-radius: 50%;
     height: 2em;
@@ -1085,7 +1091,7 @@ html {
   margin-bottom: 10px;
   transition: all 0.7s ease;
   padding: 10px 30px; }
-  .pending-screen-container li.todo-debt-row {
+  .pending-screen-container li.todo-debt-row, .pending-screen-container li.sent-debt-row {
     height: 7em; }
 
 .pending-screen-container .card-title {

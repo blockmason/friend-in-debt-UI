@@ -24,6 +24,14 @@
 
     .name-portion {
       text-align: left;
+
+      span:last-child {
+        display: block;
+        line-height: 1em;
+        font-weight: 500;
+        font-size: 9px;
+        margin-top: -1em;
+      }
     }
   }
 

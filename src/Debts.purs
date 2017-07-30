@@ -329,7 +329,7 @@ displayFriendGroup group =
 
 displayFriendLi ∷ FriendBundle → H.ComponentHTML Query
 displayFriendLi (FriendBundle bundle1) =
-  let balance = fromMaybe "" $ do
+  let balance = fromMaybe "0" $ do
                 (F.Balance bal) ← bundle1.balance
                 pure $ show $ F.numAmount bal.amount
 
@@ -340,7 +340,7 @@ displayFriendLi (FriendBundle bundle1) =
       , HH.div [HP.class_ $ HH.ClassName "col-9 name-portion"]
         [
           HH.text $ show bundle1.id,
-          HH.text balance
+          HH.span_ [HH.text $ "Balance: " <> balance]
         ]
     ]
 
