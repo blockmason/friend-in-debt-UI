@@ -168,7 +168,7 @@ exports.confirmDebtImpl = function(callback) {
         return function(friendId) {
             return function(debtId) {
                 return function() {
-                    var data = debtContract.confirmDebt(debtor, creditor, debtId);
+                    var data = debtContract.confirmDebt.getData(myId, friendId, debtId);
                     sendDebtTx(data, 0, callback);
                 };
             };
@@ -181,7 +181,7 @@ exports.rejectDebtImpl = function(callback) {
         return function(friendId) {
             return function(debtId) {
                 return function() {
-                    var data = debtContract.rejectDebt(debtor, creditor, debtId);
+                    var data = debtContract.rejectDebt.getData(myId, friendId, debtId);
                     sendDebtTx(data, 0, callback);
                 };
             };
