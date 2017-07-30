@@ -225,8 +225,10 @@ createDebtModal state =
   HH.div
     [ HP.class_ $ HH.ClassName "create-debt-container" ]
     [
-      HH.h5_ [ HH.text "Create Debt" ]
-    , HH.ul_ [
+      HH.h6 [HP.class_ $ HH.ClassName "modal-title"] [ HH.text "Create Debt" ]
+    , HH.ul
+    [ HP.class_ $ HH.ClassName "col" ]
+    [
         HH.li [ HP.class_ $ HH.ClassName "row create-debt-card" ]
           [inputDebt state.defaultCurrency state.myId state.friends state.newDebt]
       , HH.li [ HP.class_ $ HH.ClassName "row create-debt-card" ]
@@ -551,9 +553,10 @@ confirmFriendshipButton friend =
 
 addFriendWidget ∷ State → H.ComponentHTML Query
 addFriendWidget state =
-  HH.div [ HP.class_ $ HH.ClassName "addFriend" ]
+  HH.div [ HP.class_ $ HH.ClassName "add-friend" ]
   [
-    HH.small_ [HH.text "Friend's FoundationID"],
+    HH.h6 [ HP.class_ $ HH.ClassName "modal-title"][HH.text "Add New Friend"],
+    HH.label [][HH.text "Friend's FoundationID"],
     HH.input [ HP.type_ HP.InputText
              , HP.value $ inputVal state.newFriend
              , HP.class_ $ HH.ClassName "form-control"
@@ -570,6 +573,12 @@ addFriendWidget state =
 nonZero ∷ F.Debt → Boolean
 nonZero fd = ((F.numAmount ∘ F.debtMoney) fd) /= (toNumber 0)
 
+instance showDebtType :: Show DebtType where
+show debtType =
+  case debtType of
+    Debt → "Debt You Owe"
+    Credit → "Debt Owed By You"
+
 data DebtType = Debt | Credit
 inputFDebt ∷ DebtType → F.Currency → F.FoundationId → Array F.FoundationId
           → Maybe F.Debt → H.ComponentHTML Query
@@ -582,10 +591,11 @@ inputFDebt debtType cur myId friends maybeDebt =
             Credit → fromMaybe (F.zeroDebt cur friendId myId friendId) maybeDebt
           handler = case debtType of Debt   → InputDebt
                                      Credit → InputCredit
-      in HH.div [ HP.class_ $ HH.ClassName "createDebt col row" ]
+      in HH.div [ HP.class_ $ HH.ClassName "create-debt col" ]
          [
+           HH.label [][HH.text $ "Enter " <> show debtType],
            HH.input [ HP.type_ HP.InputNumber
-                    , HP.class_ $ HH.ClassName "debt-amount col-2"
+                    , HP.class_ $ HH.ClassName "debt-amount"
                     , HP.value $ noDecimals $ F.formatMoney $ F.debtMoney d
                     , HE.onValueInput
                       (HE.input (\val → handler $ amount d val cur))
@@ -602,7 +612,7 @@ inputFDebt debtType cur myId friends maybeDebt =
                     , HP.value $ S.take 32 $ F.getDesc d ]
          , HH.button [ HE.onClick $ HE.input_ $ AddDebt d
                      , HP.disabled $ F.debtAmount d == 0.0
-                     , HP.class_ $ HH.ClassName "create-debt-button col-2"]
+                     , HP.class_ $ HH.ClassName "create-debt-button form-control"]
            [ HH.text $ "Send Debt" ]
          ]
       where noDecimals = S.takeWhile (\c → c /= '.')
