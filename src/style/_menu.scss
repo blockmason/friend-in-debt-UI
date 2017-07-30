@@ -103,36 +103,3 @@
     }
   }
 }
-
-
-@keyframes color-bubble {
-  0%{color: #fff;}
-  33%{color: red;}
-  66%{color: orange;}
-  100%{color: #FEB825;}
-}
-
-@keyframes spinner-bubble {
-  from{
-    width: 10px;
-    height: 10px;
-    opacity: .8;
-  }
-  to{
-     width: 30px;
-    height: 30px;
-    opacity: 0;
-  }
-}
-
-@keyframes color-change {
-  0%{background: #fff;}
-  33%{background: #50B949;}
-  66%{background: #EE2D24;}
-  100%{background: #FEB825;}
-}
-
-@keyframes rotate {
-    from {transform: rotate(0deg);}
-    to {transform: rotate(360deg);}
-}

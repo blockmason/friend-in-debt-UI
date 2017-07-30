@@ -68,7 +68,12 @@ ui =
 
     render ∷ State → H.ParentHTML Query ChildQuery ChildSlot (FIDMonad eff)
     render state =
-      HH.div [ HP.id_ "container", HP.class_ (HH.ClassName $ "container " <> (R.getRouteNameFor state.currentScreen)  <> (if state.loading then " loading" else "")) ]
+      HH.div [ HP.id_ "container",
+               HP.class_ (HH.ClassName $
+                 "container " <>
+                 (R.getRouteNameFor state.currentScreen)  <>
+                 (if state.loading then " loading" else "") <>
+                 (if state.loggedIn then "" else " require-login")) ]
       [ promptMetamask state.loggedIn
       , loadingOverlay state.loading
       , topBar state
@@ -135,8 +140,11 @@ loadingOverlay ∷ ∀ p i. Boolean → H.HTML p i
 loadingOverlay loading =
   HH.div [ HP.id_ "loadingOverlay"
          , if loading then HP.class_ (HH.ClassName "active")
-           else HP.class_ (HH.ClassName "inActive")]
-  [ HH.h6_ [ HH.text "Loading Metamask..." ]]
+           else HP.class_ (HH.ClassName "active")]
+  [
+    HH.i [HP.class_ (HH.ClassName "loading-spinner")][],
+    HH.h6_ [ HH.text "Loading..." ]
+  ]
 
 promptMetamask ∷ ∀ p. Boolean → H.HTML p Query
 promptMetamask loggedIn =
