@@ -170,7 +170,7 @@ component =
     InputCredit credit next → do
       H.modify (_ { newCredit = Just credit })
       pure next
-    AddDebt debt next → do
+    AddDebt debt n1ext → do
       hLog debt
       s ← H.get
       handleTx NewTX s $ F.newPendingDebt debt
@@ -516,8 +516,8 @@ currencySpan (F.Money m) =
   HH.span [HP.class_ $ HH.ClassName "currency-span"] [ HH.text $ show m.currency ]
 
 moneySpan ∷ F.Money → H.ComponentHTML Query
-moneySpan (F.Money m) =
-  HH.span [HP.class_ $ HH.ClassName "money-span"] [ HH.text $ "$" <> (show $ m.amount) ]
+moneySpan m =
+  HH.span [HP.class_ $ HH.ClassName "money-span"] [ HH.text $ "$" <> F.formatMoney m ]
 
 debtAmountSpan ∷ F.Debt → H.ComponentHTML Query
 debtAmountSpan (F.Debt fd) =
