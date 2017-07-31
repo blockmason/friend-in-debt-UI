@@ -1,3 +1,7 @@
+.pending-screen-container > div > .col {
+    margin: 0;
+}
+
 .pending-screen-container {
   li {
     height: 5em;
@@ -8,8 +12,8 @@
     transition: all 0.7s ease;
     padding: 10px 30px;
 
-    &.todo-debt-row {
-      height: 8em;
+    &.todo-debt-row, &.sent-debt-row {
+      height: 7em;
     }
   }
 
@@ -72,7 +76,7 @@
     .amount {
       position: absolute;
       left: 1em;
-      top: 5em;
+      top: 3.8em;
       border-top: 1px solid #ddd;
 
       .currency-span {

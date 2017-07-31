@@ -87,10 +87,15 @@
 }
 
 .create-debt-bar, .add-friend-bar {
+  transition: all 0.8s ease-out;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+
   a {
-    position: fixed;
-    bottom: 1em;
-    right: 1em;
+    float: right;
+    margin-right: 2em;
+    margin-bottom: 1em;
     background: white;
     height: 2em;
     border-radius: 50%;
@@ -99,7 +104,16 @@
     line-height: 1em;
 
     &:hover {
-      box-shadow: 0 0px 2px 5px rgba(0, 0, 0, 0.3);
+      color: black;
+      box-shadow: 0 0px 2px 5px rgba(0, 0, 0, 0.6);
     }
   }
+}
+
+.create-debt-bar a {
+  // background-color: blue;
+}
+
+.add-friend-bar a {
+  color: orange;
 }

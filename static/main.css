@@ -1,3 +1,4 @@
+@charset "UTF-8";
 @import url("http://fonts.googleapis.com/css?family=Lato:100,300,400,700,900");
 /* general */
 body {
@@ -10,7 +11,7 @@ html {
   height: 100%; }
 
 .container {
-  background-image: linear-gradient(-180deg, #0F2422 0%, #1C4737 100%);
+  background-image: url("45-degree-fabric-light.png");
   max-width: 600px;
   box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.3);
   height: 100vh;
@@ -154,55 +155,119 @@ html {
   to {
     transform: rotate(360deg); } }
 
+.create-debt-container {
+  background: white;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 10px;
+  transition: all 0.7s ease;
+  padding: 10px 30px;
+  border-left: 5px solid #0275d8; }
+  .create-debt-container .modal-title {
+    font-weight: 100;
+    text-transform: uppercase;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 2em; }
+  .create-debt-container label {
+    text-transform: uppercase;
+    color: #777;
+    font-size: 12px;
+    position: relative; }
+    .create-debt-container label:before {
+      content: '▹';
+      height: 30px;
+      width: 30px;
+      border-radius: 50%;
+      display: block;
+      background-color: #0275d8;
+      color: white;
+      position: absolute;
+      top: -6px;
+      left: -40px;
+      padding-left: 12px;
+      line-height: 26px;
+      font-size: 18px; }
+  .create-debt-container input, .create-debt-container select {
+    width: 100%;
+    margin-bottom: 2em; }
+  .create-debt-container input[type=text], .create-debt-container input[type=number], .create-debt-container select {
+    border: 0;
+    background: none;
+    border-bottom: 1px solid #0275d8;
+    border-radius: 0; }
+    .create-debt-container input[type=text]::placeholder, .create-debt-container input[type=number]::placeholder, .create-debt-container select::placeholder {
+      color: #aaa; }
+  .create-debt-container button {
+    text-transform: uppercase; }
+    .create-debt-container button:hover {
+      background-color: #0275d8;
+      color: white;
+      border-color: #0275d8; }
+
+.add-friend {
+  background: white;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 10px;
+  transition: all 0.7s ease;
+  padding: 10px 30px;
+  border-left: 5px solid orange; }
+  .add-friend .modal-title {
+    font-weight: 100;
+    text-transform: uppercase;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 2em; }
+  .add-friend label {
+    text-transform: uppercase;
+    color: #777;
+    font-size: 12px;
+    position: relative; }
+    .add-friend label:before {
+      content: '▹';
+      height: 30px;
+      width: 30px;
+      border-radius: 50%;
+      display: block;
+      background-color: orange;
+      color: white;
+      position: absolute;
+      top: -6px;
+      left: -40px;
+      padding-left: 12px;
+      line-height: 26px;
+      font-size: 18px; }
+  .add-friend input, .add-friend select {
+    width: 100%;
+    margin-bottom: 2em; }
+  .add-friend input[type=text], .add-friend input[type=number], .add-friend select {
+    border: 0;
+    background: none;
+    border-bottom: 1px solid orange;
+    border-radius: 0; }
+    .add-friend input[type=text]::placeholder, .add-friend input[type=number]::placeholder, .add-friend select::placeholder {
+      color: #aaa; }
+  .add-friend button {
+    text-transform: uppercase; }
+    .add-friend button:hover {
+      background-color: orange;
+      color: white;
+      border-color: orange; }
+
 .create-debt-container ul {
   padding: 0;
   list-style: none; }
 
-.createDebt input, .add-friend-container input,
-.name-change-container input {
-  background: transparent;
-  border: 1px dotted white;
-  border-radius: 5px;
-  margin: 0 5px 0 0; }
-
-.createDebt button, .add-friend-container button,
-.name-change-container button {
-  background: rgba(255, 255, 255, 0.1);
-  border: 0;
-  border-radius: 5px;
-  margin: 0 5px 0 0;
-  box-shadow: 0 1px 1px 1px rgba(0, 0, 0, 0.1); }
-
-.createDebt button .confirmation-amount {
-  display: inline-block; }
-
-.create-debt-card, .addFriend {
-  margin: 10px;
-  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
-  padding: 10px;
-  border-radius: 5px; }
-
-.create-debt-card input, .addFriend input {
-  color: black;
-  background: white;
-  border: 1px solid #333;
-  border-radius: 5px; }
-
-/* add friend page*/
-.addFriend {
+.create-debt-card:first-child:after {
+  content: 'OR';
+  height: 30px;
+  width: 30px;
+  display: block;
   width: 100%;
-  margin: auto; }
-
-.addFriend small {
-  text-transform: uppercase; }
-
-.addFriend input {
-  margin-bottom: 10px;
-  color: #333; }
-
-.addFriend button:hover {
-  background-color: #2196f3;
-  color: white; }
+  text-align: center;
+  padding: 2em 0;
+  margin-bottom: 2em;
+  color: #0275d8;
+  border-bottom: 3px dotted #0275d8; }
 
 .top-bar {
   background: #ff5722;
@@ -265,18 +330,27 @@ html {
     .header-menu a.active {
       background-color: #e03702; }
 
-.create-debt-bar a, .add-friend-bar a {
+.create-debt-bar, .add-friend-bar {
+  transition: all 0.8s ease-out;
   position: fixed;
-  bottom: 1em;
-  right: 1em;
-  background: white;
-  height: 2em;
-  border-radius: 50%;
-  width: 2em;
-  padding: 0.5em 0 0 0.6em;
-  line-height: 1em; }
-  .create-debt-bar a:hover, .add-friend-bar a:hover {
-    box-shadow: 0 0px 2px 5px rgba(0, 0, 0, 0.3); }
+  bottom: 0;
+  width: 100%; }
+  .create-debt-bar a, .add-friend-bar a {
+    float: right;
+    margin-right: 2em;
+    margin-bottom: 1em;
+    background: white;
+    height: 2em;
+    border-radius: 50%;
+    width: 2em;
+    padding: 0.5em 0 0 0.6em;
+    line-height: 1em; }
+    .create-debt-bar a:hover, .add-friend-bar a:hover {
+      color: black;
+      box-shadow: 0 0px 2px 5px rgba(0, 0, 0, 0.6); }
+
+.add-friend-bar a {
+  color: orange; }
 
 .balances-screen-container {
   transition: all 0.5s;
@@ -375,6 +449,9 @@ html {
 .show-balances-screen .logo-section {
   margin-left: 0; }
 
+.show-balances-screen .add-friend-bar, .show-balances-screen .create-debt-bar {
+  transform: translateY(50px); }
+
 .show-friends-screen .balances-screen-container {
   transform: translateX(-3000px);
   height: 0;
@@ -443,6 +520,9 @@ html {
 
 .show-friends-screen .logo-section {
   margin-left: 0; }
+
+.show-friends-screen .add-friend-bar, .show-friends-screen .create-debt-bar {
+  transform: translateY(50px); }
 
 .show-pending-screen .balances-screen-container {
   transform: translateX(-3000px);
@@ -513,6 +593,9 @@ html {
 .show-pending-screen .logo-section {
   margin-left: 0; }
 
+.show-pending-screen .add-friend-bar, .show-pending-screen .create-debt-bar {
+  transform: translateY(50px); }
+
 .show-settings-screen .balances-screen-container {
   transform: translateX(-3000px);
   height: 0;
@@ -581,6 +664,9 @@ html {
 
 .show-settings-screen .logo-section {
   margin-left: 0; }
+
+.show-settings-screen .add-friend-bar, .show-settings-screen .create-debt-bar {
+  transform: translateY(50px); }
 
 .show-add-friend-screen .balances-screen-container {
   transform: translateX(-3000px);
@@ -651,6 +737,9 @@ html {
 .show-add-friend-screen .logo-section {
   margin-left: 0; }
 
+.show-add-friend-screen .add-friend-bar, .show-add-friend-screen .create-debt-bar {
+  transform: translateY(50px); }
+
 .show-create-debt-screen .balances-screen-container {
   transform: translateX(-3000px);
   height: 0;
@@ -719,6 +808,9 @@ html {
 
 .show-create-debt-screen .logo-section {
   margin-left: 0; }
+
+.show-create-debt-screen .add-friend-bar, .show-create-debt-screen .create-debt-bar {
+  transform: translateY(50px); }
 
 .show-itemized-debts-screen .balances-screen-container {
   transform: translateX(-3000px);
@@ -789,6 +881,9 @@ html {
 .show-itemized-debts-screen .logo-section {
   margin-left: 0; }
 
+.show-itemized-debts-screen .add-friend-bar, .show-itemized-debts-screen .create-debt-bar {
+  transform: translateY(50px); }
+
 .show-add-friend-screen .go-back-section {
   margin-left: 0; }
 
@@ -813,9 +908,9 @@ html {
   margin: 0;
   padding: 0; }
 
-.show-balances-screen .add-friend-bar,
-.show-friends-screen .create-debt-bar {
-  display: none; }
+.show-balances-screen .create-debt-bar,
+.show-friends-screen .add-friend-bar {
+  transform: none; }
 
 .all-balances-container ul {
   list-style: none;
@@ -955,6 +1050,12 @@ html {
       margin-top: -10px; }
     .friends-screen-container .friend-item .name-portion {
       text-align: left; }
+      .friends-screen-container .friend-item .name-portion span:last-child {
+        display: block;
+        line-height: 1em;
+        font-weight: 500;
+        font-size: 9px;
+        margin-top: -1em; }
   .friends-screen-container .generated-icon {
     border-radius: 50%;
     height: 2em;
@@ -979,6 +1080,9 @@ html {
     transition: 0.3s ease;
     padding: 20px 5px; }
 
+.pending-screen-container > div > .col {
+  margin: 0; }
+
 .pending-screen-container li {
   height: 5em;
   background: white;
@@ -987,8 +1091,8 @@ html {
   margin-bottom: 10px;
   transition: all 0.7s ease;
   padding: 10px 30px; }
-  .pending-screen-container li.todo-debt-row {
-    height: 8em; }
+  .pending-screen-container li.todo-debt-row, .pending-screen-container li.sent-debt-row {
+    height: 7em; }
 
 .pending-screen-container .card-title {
   font-size: 18px;
@@ -1036,7 +1140,7 @@ html {
 .pending-screen-container .debt-details .amount {
   position: absolute;
   left: 1em;
-  top: 5em;
+  top: 3.8em;
   border-top: 1px solid #ddd; }
   .pending-screen-container .debt-details .amount .currency-span {
     font-size: 9px; }

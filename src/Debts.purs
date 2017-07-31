@@ -225,8 +225,10 @@ createDebtModal state =
   HH.div
     [ HP.class_ $ HH.ClassName "create-debt-container" ]
     [
-      HH.h5_ [ HH.text "Create Debt" ]
-    , HH.ul_ [
+      HH.h6 [HP.class_ $ HH.ClassName "modal-title"] [ HH.text "Create Debt" ]
+    , HH.ul
+    [ HP.class_ $ HH.ClassName "col" ]
+    [
         HH.li [ HP.class_ $ HH.ClassName "row create-debt-card" ]
           [inputDebt state.defaultCurrency state.myId state.friends state.newDebt]
       , HH.li [ HP.class_ $ HH.ClassName "row create-debt-card" ]
@@ -327,7 +329,7 @@ displayFriendGroup group =
 
 displayFriendLi ∷ FriendBundle → H.ComponentHTML Query
 displayFriendLi (FriendBundle bundle1) =
-  let balance = fromMaybe "" $ do
+  let balance = fromMaybe "0" $ do
                 (F.Balance bal) ← bundle1.balance
                 pure $ show $ F.numAmount bal.amount
 
@@ -338,7 +340,7 @@ displayFriendLi (FriendBundle bundle1) =
       , HH.div [HP.class_ $ HH.ClassName "col-9 name-portion"]
         [
           HH.text $ show bundle1.id,
-          HH.text balance
+          HH.span_ [HH.text $ "Balance: " <> balance]
         ]
     ]
 
@@ -354,7 +356,7 @@ displayBalanceLi state (F.Balance bal) =
       expandClass = (\f → if f == curFriend then "expand-itemized" else "hide-itemized") <$> friendToShow
   in
     HH.li [HP.class_ $ HH.ClassName $ "balance-row row " <> fromMaybe "" expandClass,
-           HE.onClick $ HE.input_ $ ShowItemizedDebtFor $ Just bal.creditor]
+           HE.onClick $ HE.input_ $ ShowItemizedDebtFor $ Just curFriend]
     $ [
       HH.div [HP.class_ $ HH.ClassName "highlight"][],
       HH.div [HP.class_ $ HH.ClassName "col-4 debt-excerpt"][
@@ -368,7 +370,7 @@ displayBalanceLi state (F.Balance bal) =
       HH.div [HP.class_ $ HH.ClassName "col debt-details"][
         HH.div [HP.class_ $ HH.ClassName "col debt-relationship"][
           HH.div [HP.class_ $ HH.ClassName "row"][HH.text status],
-          HH.div [HP.class_ $ HH.ClassName "row"][HH.h6_ [HH.text $ show bal.creditor]]
+          HH.div [HP.class_ $ HH.ClassName "row"][HH.h6_ [HH.text $ show bal.debtor]]
         ],
         HH.div [HP.class_ $ HH.ClassName "row label-row"][
           HH.div [HP.class_ $ HH.ClassName "col-6"][HH.small_[HH.text "currency"]],
@@ -551,9 +553,10 @@ confirmFriendshipButton friend =
 
 addFriendWidget ∷ State → H.ComponentHTML Query
 addFriendWidget state =
-  HH.div [ HP.class_ $ HH.ClassName "addFriend" ]
+  HH.div [ HP.class_ $ HH.ClassName "add-friend" ]
   [
-    HH.small_ [HH.text "Friend's FoundationID"],
+    HH.h6 [ HP.class_ $ HH.ClassName "modal-title"][HH.text "Add New Friend"],
+    HH.label [][HH.text "Friend's FoundationID"],
     HH.input [ HP.type_ HP.InputText
              , HP.value $ inputVal state.newFriend
              , HP.class_ $ HH.ClassName "form-control"
@@ -570,22 +573,29 @@ addFriendWidget state =
 nonZero ∷ F.Debt → Boolean
 nonZero fd = ((F.numAmount ∘ F.debtMoney) fd) /= (toNumber 0)
 
+instance showDebtType :: Show DebtType where
+show debtType =
+  case debtType of
+    Debt → "Debt You Owe"
+    Credit → "Debt Owed To You"
+
 data DebtType = Debt | Credit
 inputFDebt ∷ DebtType → F.Currency → F.FoundationId → Array F.FoundationId
           → Maybe F.Debt → H.ComponentHTML Query
 inputFDebt debtType cur myId friends maybeDebt =
   case head friends of
-    Nothing       → HH.div_ [ HH.text "No friends to debt" ]
+    Nothing       → HH.div_ []
     Just friendId →
       let d = case debtType of
             Debt   → fromMaybe (F.zeroDebt cur myId friendId friendId) maybeDebt
             Credit → fromMaybe (F.zeroDebt cur friendId myId friendId) maybeDebt
           handler = case debtType of Debt   → InputDebt
                                      Credit → InputCredit
-      in HH.div [ HP.class_ $ HH.ClassName "createDebt col row" ]
+      in HH.div [ HP.class_ $ HH.ClassName "create-debt col" ]
          [
+           HH.label [][HH.text $ "Enter " <> show debtType],
            HH.input [ HP.type_ HP.InputNumber
-                    , HP.class_ $ HH.ClassName "debt-amount col-2"
+                    , HP.class_ $ HH.ClassName "debt-amount"
                     , HP.value $ noDecimals $ F.formatMoney $ F.debtMoney d
                     , HE.onValueInput
                       (HE.input (\val → handler $ amount d val cur))
@@ -602,7 +612,7 @@ inputFDebt debtType cur myId friends maybeDebt =
                     , HP.value $ S.take 32 $ F.getDesc d ]
          , HH.button [ HE.onClick $ HE.input_ $ AddDebt d
                      , HP.disabled $ F.debtAmount d == 0.0
-                     , HP.class_ $ HH.ClassName "create-debt-button col-2"]
+                     , HP.class_ $ HH.ClassName "create-debt-button form-control"]
            [ HH.text $ "Send Debt" ]
          ]
       where noDecimals = S.takeWhile (\c → c /= '.')

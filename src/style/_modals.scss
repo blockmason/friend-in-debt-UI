@@ -1,59 +1,90 @@
+$modals: (
+  create-debt-container: #0275d8,
+  add-friend: orange
+);
+
+@each $name, $highlight in $modals {
+  .#{$name} {
+    background: white;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    transition: all 0.7s ease;
+    padding: 10px 30px;
+    border-left: 5px solid $highlight;
+
+    .modal-title {
+      font-weight: 100;
+      text-transform: uppercase;
+      border-bottom: 1px solid #ddd;
+      margin-bottom: 2em;
+    }
+
+    label {
+      text-transform: uppercase;
+      color: #777;
+      font-size: 12px;
+      position: relative;
+
+      &:before {
+        content: '▹';
+        height: 30px;
+        width: 30px;
+        border-radius: 50%;
+        display: block;
+        background-color: $highlight;
+        color: white;
+        position: absolute;
+        top: -6px;
+        left: -40px;
+        padding-left: 12px;
+        line-height: 26px;
+        font-size: 18px;
+      }
+    }
+
+    input, select {
+      width: 100%;
+      margin-bottom: 2em;
+    }
+
+    input[type=text], input[type=number], select {
+      border: 0;
+      background: none;
+      border-bottom: 1px solid $highlight;
+      border-radius: 0;
+
+      &::placeholder {
+        color: #aaa;
+      }
+    }
+
+    button {
+      text-transform: uppercase;
+
+      &:hover {
+        background-color: $highlight;
+        color: white;
+        border-color: $highlight;
+      }
+    }
+  }
+}
+
 .create-debt-container ul {
   padding: 0;
   list-style: none;
 }
 
-.createDebt input, .add-friend-container input,
-.name-change-container input{
-  background: transparent;
-  border: 1px dotted white;
-  border-radius: 5px;
-  margin: 0 5px 0 0;
-}
-
-.createDebt button, .add-friend-container button,
-.name-change-container button{
-  background: rgba(255,255,255, 0.1);
-  border: 0;
-  border-radius: 5px;
-  margin: 0 5px 0 0;
-  box-shadow: 0 1px 1px 1px rgba(0,0,0,0.1);
-}
-
-.createDebt button .confirmation-amount {
-  display: inline-block;
-}
-
-.create-debt-card, .addFriend {
-  margin: 10px;
-  box-shadow: 0 2px 2px 0 rgba(0,0,0,.14), 0 3px 1px -2px rgba(0,0,0,.2), 0 1px 5px 0 rgba(0,0,0,.12);
-  padding: 10px;
-  border-radius: 5px;
-}
-
-.create-debt-card input, .addFriend input {
-  color: black;
-  background: white;
-  border: 1px solid #333;
-  border-radius: 5px;
-}
-
-/* add friend page*/
-
-.addFriend {
+.create-debt-card:first-child:after {
+  content: 'OR';
+  height: 30px;
+  width: 30px;
+  display: block;
   width: 100%;
-  margin: auto;
-}
-.addFriend small {
-  text-transform: uppercase;
-}
-
-.addFriend input {
-  margin-bottom: 10px;
-  color: #333;
-}
-
-.addFriend button:hover {
-  background-color: #2196f3;
-  color: white;
+  text-align: center;
+  padding: 2em 0;
+  margin-bottom: 2em;
+  color: map-get($modals, create-debt-container);
+  border-bottom: 3px dotted map-get($modals, create-debt-container);
 }
