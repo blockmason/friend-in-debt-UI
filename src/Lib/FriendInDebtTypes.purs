@@ -63,16 +63,19 @@ zeroDate = numToDate 0.0
 
 -- money
 data Currency =
-    Currency { isoCode ∷ String, decimals ∷ Int }
+    Currency { isoCode ∷ String, decimals ∷ Int, symbol ∷ String }
   | InvalidCurrency
-mkCurrency ∷ String → Int → Currency
-mkCurrency isoCode decimals = Currency { isoCode: isoCode, decimals: decimals }
-invalidCurrency = Currency { isoCode: "INVALID", decimals: 0 }
+mkCurrency ∷ String → Int → String → Currency
+mkCurrency isoCode decimals symbol = Currency { isoCode: isoCode, decimals: decimals
+                                              , symbol: symbol}
+invalidCurrency = Currency { isoCode: "INVALID", decimals: 0, symbol: "" }
 
 cIsoCode (Currency c)  = c.isoCode
 cIsoCode _             = "INVALID"
 cDecimals (Currency c) = c.decimals
 cDecimals _            = 0
+cSymbol  (Currency c ) = c.symbol
+cSymbol _              = "INVALID"
 
 instance showCurrency ∷ Show Currency where
   show (Currency c) = c.isoCode
@@ -82,8 +85,8 @@ instance eqCurrency ∷ Eq Currency where
   eq InvalidCurrency InvalidCurrency = true
   eq _ _                             = false
 
-cUSD = mkCurrency "USD" 2
-cEUR = mkCurrency "EUR" 2
+cUSD = mkCurrency "USD" 2 "$"
+cEUR = mkCurrency "EUR" 2 "€"
 fromIsoCode ∷ String → Currency
 fromIsoCode "USD" = cUSD
 fromIsoCode "EUR" = cEUR
@@ -96,7 +99,8 @@ newtype Money = Money { amount ∷ Number, currency ∷ Currency }
 formatMoney ∷ Money → String
 formatMoney m =
   let c = moneyCurrency m
-  in formatDecimal ((numAmount m) / (conversionFactor c)) $ cDecimals c
+      sym = cSymbol c
+  in sym <> (formatDecimal ((numAmount m) / (conversionFactor c)) $ cDecimals c)
 instance showMoney ∷ Show Money where
   show m = cIsoCode (moneyCurrency m) <> " " <> (formatMoney $ m)
 instance eqMoney ∷ Eq Money where
@@ -138,6 +142,7 @@ rawToBalance fi rb =
   where debtorCreditor myId cpId val = if val >= (I.toNumber 0)
                                      then Tuple myId (FoundationId cpId)
                                      else Tuple (FoundationId cpId) myId
+balAmount (Balance b) = b.amount
 
 sumMoney ∷ ∀ e. Money → Money → Aff e Money
 sumMoney m1 m2 = pure $ mkMoney ((numAmount m1) + (numAmount m2)) (moneyCurrency m1)

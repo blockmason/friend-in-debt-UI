@@ -106,7 +106,7 @@ component =
       [
         page R.FriendsScreen $
              HH.ul [ HP.class_ $ HH.ClassName "col" ]
-             $ groupFriendLiByInitial $ prepareFriendBundles state
+             $ groupFriendLiByInitial state.defaultCurrency $ prepareFriendBundles state
 
       , page R.BalancesScreen $
              HH.ul
@@ -170,7 +170,7 @@ component =
     InputCredit credit next → do
       H.modify (_ { newCredit = Just credit })
       pure next
-    AddDebt debt n1ext → do
+    AddDebt debt next → do
       hLog debt
       s ← H.get
       handleTx NewTX s $ F.newPendingDebt debt
@@ -303,16 +303,16 @@ prepareFriendBundles ∷ State → Array FriendBundle
 prepareFriendBundles state =
   (\(Tuple fid1 gradient) → FriendBundle {id: fid1, gradient: gradient, balance: findBalanceFor fid1 state.balances}) <$> (zip state.friends state.gradients)
 
-groupFriendLiByInitial ∷ Array FriendBundle → Array (H.ComponentHTML Query)
-groupFriendLiByInitial friendBundles =
+groupFriendLiByInitial ∷ F.Currency → Array FriendBundle → Array (H.ComponentHTML Query)
+groupFriendLiByInitial c friendBundles =
   let
     orderedFriends = sortBy (\(FriendBundle bundle1) (FriendBundle bundle2) → S.localeCompare (F.initial bundle1.id) (F.initial bundle2.id)) friendBundles
     friendGroups = groupBy (\(FriendBundle bundle1) (FriendBundle bundle2) → (F.initial bundle1.id) == (F.initial bundle2.id)) orderedFriends
   in
-    displayFriendGroup <$> friendGroups
+    displayFriendGroup c <$> friendGroups
 
-displayFriendGroup ∷ NonEmpty Array FriendBundle → H.ComponentHTML Query
-displayFriendGroup group =
+displayFriendGroup ∷ F.Currency → NonEmpty Array FriendBundle → H.ComponentHTML Query
+displayFriendGroup c group =
  let
   innerArr = oneOf group
   initial = fromMaybe "" $ do
@@ -324,23 +324,20 @@ displayFriendGroup group =
              HH.div [HP.class_ $ HH.ClassName "col-1"]
                     [HH.h6 [HP.class_ $ HH.ClassName "initial-label"] [HH.text initial]]
             , HH.div [HP.class_ $ HH.ClassName "col"]
-                     $ displayFriendLi <$> innerArr
+                     $ displayFriendLi c <$> innerArr
             ]
 
-displayFriendLi ∷ FriendBundle → H.ComponentHTML Query
-displayFriendLi (FriendBundle bundle1) =
-  let balance = fromMaybe "0" $ do
-                (F.Balance bal) ← bundle1.balance
-                pure $ show $ F.numAmount bal.amount
-
+displayFriendLi ∷ F.Currency → FriendBundle → H.ComponentHTML Query
+displayFriendLi c (FriendBundle bundle) =
+  let amount = maybe (F.mkMoney 0.0 c) F.balAmount bundle.balance
   in HH.li [HP.class_ $ HH.ClassName "friend-item row"]
     [
       HH.div [HP.class_ $ HH.ClassName "col-3"]
-        [ICON.generatedIcon (show bundle1.id) bundle1.gradient]
+        [ICON.generatedIcon (show bundle.id) bundle.gradient]
       , HH.div [HP.class_ $ HH.ClassName "col-9 name-portion"]
         [
-          HH.text $ show bundle1.id,
-          HH.span_ [HH.text $ "Balance: " <> balance]
+          HH.text $ show bundle.id,
+          HH.span_ [HH.text $ "Balance: " <> F.formatMoney amount ]
         ]
     ]
 
@@ -519,7 +516,7 @@ currencySpan (F.Money m) =
 
 moneySpan ∷ F.Money → H.ComponentHTML Query
 moneySpan m =
-  HH.span [HP.class_ $ HH.ClassName "money-span"] [ HH.text $ "$" <> F.formatMoney m ]
+  HH.span [HP.class_ $ HH.ClassName "money-span"] [ HH.text $ F.formatMoney m ]
 
 debtAmountSpan ∷ F.Debt → H.ComponentHTML Query
 debtAmountSpan (F.Debt fd) =
