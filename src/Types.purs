@@ -31,3 +31,6 @@ instance showContainerMsg ∷ Show ContainerMsg where
   show CheckMetamask = "Checking Metamask status."
 
 type ContainerMsgBus = Maybe (Bus.BusRW ContainerMsg)
+
+-- Input field types
+type InputMoney = { whole ∷ Int, decs ∷ Int, debt ∷ F.Debt }

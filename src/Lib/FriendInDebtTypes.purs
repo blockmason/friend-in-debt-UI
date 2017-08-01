@@ -15,7 +15,7 @@ import Data.Format.Money           (formatDecimal)
 import Data.Int                                                    as I
 import Data.Number                                                 as N
 import Data.String                 (localeCompare)
-import Math                        (abs, pow)
+import Math                        ((%), abs, pow)
 import Data.Map                                                    as M
 import Data.Array                                                  as A
 import Data.Tuple                  (Tuple(..))
@@ -95,7 +95,6 @@ conversionFactor ∷ Currency → Number
 conversionFactor = (pow 10.0) <<< I.toNumber <<< cDecimals
 
 newtype Money = Money { amount ∷ Number, currency ∷ Currency }
-
 formatMoney ∷ Money → String
 formatMoney m =
   let c = moneyCurrency m
@@ -109,8 +108,8 @@ instance ordMoney ∷ Ord Money where
   compare (Money m1) (Money m2) = compare m1.amount m2.amount
   --TODO: make the above work with multiple currencies
 
-moneyFromDecString ∷ String → Currency → Money
-moneyFromDecString val c =
+moneyFromDecString ∷ Currency → String → Money
+moneyFromDecString c val =
   let amount = (fromMaybe 0.0 $ N.fromString val) * (conversionFactor c)
   in mkMoney amount c
 mkMoney ∷ Number → Currency → Money
@@ -119,6 +118,10 @@ numAmount ∷ Money → Number
 numAmount (Money m) = m.amount
 moneyCurrency ∷ Money → Currency
 moneyCurrency (Money m) = m.currency
+moneyDecimals ∷ Money → Int
+moneyDecimals (Money m) = I.floor $ m.amount % (conversionFactor m.currency)
+moneyWhole ∷ Money → Int
+moneyWhole (Money m) = I.floor $ m.amount / (conversionFactor m.currency)
 
 -- rewrite this function using currency converter
 mockConvertCurrency :: Money → Currency → Money

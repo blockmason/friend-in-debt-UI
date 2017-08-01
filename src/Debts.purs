@@ -2,12 +2,12 @@ module Debts where
 
 
 import FriendInDebt.Prelude
-import FriendInDebt.Types (FIDMonad, ContainerMsgBus, ContainerMsg(..), NameMap, DebtsMap)
+import FriendInDebt.Types (FIDMonad, ContainerMsgBus, ContainerMsg(..), NameMap, DebtsMap, InputMoney)
 import Control.Monad.Eff.Console (logShow)
 import Control.Monad.Aff (Aff)
 import Data.Array (singleton, head)
 import Control.Monad.Aff.Bus as Bus
-import Data.Int (toNumber, decimal, fromStringAs)
+import Data.Int    as I
 import Data.Number as N
 import Data.String as S
 import Data.Map    as M
@@ -29,8 +29,10 @@ import FriendInDebt.Routes              as R
 data Query a
   = RefreshDebts a
   | HandleInput Input a
-  | InputDebt F.Debt a
-  | InputCredit F.Debt a
+  | InputDebtAmount InputMoney a
+  | InputCreditAmount InputMoney a
+  | InputDebtDetails F.Debt a
+  | InputCreditDetails F.Debt a
   | AddDebt F.Debt a
   | ConfirmPending F.Debt a
   | RejectPending F.Debt a
@@ -145,7 +147,6 @@ component =
           gradients <- H.liftEff $ sequence $ (const ICON.randomGradient) <$> state.friends
           H.modify (_ { errorBus = input, gradients = gradients })
           pure next
-
         _ → do
           H.modify (_ { errorBus = input })
           pure next
@@ -163,12 +164,18 @@ component =
         then H.modify (_ { newFriend = Right $ F.FoundationId friendStr })
         else H.modify (_ { newFriend = Left friendStr })
       pure next
-    InputDebt debt next → do
-      hLog debt
-      H.modify (_ { newDebt = Just debt })
+    InputDebtAmount im next → do
+      c ← H.gets _.defaultCurrency
+      let m  = F.moneyFromDecString c $ show im.whole <> "." <> show im.decs
+      H.modify (_ { newDebt = Just $ F.setDebtMoney im.debt m })
       pure next
-    InputCredit credit next → do
-      H.modify (_ { newCredit = Just credit })
+    InputCreditAmount im next → do
+      pure next
+    InputDebtDetails debt next → do
+      hLog debt
+      pure next
+    InputCreditDetails debt next → do
+      hLog debt
       pure next
     AddDebt debt next → do
       hLog debt
@@ -568,7 +575,7 @@ addFriendWidget state =
   where inputVal = either id show
 
 nonZero ∷ F.Debt → Boolean
-nonZero fd = ((F.numAmount ∘ F.debtMoney) fd) /= (toNumber 0)
+nonZero fd = ((F.numAmount ∘ F.debtMoney) fd) /= 0.0
 
 instance showDebtType :: Show DebtType where
 show debtType =
@@ -586,35 +593,47 @@ inputFDebt debtType cur myId friends maybeDebt =
       let d = case debtType of
             Debt   → fromMaybe (F.zeroDebt cur myId friendId friendId) maybeDebt
             Credit → fromMaybe (F.zeroDebt cur friendId myId friendId) maybeDebt
-          handler = case debtType of Debt   → InputDebt
-                                     Credit → InputCredit
+          handler = case debtType of Debt   → InputDebtAmount
+                                     Credit → InputCreditAmount
+          handler' = case debtType of Debt   → InputDebtDetails
+                                      Credit → InputCreditDetails
       in HH.div [ HP.class_ $ HH.ClassName "create-debt col" ]
          [
-           HH.label [][HH.text $ "Enter " <> show debtType],
-           HH.input [ HP.type_ HP.InputNumber
+           HH.label_ [ HH.text $ "Enter " <> show debtType ],
+           HH.input [ HP.type_ HP.InputText
                     , HP.class_ $ HH.ClassName "debt-amount"
-                    , HP.value $ noDecimals $ F.formatMoney $ F.debtMoney d
+                    , HP.value $ show $ whole d
                     , HE.onValueInput
-                      (HE.input (\val → handler $ amount d val cur))
-                    , HP.min $ toNumber (-1000000)
-                    , HP.max $ toNumber 1000000]
+                      (HE.input (\v → handler { whole: fromMaybe 0 $ I.fromString v
+                                              , decs:  decs d
+                                              , debt: d }))
+                    ]
+         , HH.input [ HP.type_ HP.InputText
+                    , HP.class_ $ HH.ClassName "debt-amount"
+                    , HP.value $ show $ decs d
+                    , HE.onValueInput
+                      (HE.input (\v → handler $ { whole: whole d
+                                                , decs:  fromMaybe 0 $ I.fromString $ S.take 2 v
+                                                , debt: d }))
+                    ]
          , HH.select [ HE.onValueChange
-                       (HE.input (\v → handler $ counterparty d debtType v))
+                       (HE.input (\v → handler' $ counterparty d debtType v))
                      ]
              ((\f → HH.option_ [ HH.text $ F.fiGetId f ]) <$> friends)
          , HH.input [ HP.type_ HP.InputText
                     , HP.placeholder $ "Enter debt memo here"
                     , HE.onValueInput
-                      (HE.input (\val → handler $ F.setDesc d (S.take 32 val)))
+                      (HE.input (\val → handler' $ F.setDesc d (S.take 32 val)))
                     , HP.value $ S.take 32 $ F.getDesc d ]
          , HH.button [ HE.onClick $ HE.input_ $ AddDebt d
                      , HP.disabled $ F.debtAmount d == 0.0
                      , HP.class_ $ HH.ClassName "create-debt-button form-control"]
            [ HH.text $ "Send Debt" ]
          ]
-      where noDecimals = S.takeWhile (\c → c /= '.')
-            amount debt v currency = F.setDebtMoney debt $
-              F.moneyFromDecString (noDecimals v) currency
+      where whole ∷ F.Debt → Int
+            whole = F.moneyWhole ∘ F.debtMoney
+            decs  ∷ F.Debt → Int
+            decs  = F.moneyDecimals ∘ F.debtMoney
             counterparty debt dType v = case dType of
               Debt   → F.debtSetCreditor debt (F.fiMkId v)
               Credit → F.debtSetDebtor   debt (F.fiMkId v)
@@ -623,7 +642,7 @@ inputDebt   = inputFDebt Debt
 inputCredit = inputFDebt Credit
 
 numberFromString ∷ String → Number
-numberFromString s = fromMaybe (toNumber 0) (N.fromString s)
+numberFromString s = fromMaybe 0.0 (N.fromString s)
 --
 -- mockFriendNames :: Array String
 -- mockFriendNames = ["bob", "tim", "kevin"]
