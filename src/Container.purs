@@ -38,6 +38,7 @@ data Query a
 
 type State = { loggedIn ∷ Boolean
              , loading  ∷ Boolean
+             , hasFoundation ∷ Boolean
              , errorBus ∷ ContainerMsgBus
              , txs      ∷ Array E.TX
              , currentScreen ∷ R.Screen
@@ -61,6 +62,7 @@ ui =
     initialState ∷ State
     initialState = { loggedIn: true
                    , loading: true
+                   , hasFoundation: true
                    , errorBus: Nothing
                    , txs: []
                    , currentScreen: R.BalancesScreen
@@ -73,9 +75,10 @@ ui =
                  "container " <>
                  (R.getRouteNameFor state.currentScreen)  <>
                  (if state.loading then " loading" else "") <>
-                 (if state.loggedIn then "" else " require-login")) ]
+                 (if state.loggedIn && state.hasFoundation then "" else " require-login")) ]
       [ promptMetamask state.loggedIn
       , loadingOverlay state.loading
+      , promptFoundation state.hasFoundation
       , topBar state
       , menu state.currentScreen
       , HH.div [ HP.class_ (HH.ClassName "create-debt-bar") ]
@@ -109,8 +112,13 @@ ui =
       HandleMsg msg next → do
         case msg of
           FIDError e → do
-            H.modify (_ { loggedIn = false })
-            pure next
+            case e of
+              F.NoFoundationId → do
+                H.modify (_ { hasFoundation = false })
+                pure next
+              _ → do
+                H.modify (_ { loggedIn = false })
+                pure next
           CheckMetamask → do
             mmStatus ← H.liftEff MM.loggedIn
             loggedIn ← H.gets _.loggedIn
@@ -156,6 +164,18 @@ promptMetamask loggedIn =
     , HH.button [ HE.onClick $ HE.input_ $ RefreshMetamask
                 , HP.class_ $ HH.ClassName "btn-info"]
       [ HH.i [HP.class_ (HH.ClassName "fa fa-refresh")][] ]
+  ]
+
+promptFoundation ∷ ∀ p. Boolean → H.HTML p Query
+promptFoundation hasFoundation =
+  HH.div [ HP.id_ "noFoundationOverlay"
+         , if hasFoundation then HP.class_ (HH.ClassName "in-active")
+           else HP.class_ (HH.ClassName "active")]
+  [
+    HH.h6_ [ HH.text "No Foundation ID detected." ]
+    , HH.button [ HE.onClick $ HE.input_ $ RefreshMetamask
+                , HP.class_ $ HH.ClassName "btn-info"]
+      [ HH.i [HP.class_ (HH.ClassName "fa fa-user-plus")][], HH.text "Register" ]
   ]
 
 refreshMetamask ∷ ∀ e. H.ParentDSL State Query ChildQuery ChildSlot Void (FIDMonad e) Unit
