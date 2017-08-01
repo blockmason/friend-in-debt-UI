@@ -269,6 +269,14 @@ html {
   color: #0275d8;
   border-bottom: 3px dotted #0275d8; }
 
+.show-cents .amount-row {
+  margin: 0 0.1em; }
+  .show-cents .amount-row .debt-amount:first-of-type {
+    width: 40%; }
+  .show-cents .amount-row .debt-amount:last-of-type {
+    margin-left: 1%;
+    width: 8%; }
+
 .top-bar {
   background: #ff5722;
   line-height: 3em; }

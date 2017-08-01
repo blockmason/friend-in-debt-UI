@@ -602,27 +602,35 @@ inputFDebt debtType _ cur myId friends maybeDebt =
             Credit → fromMaybe (F.zeroDebt cur friendId myId friendId) maybeDebt
           sendMsg  = case debtType of Debt   → "I Owe This"
                                       Credit → "I Am Owed This"
-      in HH.div [ HP.class_ $ HH.ClassName "create-debt col" ]
+          showCents = case (F.cDecimals cur) of 0 → ""
+                                                _ → "show-cents"
+      in HH.div [ HP.class_ $ HH.ClassName $ "create-debt col " <> showCents]
          [
            HH.label_ [ HH.text $ "Enter " <> show debtType ],
-           HH.input [ HP.type_ HP.InputNumber
-                    , HP.class_ $ HH.ClassName "debt-amount"
-                    , HP.value $ show $ whole d
-                    , HE.onValueInput
-                      (HE.input (\v → InputDebtAmount debtType
-                                      { whole: fromMaybe 0 $ I.fromString v
-                                      , decs:  decs d
-                                      , debt: d }))
-                    ]
-         , HH.input [ HP.type_ HP.InputNumber
-                    , HP.class_ $ HH.ClassName "debt-amount"
-                    , HP.value $ show $ decs d
-                    , HE.onValueInput
-                      (HE.input (\v → InputDebtAmount debtType
-                                      { whole: whole d
-                                      , decs:  fromMaybe 0 $ I.fromString $ S.take 2 v
-                                      , debt: d }))
-                    ]
+           HH.div [ HP.class_ $ HH.ClassName "row amount-row" ]
+            [
+               HH.span_ [HH.text $ F.cSymbol cur]
+             , HH.input [ HP.type_ HP.InputNumber
+                        , HP.class_ $ HH.ClassName "debt-amount"
+                        , HP.value $ show $ whole d
+                        , HE.onValueInput
+                          (HE.input (\v → InputDebtAmount debtType
+                                          { whole: fromMaybe 0 $ I.fromString v
+                                          , decs:  decs d
+                                          , debt: d }))
+                        ]
+             , HH.span_ [HH.text "."]
+             , HH.input [ HP.type_ HP.InputNumber
+                        , HP.class_ $ HH.ClassName "debt-amount"
+                        , HP.value $ show $ decs d
+                        , HE.onValueInput
+                          (HE.input (\v → InputDebtAmount debtType
+                                          { whole: whole d
+                                          , decs:  fromMaybe 0 $ I.fromString $ S.take 2 v
+                                          , debt: d }))
+                        ]
+             , HH.span_ [HH.text $ F.cIsoCode cur]  
+            ]
          , HH.select [ HE.onValueChange
                        (HE.input (\v → InputDebtDetails debtType $ counterparty d debtType v))
                      ]

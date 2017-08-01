@@ -88,3 +88,21 @@ $modals: (
   color: map-get($modals, create-debt-container);
   border-bottom: 3px dotted map-get($modals, create-debt-container);
 }
+
+.show-cents .amount-row {
+  margin: 0 0.1em;
+
+  .debt-amount:first-of-type {
+    width: 40%;
+  }
+
+  .debt-amount:last-of-type {
+    margin-left: 1%;
+    width: 8%;
+  }
+
+  // & > span {
+  //   line-height: 2em;
+  //   padding-left: 10px;
+  // }
+}
