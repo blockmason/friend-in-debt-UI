@@ -2,10 +2,10 @@ module FriendInDebt.Blockchain where
 
 import FriendInDebt.Prelude
 import FriendInDebt.Types (ContainerMsg(..))
-import Data.Array             as A
-import Control.Monad.Aff.Bus  as Bus
-import Halogen                as H
-import Network.Eth            as E
+import Data.Array               as A
+import Control.Monad.Aff.Bus    as Bus
+import Halogen                  as H
+import Network.Eth              as E
 import Network.Eth.FriendInDebt as F
 
 --helper to query the blockchain
