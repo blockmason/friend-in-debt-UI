@@ -101,9 +101,9 @@ ui =
         H.subscribe $ busEventSource (flip HandleMsg ES.Listening) bus
         H.modify (_ { loggedIn = true, loading = true, errorBus = Just bus })
         H.liftAff $ delay (Milliseconds (toNumber 1500))
-        H.modify (_ { loading = false })
         refreshMetamask
-        runTests
+        H.modify (_ { loading = false })
+--        runTests
         startCheckInterval (Just bus) 5000
         pure next
       HandleMsg msg next → do
@@ -182,29 +182,12 @@ startCheckInterval maybeBus ms = do
               _ ← launchAff $ Bus.write CheckMetamask bus
               pure unit
 
-  {-
-      , foundationId
-       , confirmedFriends
-       , createFriendship
-       , confirmFriendship
-       , deleteFriendship
-       , pendingFriends
-
-       , newPendingDebt
-       , confirmPendingDebt
-       , rejectPendingDebt
-       , debtBalances
-       , itemizedDebts
-       , pendingDebts
--}
-
 runTests = do
   (H.liftAff $ F.runMonadF $ F.foundationId)       >>= hLog
   (H.liftAff $ F.runMonadF $ F.confirmedFriends)   >>= hLog
   (H.liftAff $ F.runMonadF $ F.pendingFriends)     >>= hLog
   (H.liftAff $ F.runMonadF $ F.pendingDebts)       >>= hLog
   (H.liftAff $ F.runMonadF $ F.debtBalances)       >>= hLog
---  (H.liftAff $ F.runMonadF $ F.itemizedDebts)      >>= hLog
   pure unit
 
 mkFriends = do

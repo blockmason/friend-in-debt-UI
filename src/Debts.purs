@@ -29,10 +29,8 @@ import FriendInDebt.Routes              as R
 data Query a
   = RefreshDebts a
   | HandleInput Input a
-  | InputDebtAmount InputMoney a
-  | InputCreditAmount InputMoney a
-  | InputDebtDetails F.Debt a
-  | InputCreditDetails F.Debt a
+  | InputDebtAmount DebtType InputMoney a
+  | InputDebtDetails DebtType F.Debt a
   | AddDebt F.Debt a
   | ConfirmPending F.Debt a
   | RejectPending F.Debt a
@@ -64,6 +62,7 @@ type State = { friends             ∷ Array F.FoundationId
              , showItemizedDebtFor ∷ Maybe F.FoundationId
              , defaultCurrency     ∷ F.Currency
              , loading             ∷ Boolean
+             , inputChanged        ∷ Boolean
              , errorBus            ∷ ContainerMsgBus }
 
 component ∷ ∀ eff. H.Component HH.HTML Query Input Message (FIDMonad eff)
@@ -94,6 +93,7 @@ component =
                        , showItemizedDebtFor: Nothing
                        , defaultCurrency: F.cUSD
                        , loading: false
+                       , inputChanged: false
                        , errorBus: input }
 
   render ∷ State → H.ComponentHTML Query
@@ -164,17 +164,23 @@ component =
         then H.modify (_ { newFriend = Right $ F.FoundationId friendStr })
         else H.modify (_ { newFriend = Left friendStr })
       pure next
-    InputDebtAmount im next → do
-      c ← H.gets _.defaultCurrency
+    InputDebtAmount debtType im next → do
+      c  ← H.gets _.defaultCurrency
       let m  = F.moneyFromDecString c $ show im.whole <> "." <> show im.decs
-      H.modify (_ { newDebt = Just $ F.setDebtMoney im.debt m })
+      case debtType of
+        Debt   → H.modify (_ { newDebt   = Just $ F.setDebtMoney im.debt m })
+        Credit → H.modify (_ { newCredit = Just $ F.setDebtMoney im.debt m })
+      H.modify (\s → s { inputChanged = not s.inputChanged })
+      case debtType of
+        Debt   → (H.gets _.newDebt)   >>= hLog
+        Credit → (H.gets _.newCredit) >>= hLog
       pure next
-    InputCreditAmount im next → do
-      pure next
-    InputDebtDetails debt next → do
-      hLog debt
-      pure next
-    InputCreditDetails debt next → do
+    InputDebtDetails debtType debt next → do
+      case debtType of
+        Debt   → H.modify (_ { newDebt   = Just debt })
+        Credit → H.modify (_ { newCredit = Just debt })
+      ic ← H.gets _.inputChanged
+      H.modify (\s → s { inputChanged = not s.inputChanged })
       hLog debt
       pure next
     AddDebt debt next → do
@@ -237,9 +243,9 @@ createDebtModal state =
     [ HP.class_ $ HH.ClassName "col" ]
     [
         HH.li [ HP.class_ $ HH.ClassName "row create-debt-card" ]
-          [inputDebt state.defaultCurrency state.myId state.friends state.newDebt]
+          [inputDebt state.inputChanged state.defaultCurrency state.myId state.friends state.newDebt]
       , HH.li [ HP.class_ $ HH.ClassName "row create-debt-card" ]
-          [inputCredit state.defaultCurrency state.myId state.friends state.newCredit]
+          [inputCredit state.inputChanged state.defaultCurrency state.myId state.friends state.newCredit]
       ]
     ]
 
@@ -584,51 +590,52 @@ show debtType =
     Credit → "Debt Owed To You"
 
 data DebtType = Debt | Credit
-inputFDebt ∷ DebtType → F.Currency → F.FoundationId → Array F.FoundationId
+--Boolean passed is just to force a refresh
+inputFDebt ∷ DebtType → Boolean → F.Currency → F.FoundationId → Array F.FoundationId
           → Maybe F.Debt → H.ComponentHTML Query
-inputFDebt debtType cur myId friends maybeDebt =
+inputFDebt debtType _ cur myId friends maybeDebt =
   case head friends of
     Nothing       → HH.div_ []
     Just friendId →
       let d = case debtType of
             Debt   → fromMaybe (F.zeroDebt cur myId friendId friendId) maybeDebt
             Credit → fromMaybe (F.zeroDebt cur friendId myId friendId) maybeDebt
-          handler = case debtType of Debt   → InputDebtAmount
-                                     Credit → InputCreditAmount
-          handler' = case debtType of Debt   → InputDebtDetails
-                                      Credit → InputCreditDetails
+          sendMsg  = case debtType of Debt   → "I Owe This"
+                                      Credit → "I Am Owed This"
       in HH.div [ HP.class_ $ HH.ClassName "create-debt col" ]
          [
            HH.label_ [ HH.text $ "Enter " <> show debtType ],
-           HH.input [ HP.type_ HP.InputText
+           HH.input [ HP.type_ HP.InputNumber
                     , HP.class_ $ HH.ClassName "debt-amount"
                     , HP.value $ show $ whole d
                     , HE.onValueInput
-                      (HE.input (\v → handler { whole: fromMaybe 0 $ I.fromString v
-                                              , decs:  decs d
-                                              , debt: d }))
+                      (HE.input (\v → InputDebtAmount debtType
+                                      { whole: fromMaybe 0 $ I.fromString v
+                                      , decs:  decs d
+                                      , debt: d }))
                     ]
-         , HH.input [ HP.type_ HP.InputText
+         , HH.input [ HP.type_ HP.InputNumber
                     , HP.class_ $ HH.ClassName "debt-amount"
                     , HP.value $ show $ decs d
                     , HE.onValueInput
-                      (HE.input (\v → handler $ { whole: whole d
-                                                , decs:  fromMaybe 0 $ I.fromString $ S.take 2 v
-                                                , debt: d }))
+                      (HE.input (\v → InputDebtAmount debtType
+                                      { whole: whole d
+                                      , decs:  fromMaybe 0 $ I.fromString $ S.take 2 v
+                                      , debt: d }))
                     ]
          , HH.select [ HE.onValueChange
-                       (HE.input (\v → handler' $ counterparty d debtType v))
+                       (HE.input (\v → InputDebtDetails debtType $ counterparty d debtType v))
                      ]
              ((\f → HH.option_ [ HH.text $ F.fiGetId f ]) <$> friends)
          , HH.input [ HP.type_ HP.InputText
                     , HP.placeholder $ "Enter debt memo here"
                     , HE.onValueInput
-                      (HE.input (\val → handler' $ F.setDesc d (S.take 32 val)))
+                      (HE.input (\val → InputDebtDetails debtType $ F.setDesc d (S.take 32 val)))
                     , HP.value $ S.take 32 $ F.getDesc d ]
          , HH.button [ HE.onClick $ HE.input_ $ AddDebt d
                      , HP.disabled $ F.debtAmount d == 0.0
                      , HP.class_ $ HH.ClassName "create-debt-button form-control"]
-           [ HH.text $ "Send Debt" ]
+           [ HH.text $ sendMsg ]
          ]
       where whole ∷ F.Debt → Int
             whole = F.moneyWhole ∘ F.debtMoney
