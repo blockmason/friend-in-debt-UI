@@ -20,20 +20,22 @@
     "purescript-either": "^3.0.0",
     "purescript-gen": "^1.1.0",
     "purescript-maybe": "^3.0.0",
-    "purescript-partial": "^1.2.0"
+    "purescript-partial": "^1.2.0",
+    "purescript-unfoldable": "^3.0.0",
+    "purescript-arrays": "^4.0.1"
   },
   "devDependencies": {
     "purescript-assert": "^3.0.0",
     "purescript-console": "^3.0.0"
   },
-  "version": "3.2.1",
-  "_release": "3.2.1",
+  "version": "3.3.0",
+  "_release": "3.3.0",
   "_resolution": {
     "type": "version",
-    "tag": "v3.2.1",
-    "commit": "dc78175df95d188c26d5ed43922e5a39c274ecc8"
+    "tag": "v3.3.0",
+    "commit": "90811242c4f1d74bfd59dbfa72fe6665bcb857f2"
   },
   "_source": "https://github.com/purescript/purescript-strings.git",
-  "_target": "^3.0.0",
+  "_target": "^3.3.0",
   "_originalSource": "purescript-strings"
 }
