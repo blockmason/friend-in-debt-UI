@@ -21,7 +21,7 @@ html {
   margin-top: 10px; }
 
 /* loading overlays */
-#metamaskOverlay {
+#metamaskOverlay, #noFoundationOverlay {
   padding: 20px;
   position: absolute;
   top: 0;
@@ -34,21 +34,36 @@ html {
   justify-content: center;
   align-items: center;
   text-transform: uppercase; }
-  #metamaskOverlay.in-active {
+  #metamaskOverlay.in-active, #noFoundationOverlay.in-active {
     display: none; }
-  #metamaskOverlay h6 {
+  #metamaskOverlay h6, #noFoundationOverlay h6 {
     font-weight: 100;
     width: 100%; }
-  #metamaskOverlay button {
-    background: none;
-    border: none;
-    transition: 0.5s;
-    cursor: pointer; }
-    #metamaskOverlay button:hover {
-      color: #aaa;
-      transform: rotate(60deg); }
-    #metamaskOverlay button:focus {
-      border: none; }
+
+#metamaskOverlay button {
+  background: none;
+  border: none;
+  transition: 0.5s;
+  cursor: pointer; }
+  #metamaskOverlay button:hover {
+    color: #aaa;
+    transform: rotate(60deg); }
+  #metamaskOverlay button:focus {
+    border: none; }
+
+#noFoundationOverlay button {
+  background: none;
+  border: none;
+  transition: 0.5s;
+  cursor: pointer;
+  width: 180px;
+  text-transform: uppercase;
+  border: 1px solid white;
+  border-radius: 5px; }
+  #noFoundationOverlay button i {
+    margin-right: 2px; }
+  #noFoundationOverlay button:focus {
+    border: none; }
 
 #loadingOverlay {
   padding: 20px;
@@ -87,6 +102,9 @@ html {
   filter: url(#blur-filter);
   -webkit-filter: blur(5px);
   filter: blur(5px); }
+
+.container.require-login #loadingOverlay {
+  display: none; }
 
 #debtLoadingOverlay {
   padding: 20px;

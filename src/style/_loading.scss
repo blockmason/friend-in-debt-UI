@@ -1,6 +1,6 @@
 
 /* loading overlays */
-#metamaskOverlay {
+#metamaskOverlay, #noFoundationOverlay {
   padding: 20px;
   position: absolute;
   top: 0;
@@ -22,7 +22,9 @@
     font-weight: 100;
     width: 100%;
   }
+}
 
+#metamaskOverlay {
   button {
     background: none;
     border: none;
@@ -32,6 +34,27 @@
     &:hover {
       color: #aaa;
       transform: rotate(60deg);
+    }
+
+    &:focus {
+      border: none;
+    }
+  }
+}
+
+#noFoundationOverlay {
+  button {
+    background: none;
+    border: none;
+    transition: 0.5s;
+    cursor: pointer;
+    width: 180px;
+    text-transform: uppercase;
+    border: 1px solid white;
+    border-radius: 5px;
+
+    i {
+      margin-right: 2px;
     }
 
     &:focus {
@@ -86,6 +109,10 @@
     filter: url(#blur-filter);
     -webkit-filter: blur(5px);
     filter: blur(5px);
+  }
+
+  #loadingOverlay {
+    display: none;
   }
 }
 
