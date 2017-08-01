@@ -333,21 +333,22 @@ html {
 .create-debt-bar, .add-friend-bar {
   transition: all 0.8s ease-out;
   position: fixed;
-  bottom: 0;
-  width: 100%; }
+  bottom: 0; }
   .create-debt-bar a, .add-friend-bar a {
     float: right;
     margin-right: 2em;
     margin-bottom: 1em;
     background: white;
     height: 2em;
-    border-radius: 50%;
-    width: 2em;
-    padding: 0.5em 0 0 0.6em;
+    border-radius: 10px;
+    padding: 0.5em 0.6em;
     line-height: 1em; }
     .create-debt-bar a:hover, .add-friend-bar a:hover {
       color: black;
-      box-shadow: 0 0px 2px 5px rgba(0, 0, 0, 0.6); }
+      box-shadow: 0 0px 2px 5px rgba(0, 0, 0, 0.6);
+      text-decoration: none; }
+    .create-debt-bar a i, .add-friend-bar a i {
+      margin-right: 5px; }
 
 .add-friend-bar a {
   color: orange; }
@@ -1076,7 +1077,6 @@ html {
     overflow: hidden;
     background-color: white;
     text-align: center;
-    box-shadow: 4px -10px 17px 5px rgba(0, 0, 0, 0.3);
     transition: 0.3s ease;
     padding: 20px 5px; }
 

@@ -90,7 +90,6 @@
   transition: all 0.8s ease-out;
   position: fixed;
   bottom: 0;
-  width: 100%;
 
   a {
     float: right;
@@ -98,14 +97,18 @@
     margin-bottom: 1em;
     background: white;
     height: 2em;
-    border-radius: 50%;
-    width: 2em;
-    padding: 0.5em 0 0 0.6em;
+    border-radius: 10px;
+    padding: 0.5em 0.6em;
     line-height: 1em;
 
     &:hover {
       color: black;
       box-shadow: 0 0px 2px 5px rgba(0, 0, 0, 0.6);
+      text-decoration: none;
+    }
+
+    i {
+      margin-right: 5px;
     }
   }
 }

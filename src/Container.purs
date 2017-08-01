@@ -81,12 +81,12 @@ ui =
       , HH.div [ HP.class_ (HH.ClassName "create-debt-bar") ]
       [
         HH.a [HP.href "#", HP.class_ (HH.ClassName ""), HE.onClick $ HE.input_ $ SetScreen R.CreateDebtScreen] [
-        HH.i [ HP.class_ (HH.ClassName "fa fa-plus")][]]
+        HH.i [ HP.class_ (HH.ClassName "fa fa-plus")][], HH.text "Add New Debt"]
       ]
       , HH.div [ HP.class_ (HH.ClassName "add-friend-bar") ]
       [
         HH.a [HP.href "#", HP.class_ (HH.ClassName ""), HE.onClick $ HE.input_ $ SetScreen R.AddFriendScreen] [
-        HH.i [ HP.class_ (HH.ClassName "fa fa-plus")][]]
+        HH.i [ HP.class_ (HH.ClassName "fa fa-plus")][], HH.text "Add New Friend"]
       ]
       , HH.div [ HP.class_ (HH.ClassName "row")]
         [
