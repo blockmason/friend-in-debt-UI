@@ -290,7 +290,8 @@ html {
 .show-cents .amount-row {
   margin: 0 0.1em; }
   .show-cents .amount-row .debt-amount:first-of-type {
-    width: 40%; }
+    width: 40%;
+    text-align: right; }
   .show-cents .amount-row .debt-amount:last-of-type {
     margin-left: 1%;
     width: 8%; }
