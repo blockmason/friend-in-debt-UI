@@ -12,3 +12,34 @@ exports.checkStatusImpl = function(dummyVal) {
         }
     };
 };
+
+exports.currentUserImpl = function(dummyVal) {
+    return function() {
+        return web3.eth.accounts[0];
+    };
+};
+
+exports.checkTxStatusImpl = function(callback) {
+    return function(txHash) {
+        return function() {
+            web3.eth.getTransaction(txHash, function(err, result) {
+                if ( err ) {
+                    console.log(err);
+                    console.log("got a network error");
+                    callback("NetworkError")();
+                }
+                else {
+                    callback(txResultToRaw(result))();
+                }
+            });
+        };
+    };
+};
+
+var txResultToRaw = function(txResult) {
+    if ( txResult == null )
+        return "Pending";
+    else
+        return "Done";
+    return "BadTx";
+};

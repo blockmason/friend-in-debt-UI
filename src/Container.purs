@@ -112,7 +112,7 @@ ui =
             H.modify (_ { loggedIn = false })
             pure next
           CheckMetamask → do
-            mmStatus ← MM.loggedIn <$> (H.liftEff MM.checkStatus)
+            mmStatus ← H.liftEff MM.loggedIn
             loggedIn ← H.gets _.loggedIn
             checkMetamask loggedIn mmStatus
             pure next
@@ -160,10 +160,10 @@ promptMetamask loggedIn =
 
 refreshMetamask ∷ ∀ e. H.ParentDSL State Query ChildQuery ChildSlot Void (FIDMonad e) Unit
 refreshMetamask = do
-  mmStatus ← MM.loggedIn <$> (H.liftEff MM.checkStatus)
+  mmStatus ← H.liftEff MM.loggedIn
   if mmStatus
     then do _ ← H.query' CP.cp1 unit (D.RefreshDebts unit)
-            newmmStatus ← MM.loggedIn <$> (H.liftEff MM.checkStatus)
+            newmmStatus ← H.liftEff MM.loggedIn
             H.modify (_ { loggedIn = newmmStatus })
     else do H.modify (_ { loggedIn = mmStatus })
 
