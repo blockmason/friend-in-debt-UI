@@ -27,6 +27,8 @@ import Network.Eth              as E
 import Network.Eth.FriendInDebt as F
 
 import FriendInDebt.Routes      as R
+import FriendInDebt.Config      as C
+import FriendInDebt.Blockchain (hasNetworkError, loadingOverlay)
 
 data Query a
   = Init a
@@ -107,10 +109,14 @@ ui =
         refreshMetamask
         H.modify (_ { loading = false })
 --        runTests
-        startCheckInterval (Just bus) 5000
+        startCheckInterval (Just bus) C.checkMMInterval C.checkTxInterval
         pure next
       HandleMsg msg next → do
         case msg of
+          NetworkError → do
+            hLog NetworkError
+            H.modify (_ { loggedIn = false })
+            pure next
           FIDError e → do
             case e of
               F.NoFoundationId → do
@@ -123,6 +129,24 @@ ui =
             mmStatus ← H.liftEff MM.loggedIn
             loggedIn ← H.gets _.loggedIn
             checkMetamask loggedIn mmStatus
+            pure next
+          CheckTxs → do
+            hLog "checking Tx"
+            txs ← H.gets _.txs
+            hLog txs
+            bus ← H.gets _.errorBus
+            statii ← H.liftAff $ sequence (MM.checkTxStatus <$> txs)
+            if hasNetworkError statii
+              then case bus of
+                Nothing → pure unit
+                Just b  → H.liftAff $ Bus.write NetworkError b
+              else do
+                let pending = A.filter (\(Tuple s _) → E.notDone s) $ A.zip statii txs
+                if A.length pending /= A.length txs
+                  then do
+                    H.modify (_ { txs = (\(Tuple _ tx) → tx) <$> pending })
+                    refreshMetamask
+                  else pure unit
             pure next
       RefreshMetamask next → do
         refreshMetamask
@@ -143,16 +167,6 @@ ui =
       PreviousScreen next → do
         H.modify (\state → state {currentScreen = (fromMaybe R.BalancesScreen $ A.head state.history), history = (fromMaybe [] $ A.tail state.history)})
         pure next
-
-loadingOverlay ∷ ∀ p i. Boolean → H.HTML p i
-loadingOverlay loading =
-  HH.div [ HP.id_ "loadingOverlay"
-         , if loading then HP.class_ (HH.ClassName "active")
-           else HP.class_ (HH.ClassName "in-active")]
-  [
-    HH.i [HP.class_ (HH.ClassName "loading-spinner")][],
-    HH.h6_ [ HH.text "Loading..." ]
-  ]
 
 promptMetamask ∷ ∀ p. Boolean → H.HTML p Query
 promptMetamask loggedIn =
@@ -192,14 +206,18 @@ checkMetamask ∷ ∀ e. Boolean → Boolean
 checkMetamask loggedIn mmStatus =
   if (loggedIn && mmStatus) then pure unit else refreshMetamask
 
-startCheckInterval maybeBus ms = do
+startCheckInterval maybeBus mmInterval txInterval = do
   case maybeBus of
     Nothing → pure unit
-    Just b  → do
-      _ ← H.liftEff $ setInterval ms $ effToRun b
+    Just bus  → do
+      _ ← H.liftEff $ setInterval mmInterval $ checkMMEff  bus
+      _ ← H.liftEff $ setInterval txInterval $ checkTxsEff bus
       pure unit
-      where effToRun bus = do
-              _ ← launchAff $ Bus.write CheckMetamask bus
+      where checkMMEff b = do
+              _ ← launchAff $ Bus.write CheckMetamask b
+              pure unit
+            checkTxsEff b = do
+              _ ← launchAff $ Bus.write CheckTxs b
               pure unit
 
 runTests = do

@@ -7,6 +7,8 @@ import Data.Formatter.DateTime  as DTF
 import Data.Array               as A
 import Control.Monad.Aff.Bus    as Bus
 import Halogen                  as H
+import Halogen.HTML            as HH
+import Halogen.HTML.Properties as HP
 import Network.Eth              as E
 import Network.Eth.FriendInDebt as F
 
@@ -37,3 +39,13 @@ hasNetworkError = not ∘ A.null ∘ (A.filter E.hasError)
 
 formatDate ∷ DateTime → String
 formatDate = (either (const "") id) ∘ (DTF.formatDateTime "YYYY-MM-DD")
+
+loadingOverlay ∷ ∀ p i. Boolean → H.HTML p i
+loadingOverlay loading =
+  HH.div [ HP.id_ "loadingOverlay"
+         , if loading then HP.class_ (HH.ClassName "active")
+           else HP.class_ (HH.ClassName "in-active")]
+  [
+    HH.i [HP.class_ (HH.ClassName "loading-spinner")][],
+    HH.h6_ [ HH.text "Loading..." ]
+  ]

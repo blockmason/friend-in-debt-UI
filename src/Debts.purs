@@ -184,10 +184,11 @@ component =
       hLog debt
       pure next
     AddDebt debt next → do
+      H.modify (_ { loading = true })
       hLog debt
       s ← H.get
       handleTx NewTX s (ScreenChange R.BalancesScreen) $ F.newPendingDebt debt
-      H.modify (_ { newDebt = Nothing, newCredit = Nothing })
+      H.modify (_ { newDebt = Nothing, newCredit = Nothing, loading = false })
       pure next
     ConfirmPending debt next → do
       s ← H.get
