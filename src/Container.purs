@@ -255,6 +255,8 @@ menuItem screen state =
         case screen of
           R.SettingsScreen →
             [ HH.i [HP.class_ (HH.ClassName "fa fa-user")][], HH.text "MockId123"]
+          R.PendingScreen →
+            [HH.text $ R.getMenuNameFor screen, HH.span_ [HH.text "5"]]
           _ →
             [HH.text $ R.getMenuNameFor screen]
   in HH.a

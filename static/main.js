@@ -12646,6 +12646,9 @@ var PS = {};
               if (screen instanceof FriendInDebt_Routes.SettingsScreen) {
                   return [ Halogen_HTML_Elements.i([ Halogen_HTML_Properties.class_("fa fa-user") ])([  ]), Halogen_HTML_Core.text("MockId123") ];
               };
+              if (screen instanceof FriendInDebt_Routes.PendingScreen) {
+                  return [ Halogen_HTML_Core.text(FriendInDebt_Routes.getMenuNameFor(screen)), Halogen_HTML_Elements.span_([ Halogen_HTML_Core.text("5") ]) ];
+              };
               return [ Halogen_HTML_Core.text(FriendInDebt_Routes.getMenuNameFor(screen)) ];
           })();
           return Halogen_HTML_Elements.a([ Halogen_HTML_Properties.href("#"), Halogen_HTML_Properties.class_(Halogen_HTML_Core.ClassName("col-3 " + (function () {
