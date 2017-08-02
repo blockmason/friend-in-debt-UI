@@ -80,7 +80,7 @@ ui =
       , loadingOverlay state.loading
       , promptFoundation state.hasFoundation
       , topBar state
-      , menu state.currentScreen
+      , menu state
       , HH.div [ HP.class_ (HH.ClassName "create-debt-bar") ]
       [
         HH.a [HP.href "#", HP.class_ (HH.ClassName ""), HE.onClick $ HE.input_ $ SetScreen R.CreateDebtScreen] [
@@ -238,24 +238,30 @@ topBar state =
         ]
     ]
 
-menu ∷ ∀ p. R.Screen → H.HTML p Query
-menu currentScreen =
+menu ∷ ∀ p. State → H.HTML p Query
+menu state =
   HH.div
     [ HP.class_ (HH.ClassName "header-menu row")]
     [
-        menuItem R.BalancesScreen currentScreen
-      , menuItem R.FriendsScreen currentScreen
-      , menuItem R.PendingScreen currentScreen
-      , menuItem R.SettingsScreen currentScreen
+        menuItem R.BalancesScreen state
+      , menuItem R.FriendsScreen state
+      , menuItem R.PendingScreen state
+      , menuItem R.SettingsScreen state
     ]
 
-menuItem ∷ ∀ p. R.Screen → R.Screen → H.HTML p Query
-menuItem screen currentScreen =
-  HH.a
-  [HP.href "#",
-        HP.class_ (HH.ClassName $ "col-3 " <> if screen == currentScreen then "active" else ""),
-        HE.onClick $ HE.input_ $ SetScreen screen]
-  [ HH.text $ R.getMenuNameFor screen]
+menuItem ∷ ∀ p. R.Screen → State → H.HTML p Query
+menuItem screen state =
+  let menuText =
+        case screen of
+          R.SettingsScreen →
+            [ HH.i [HP.class_ (HH.ClassName "fa fa-user")][], HH.text "MockId123"]
+          _ →
+            [HH.text $ R.getMenuNameFor screen]
+  in HH.a
+    [HP.href "#",
+          HP.class_ (HH.ClassName $ "col-3 " <> if screen == state.currentScreen then "active" else ""),
+          HE.onClick $ HE.input_ $ SetScreen screen] $ menuText
+
 
 -- randomLoadingText ∷ String
 -- randomLoadingText =

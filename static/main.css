@@ -354,9 +354,12 @@ html {
     text-decoration: none;
     border-radius: 1em;
     transition: 1s ease;
-    text-align: center; }
+    text-align: center;
+    font-size: 14px; }
     .header-menu a.active {
       background-color: #e03702; }
+    .header-menu a i {
+      margin-right: 5px; }
 
 .create-debt-bar, .add-friend-bar {
   transition: all 0.8s ease-out;
