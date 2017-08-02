@@ -246,7 +246,7 @@ topBar state =
     [
       HH.div [ HP.class_ (HH.ClassName "col logo-section")]
       [
-        HH.img [HP.src "http://blockmason.io/assets/img/friends_in_debt_logo.svg"]
+        HH.img [HP.src "fid@1x.png"]
         , HH.text "Friend in Debt"
       ]
       , HH.div [HP.class_ (HH.ClassName "col go-back-section")]
