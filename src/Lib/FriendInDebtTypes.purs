@@ -141,11 +141,16 @@ rawToBalance fi rb =
   in Balance { amount: mkMoney (abs rb.amount) (fromIsoCode rb.currency)
              , debtor: d, creditor: c
              , totalDebts: (fromMaybe 0 $ I.fromNumber rb.totalDebts)
-             , mostRecent: toDateTime <$> instant (Milliseconds rb.mostRecent) }
+             , mostRecent: toDateTime <$>
+               instant (Milliseconds $ rb.mostRecent * 1000.0) }
   where debtorCreditor myId cpId val = if val >= (I.toNumber 0)
                                      then Tuple myId (FoundationId cpId)
                                      else Tuple (FoundationId cpId) myId
 balAmount (Balance b) = b.amount
+balMostRecent (Balance b) = b.mostRecent
+balCreditor (Balance b) = b.creditor
+balDebtor (Balance b) = b.debtor
+balTotalDebts (Balance b) = b.totalDebts
 
 sumMoney ∷ ∀ e. Money → Money → Aff e Money
 sumMoney m1 m2 = pure $ mkMoney ((numAmount m1) + (numAmount m2)) (moneyCurrency m1)

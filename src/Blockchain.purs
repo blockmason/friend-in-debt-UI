@@ -1,7 +1,9 @@
 module FriendInDebt.Blockchain where
 
 import FriendInDebt.Prelude
-import FriendInDebt.Types (ContainerMsg(..))
+import FriendInDebt.Types              (ContainerMsg(..))
+import Data.DateTime                   (DateTime(..))
+import Data.Formatter.DateTime  as DTF
 import Data.Array               as A
 import Control.Monad.Aff.Bus    as Bus
 import Halogen                  as H
@@ -32,3 +34,6 @@ handleTx message state fnToRun = do
 
 hasNetworkError ∷ Array E.TxStatus → Boolean
 hasNetworkError = not ∘ A.null ∘ (A.filter E.hasError)
+
+formatDate ∷ DateTime → String
+formatDate = (either (const "") id) ∘ (DTF.formatDateTime "YYYY-MM-DD")

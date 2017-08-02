@@ -19,7 +19,7 @@ import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
 import Halogen.HTML.Events as HE
 
-import FriendInDebt.Blockchain          (handleCall, handleTx, hasNetworkError)
+import FriendInDebt.Blockchain          (handleCall, handleTx, hasNetworkError, formatDate)
 import Network.Eth.FriendInDebt         as F
 import Network.Eth                      as E
 import UI.IconGenerator as ICON
@@ -357,11 +357,16 @@ displayFriendLi c (FriendBundle bundle) =
 -- Balance List
 
 displayBalanceLi :: State → F.Balance → H.ComponentHTML Query
-displayBalanceLi state (F.Balance bal) =
+displayBalanceLi state bal =
   let debtsMap = state.itemizedDebts
       me       = state.myId
-      curFriend= if bal.creditor == me then bal.debtor else bal.creditor
-      status   = if bal.creditor == me then "Holds debts from:" else "Is owing..."
+      creditor = F.balCreditor bal
+      debtor   = F.balCreditor bal
+      amount   = F.balAmount bal
+      totalDebts  = F.balTotalDebts bal
+      mostRecent  = maybe "" formatDate $ F.balMostRecent bal
+      curFriend = if creditor == me then debtor else creditor
+      status    = if creditor == me then "Holds debts from:" else "Is owing..."
       friendToShow = state.showItemizedDebtFor
       expandClass = (\f → if f == curFriend then "expand-itemized" else "hide-itemized") <$> friendToShow
   in
@@ -370,25 +375,26 @@ displayBalanceLi state (F.Balance bal) =
     $ [
       HH.div [HP.class_ $ HH.ClassName "highlight"][],
       HH.div [HP.class_ $ HH.ClassName "col-4 debt-excerpt"][
-        HH.div [HP.class_ $ HH.ClassName "row debt-amount"][moneySpan bal.amount],
+        HH.div [HP.class_ $ HH.ClassName "row debt-amount"][moneySpan amount],
         HH.div [HP.class_ $ HH.ClassName "row label-row"][HH.small_[HH.text "last"]],
         HH.div [HP.class_ $ HH.ClassName "row thin-item-row"]
           [
-            HH.span [HP.class_ $ HH.ClassName "thin-item"][HH.text "2017/07/01"]
+            HH.span [HP.class_ $ HH.ClassName "thin-item"]
+            [HH.text mostRecent]
           ]
       ],
       HH.div [HP.class_ $ HH.ClassName "col debt-details"][
         HH.div [HP.class_ $ HH.ClassName "col debt-relationship"][
           HH.div [HP.class_ $ HH.ClassName "row"][HH.text status],
-          HH.div [HP.class_ $ HH.ClassName "row"][HH.h6_ [HH.text $ show bal.debtor]]
+          HH.div [HP.class_ $ HH.ClassName "row"][HH.h6_ [HH.text $ show debtor]]
         ],
         HH.div [HP.class_ $ HH.ClassName "row label-row"][
           HH.div [HP.class_ $ HH.ClassName "col-6"][HH.small_[HH.text "currency"]],
           HH.div [HP.class_ $ HH.ClassName "col-6"][HH.small_[HH.text "debts"]]
         ],
         HH.div [HP.class_ $ HH.ClassName "row thin-item-row"][
-          HH.div [HP.class_ $ HH.ClassName "col thin-item"][currencySpan bal.amount],
-          HH.div [HP.class_ $ HH.ClassName "col thin-item"][HH.text $ "314" <> "debts"]
+          HH.div [HP.class_ $ HH.ClassName "col thin-item"][currencySpan amount],
+          HH.div [HP.class_ $ HH.ClassName "col thin-item"][HH.text $ show totalDebts <> " debts"]
         ]
       ],
       (displayItemizedDebtTimeline friendToShow debtsMap curFriend)
@@ -629,7 +635,7 @@ inputFDebt debtType _ cur myId friends maybeDebt =
                                           , decs:  fromMaybe 0 $ I.fromString $ S.take 2 v
                                           , debt: d }))
                         ]
-             , HH.span_ [HH.text $ F.cIsoCode cur]  
+             , HH.span_ [HH.text $ F.cIsoCode cur]
             ]
          , HH.select [ HE.onValueChange
                        (HE.input (\v → InputDebtDetails debtType $ counterparty d debtType v))
