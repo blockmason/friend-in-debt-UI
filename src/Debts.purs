@@ -387,7 +387,7 @@ displayBalanceLi state bal =
       HH.div [HP.class_ $ HH.ClassName "col debt-details"][
         HH.div [HP.class_ $ HH.ClassName "col debt-relationship"][
           HH.div [HP.class_ $ HH.ClassName "row"][HH.text status],
-          HH.div [HP.class_ $ HH.ClassName "row"][HH.h6_ [HH.text $ show debtor]]
+          HH.div [HP.class_ $ HH.ClassName "row"][HH.h6_ [HH.text $ show curFriend]]
         ],
         HH.div [HP.class_ $ HH.ClassName "row label-row"][
           HH.div [HP.class_ $ HH.ClassName "col-6"][HH.small_[HH.text "currency"]],
