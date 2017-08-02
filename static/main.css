@@ -376,7 +376,7 @@ html {
 .create-debt-bar, .add-friend-bar {
   transition: all 0.8s ease-out;
   position: fixed;
-  bottom: 0; }
+  bottom: 1em; }
   .create-debt-bar a, .add-friend-bar a {
     float: right;
     margin-right: 2em;
@@ -494,7 +494,7 @@ html {
   margin-left: 0; }
 
 .show-balances-screen .add-friend-bar, .show-balances-screen .create-debt-bar {
-  transform: translateY(50px); }
+  transform: translateY(80px); }
 
 .show-friends-screen .balances-screen-container {
   transform: translateX(-3000px);
@@ -566,7 +566,7 @@ html {
   margin-left: 0; }
 
 .show-friends-screen .add-friend-bar, .show-friends-screen .create-debt-bar {
-  transform: translateY(50px); }
+  transform: translateY(80px); }
 
 .show-pending-screen .balances-screen-container {
   transform: translateX(-3000px);
@@ -638,7 +638,7 @@ html {
   margin-left: 0; }
 
 .show-pending-screen .add-friend-bar, .show-pending-screen .create-debt-bar {
-  transform: translateY(50px); }
+  transform: translateY(80px); }
 
 .show-settings-screen .balances-screen-container {
   transform: translateX(-3000px);
@@ -710,7 +710,7 @@ html {
   margin-left: 0; }
 
 .show-settings-screen .add-friend-bar, .show-settings-screen .create-debt-bar {
-  transform: translateY(50px); }
+  transform: translateY(80px); }
 
 .show-add-friend-screen .balances-screen-container {
   transform: translateX(-3000px);
@@ -782,7 +782,7 @@ html {
   margin-left: 0; }
 
 .show-add-friend-screen .add-friend-bar, .show-add-friend-screen .create-debt-bar {
-  transform: translateY(50px); }
+  transform: translateY(80px); }
 
 .show-create-debt-screen .balances-screen-container {
   transform: translateX(-3000px);
@@ -854,7 +854,7 @@ html {
   margin-left: 0; }
 
 .show-create-debt-screen .add-friend-bar, .show-create-debt-screen .create-debt-bar {
-  transform: translateY(50px); }
+  transform: translateY(80px); }
 
 .show-itemized-debts-screen .balances-screen-container {
   transform: translateX(-3000px);
@@ -926,7 +926,7 @@ html {
   margin-left: 0; }
 
 .show-itemized-debts-screen .add-friend-bar, .show-itemized-debts-screen .create-debt-bar {
-  transform: translateY(50px); }
+  transform: translateY(80px); }
 
 .show-add-friend-screen .go-back-section {
   margin-left: 0; }
@@ -1135,7 +1135,8 @@ html {
   transition: all 0.7s ease;
   padding: 10px 30px; }
   .pending-screen-container li.todo-debt-row, .pending-screen-container li.sent-debt-row {
-    height: 7em; }
+    height: 7em;
+    position: relative; }
 
 .pending-screen-container .card-title {
   font-size: 18px;
