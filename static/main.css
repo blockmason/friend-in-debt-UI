@@ -1173,7 +1173,7 @@ html {
   text-transform: uppercase;
   width: 100%; }
   .pending-screen-container .debt-details .debtor:after {
-    content: ' owes'; }
+    content: ' owe'; }
 
 .pending-screen-container .debt-details .creditor {
   font-size: 10px;

@@ -523,7 +523,7 @@ idSpan :: F.FoundationId → F.FoundationId → H.ComponentHTML Query
 idSpan me idToDisplay =
   let isItMe = me == idToDisplay
   in case isItMe of
-    true → HH.text $ "Me"
+    true → HH.text $ "You"
     false → HH.a [HP.class_ $ HH.ClassName "expandable-id", HP.href "#", HE.onClick $ HE.input_ $ ShowItemizedDebtFor $ Just idToDisplay] [HH.text $ show idToDisplay]
 
 descSpan ∷ F.Debt → H.ComponentHTML Query
