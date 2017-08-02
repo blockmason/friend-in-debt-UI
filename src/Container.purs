@@ -43,6 +43,7 @@ type State = { loggedIn ∷ Boolean
              , hasFoundation ∷ Boolean
              , errorBus ∷ ContainerMsgBus
              , txs      ∷ Array E.TX
+             , numPendingTodo ∷ Int
              , currentScreen ∷ R.Screen
              , history ∷ Array R.Screen }
 
@@ -67,6 +68,7 @@ ui =
                    , hasFoundation: true
                    , errorBus: Nothing
                    , txs: []
+                   , numPendingTodo: 0
                    , currentScreen: R.BalancesScreen
                    , history: []}
 
@@ -161,6 +163,9 @@ ui =
             pure next
           D.NewTX newTx → do
             H.modify (\s → s { txs = s.txs <> [newTx] })
+            pure next
+          D.NumPendingTodo n → do
+            H.modify (_ { numPendingTodo = n })
             pure next
       PreviousScreen next → do
         H.modify (\state → state {currentScreen = (fromMaybe R.BalancesScreen $ A.head state.history), history = (fromMaybe [] $ A.tail state.history)})
