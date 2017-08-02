@@ -258,6 +258,10 @@ topBar state =
           HH.i [HP.class_ (HH.ClassName "transaction-spinner")][],
           HH.span_ [HH.text $ "Immortalizing " <> show (A.length state.txs) <> " items..."]
         ]
+      , HH.a [HP.href "#", HE.onClick $ HE.input_ $ RefreshMetamask , HP.class_ (HH.ClassName $ "col-4 align-self-end reload-button" <> if processing then "" else " show-reload") ]
+        [
+          HH.i [HP.class_ (HH.ClassName "fa fa-refresh")][]
+        ]
     ]
 
 menu ∷ ∀ p. State → H.HTML p Query

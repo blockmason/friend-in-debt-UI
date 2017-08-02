@@ -12,7 +12,7 @@ html {
 
 .container {
   background-image: url("45-degree-fabric-light.png");
-  max-width: 600px;
+  width: 550px;
   box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.3);
   height: 100vh;
   overflow-y: scroll; }
@@ -319,9 +319,9 @@ html {
     font-size: 10px;
     text-transform: uppercase;
     color: white;
-    opacity: 0; }
+    display: none; }
     .top-bar .current-transactions.processing {
-      opacity: 1; }
+      display: block; }
   .top-bar .transaction-spinner {
     width: 20px;
     height: 20px;
@@ -342,6 +342,16 @@ html {
       border-radius: 100%;
       left: 9px;
       top: 15px; }
+  .top-bar .reload-button {
+    display: none;
+    color: white;
+    text-align: right; }
+    .top-bar .reload-button.show-reload {
+      display: block; }
+    .top-bar .reload-button i {
+      transition: 0.5s ease; }
+    .top-bar .reload-button i:hover {
+      transform: rotate(30deg); }
 
 .header-menu {
   background: #ff5722;
@@ -376,7 +386,7 @@ html {
 .create-debt-bar, .add-friend-bar {
   transition: all 0.8s ease-out;
   position: fixed;
-  bottom: 0; }
+  bottom: 1em; }
   .create-debt-bar a, .add-friend-bar a {
     float: right;
     margin-right: 2em;
@@ -494,7 +504,7 @@ html {
   margin-left: 0; }
 
 .show-balances-screen .add-friend-bar, .show-balances-screen .create-debt-bar {
-  transform: translateY(50px); }
+  transform: translateY(80px); }
 
 .show-friends-screen .balances-screen-container {
   transform: translateX(-3000px);
@@ -566,7 +576,7 @@ html {
   margin-left: 0; }
 
 .show-friends-screen .add-friend-bar, .show-friends-screen .create-debt-bar {
-  transform: translateY(50px); }
+  transform: translateY(80px); }
 
 .show-pending-screen .balances-screen-container {
   transform: translateX(-3000px);
@@ -638,7 +648,7 @@ html {
   margin-left: 0; }
 
 .show-pending-screen .add-friend-bar, .show-pending-screen .create-debt-bar {
-  transform: translateY(50px); }
+  transform: translateY(80px); }
 
 .show-settings-screen .balances-screen-container {
   transform: translateX(-3000px);
@@ -710,7 +720,7 @@ html {
   margin-left: 0; }
 
 .show-settings-screen .add-friend-bar, .show-settings-screen .create-debt-bar {
-  transform: translateY(50px); }
+  transform: translateY(80px); }
 
 .show-add-friend-screen .balances-screen-container {
   transform: translateX(-3000px);
@@ -782,7 +792,7 @@ html {
   margin-left: 0; }
 
 .show-add-friend-screen .add-friend-bar, .show-add-friend-screen .create-debt-bar {
-  transform: translateY(50px); }
+  transform: translateY(80px); }
 
 .show-create-debt-screen .balances-screen-container {
   transform: translateX(-3000px);
@@ -854,7 +864,7 @@ html {
   margin-left: 0; }
 
 .show-create-debt-screen .add-friend-bar, .show-create-debt-screen .create-debt-bar {
-  transform: translateY(50px); }
+  transform: translateY(80px); }
 
 .show-itemized-debts-screen .balances-screen-container {
   transform: translateX(-3000px);
@@ -926,7 +936,7 @@ html {
   margin-left: 0; }
 
 .show-itemized-debts-screen .add-friend-bar, .show-itemized-debts-screen .create-debt-bar {
-  transform: translateY(50px); }
+  transform: translateY(80px); }
 
 .show-add-friend-screen .go-back-section {
   margin-left: 0; }
@@ -1011,6 +1021,20 @@ html {
   position: absolute;
   bottom: 30px;
   width: 100%; }
+
+.no-balances {
+  color: white;
+  height: 80vh;
+  width: 100%;
+  color: white;
+  z-index: 99;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-transform: uppercase; }
+
+.loading .no-balances {
+  display: none; }
 
 .show-itemized-debts-screen .balance-row.expand-itemized {
   height: auto; }
@@ -1135,7 +1159,8 @@ html {
   transition: all 0.7s ease;
   padding: 10px 30px; }
   .pending-screen-container li.todo-debt-row, .pending-screen-container li.sent-debt-row {
-    height: 7em; }
+    height: 7em;
+    position: relative; }
 
 .pending-screen-container .card-title {
   font-size: 18px;
@@ -1172,7 +1197,7 @@ html {
   text-transform: uppercase;
   width: 100%; }
   .pending-screen-container .debt-details .debtor:after {
-    content: ' owes'; }
+    content: ' owe'; }
 
 .pending-screen-container .debt-details .creditor {
   font-size: 10px;

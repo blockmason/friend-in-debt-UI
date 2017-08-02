@@ -114,7 +114,11 @@ component =
       , page R.BalancesScreen $
              HH.ul
              [ HP.class_ $ HH.ClassName "col-12" ]
-             $ (displayBalanceLi state) <$> state.balances
+             $ case (length state.balances) of
+                0 →
+                  [emptyBalance]
+                _ →
+                  (displayBalanceLi state) <$> state.balances
       , page R.PendingScreen $ pendingPage state
       , page R.SettingsScreen $ settingsPage state
       , page R.AddFriendScreen $
@@ -360,6 +364,10 @@ displayFriendLi c (FriendBundle bundle) =
 
 -- Balance List
 
+emptyBalance :: H.ComponentHTML Query
+emptyBalance =
+  HH.div [HP.class_ $ HH.ClassName "no-balances"][HH.text "No Balances Found, Check Pending for Unconfirmed Debts"]
+
 displayBalanceLi :: State → F.Balance → H.ComponentHTML Query
 displayBalanceLi state bal =
   let debtsMap = state.itemizedDebts
@@ -390,7 +398,7 @@ displayBalanceLi state bal =
       HH.div [HP.class_ $ HH.ClassName "col debt-details"][
         HH.div [HP.class_ $ HH.ClassName "col debt-relationship"][
           HH.div [HP.class_ $ HH.ClassName "row"][HH.text status],
-          HH.div [HP.class_ $ HH.ClassName "row"][HH.h6_ [HH.text $ show debtor]]
+          HH.div [HP.class_ $ HH.ClassName "row"][HH.h6_ [HH.text $ show curFriend]]
         ],
         HH.div [HP.class_ $ HH.ClassName "row label-row"][
           HH.div [HP.class_ $ HH.ClassName "col-6"][HH.small_[HH.text "currency"]],
@@ -526,7 +534,7 @@ idSpan :: F.FoundationId → F.FoundationId → H.ComponentHTML Query
 idSpan me idToDisplay =
   let isItMe = me == idToDisplay
   in case isItMe of
-    true → HH.text $ "Me"
+    true → HH.text $ "You"
     false → HH.a [HP.class_ $ HH.ClassName "expandable-id", HP.href "#", HE.onClick $ HE.input_ $ ShowItemizedDebtFor $ Just idToDisplay] [HH.text $ show idToDisplay]
 
 descSpan ∷ F.Debt → H.ComponentHTML Query
