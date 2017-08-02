@@ -342,6 +342,12 @@ html {
       border-radius: 100%;
       left: 9px;
       top: 15px; }
+  .top-bar .reload-button {
+    display: none;
+    color: white;
+    text-align: right; }
+    .top-bar .reload-button.show-reload {
+      display: block; }
 
 .header-menu {
   background: #ff5722;
