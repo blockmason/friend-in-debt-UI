@@ -56,10 +56,10 @@ getDebtId ∷ DebtId → Number
 getDebtId (DebtId id) = id
 getDebtId _           = -1.0
 
-numToDate ∷ Number → Maybe DateTime
-numToDate n = toDateTime <$> instant (Milliseconds n)
+secsToDate ∷ Number → Maybe DateTime
+secsToDate n = toDateTime <$> instant (Milliseconds $ 1000.0 * n)
 zeroDate ∷ Maybe DateTime
-zeroDate = numToDate 0.0
+zeroDate = secsToDate 0.0
 
 -- money
 data Currency =
@@ -141,11 +141,15 @@ rawToBalance fi rb =
   in Balance { amount: mkMoney (abs rb.amount) (fromIsoCode rb.currency)
              , debtor: d, creditor: c
              , totalDebts: (fromMaybe 0 $ I.fromNumber rb.totalDebts)
-             , mostRecent: toDateTime <$> instant (Milliseconds rb.mostRecent) }
+             , mostRecent: secsToDate rb.mostRecent }
   where debtorCreditor myId cpId val = if val >= (I.toNumber 0)
                                      then Tuple myId (FoundationId cpId)
                                      else Tuple (FoundationId cpId) myId
 balAmount (Balance b) = b.amount
+balMostRecent (Balance b) = b.mostRecent
+balCreditor (Balance b) = b.creditor
+balDebtor (Balance b) = b.debtor
+balTotalDebts (Balance b) = b.totalDebts
 
 sumMoney ∷ ∀ e. Money → Money → Aff e Money
 sumMoney m1 m2 = pure $ mkMoney ((numAmount m1) + (numAmount m2)) (moneyCurrency m1)
@@ -173,7 +177,7 @@ rawToDebt rd =
        , toConfirm: FoundationId rd.confirmerId
        , debt: mkMoney rd.amount (fromIsoCode rd.currency)
        , desc: rd.desc
-       , timestamp: toDateTime <$> instant (Milliseconds rd.timestamp)}
+       , timestamp: secsToDate rd.timestamp }
 
 rawConfirmedToDebt ∷ RawConfirmed → Debt
 rawConfirmedToDebt rd =
@@ -183,7 +187,7 @@ rawConfirmedToDebt rd =
        , toConfirm: fiBlankId
        , debt: mkMoney rd.amount (fromIsoCode rd.currency)
        , desc: rd.desc
-       , timestamp: toDateTime <$> instant (Milliseconds rd.timestamp) }
+       , timestamp: secsToDate rd.timestamp }
 
 mkDebt ∷ FoundationId → FoundationId → FoundationId → Money → DebtId → Description
        → Debt

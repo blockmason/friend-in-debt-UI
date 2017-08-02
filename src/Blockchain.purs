@@ -1,11 +1,15 @@
 module FriendInDebt.Blockchain where
 
 import FriendInDebt.Prelude
-import FriendInDebt.Types (ContainerMsg(..))
-import Data.Array             as A
-import Control.Monad.Aff.Bus  as Bus
-import Halogen                as H
-import Network.Eth            as E
+import FriendInDebt.Types              (ContainerMsg(..))
+import Data.DateTime                   (DateTime(..))
+import Data.Formatter.DateTime  as DTF
+import Data.Array               as A
+import Control.Monad.Aff.Bus    as Bus
+import Halogen                  as H
+import Halogen.HTML            as HH
+import Halogen.HTML.Properties as HP
+import Network.Eth              as E
 import Network.Eth.FriendInDebt as F
 
 --helper to query the blockchain
@@ -25,10 +29,23 @@ handleCall errorBus blankVal affCall = do
 
 setWatchTx message tx = if E.isBlank tx then pure unit else H.raise $ message tx
 
-handleTx message state fnToRun = do
+handleTx message state homeScreenQuery fnToRun = do
   tx ← handleCall state.errorBus E.blankTx fnToRun
   setWatchTx message tx
---  H.raise $ ScreenChange
+  H.raise homeScreenQuery
 
 hasNetworkError ∷ Array E.TxStatus → Boolean
 hasNetworkError = not ∘ A.null ∘ (A.filter E.hasError)
+
+formatDate ∷ DateTime → String
+formatDate = (either (const "") id) ∘ (DTF.formatDateTime "YYYY-MM-DD")
+
+loadingOverlay ∷ ∀ p i. Boolean → H.HTML p i
+loadingOverlay loading =
+  HH.div [ HP.id_ "loadingOverlay"
+         , if loading then HP.class_ (HH.ClassName "active")
+           else HP.class_ (HH.ClassName "in-active")]
+  [
+    HH.i [HP.class_ (HH.ClassName "loading-spinner")][],
+    HH.h6_ [ HH.text "Loading..." ]
+  ]

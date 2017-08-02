@@ -26,9 +26,13 @@ type FIDMonad eff = (Aff (exception ∷ EXCEPTION, timer ∷ TIMER, random ∷ R
 data ContainerMsg
   = FIDError F.Error
   | CheckMetamask
+  | CheckTxs
+  | NetworkError
 instance showContainerMsg ∷ Show ContainerMsg where
   show (FIDError fe) = show fe
   show CheckMetamask = "Checking Metamask status."
+  show CheckTxs      = "Checking status of transactions."
+  show NetworkError  = "NetworkError accessing blockchain"
 
 type ContainerMsgBus = Maybe (Bus.BusRW ContainerMsg)
 
