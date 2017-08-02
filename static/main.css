@@ -353,9 +353,25 @@ html {
     font-weight: 100;
     text-decoration: none;
     border-radius: 1em;
-    transition: 1s ease; }
+    transition: 1s ease;
+    text-align: center;
+    font-size: 14px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis; }
     .header-menu a.active {
       background-color: #e03702; }
+    .header-menu a i {
+      margin-right: 5px; }
+    .header-menu a span {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: white;
+      color: #ff5722;
+      padding: 0 5px;
+      margin-left: 5px;
+      font-weight: 600; }
 
 .create-debt-bar, .add-friend-bar {
   transition: all 0.8s ease-out;
