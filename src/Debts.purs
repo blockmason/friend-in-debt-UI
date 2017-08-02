@@ -113,7 +113,11 @@ component =
       , page R.BalancesScreen $
              HH.ul
              [ HP.class_ $ HH.ClassName "col-12" ]
-             $ (displayBalanceLi state) <$> state.balances
+             $ case (length state.balances) of
+                0 →
+                  [emptyBalance]
+                _ →
+                  (displayBalanceLi state) <$> state.balances
       , page R.PendingScreen $ pendingPage state
       , page R.SettingsScreen $ settingsPage state
       , page R.AddFriendScreen $
@@ -356,6 +360,10 @@ displayFriendLi c (FriendBundle bundle) =
     ]
 
 -- Balance List
+
+emptyBalance :: H.ComponentHTML Query
+emptyBalance =
+  HH.div [HP.class_ $ HH.ClassName "no-balances"][HH.text "No Balances Found, Check Pending for Unconfirmed Debts"]
 
 displayBalanceLi :: State → F.Balance → H.ComponentHTML Query
 displayBalanceLi state bal =

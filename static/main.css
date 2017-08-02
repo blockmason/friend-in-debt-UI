@@ -1022,6 +1022,20 @@ html {
   bottom: 30px;
   width: 100%; }
 
+.no-balances {
+  color: white;
+  height: 80vh;
+  width: 100%;
+  color: white;
+  z-index: 99;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-transform: uppercase; }
+
+.loading .no-balances {
+  display: none; }
+
 .show-itemized-debts-screen .balance-row.expand-itemized {
   height: auto; }
 
