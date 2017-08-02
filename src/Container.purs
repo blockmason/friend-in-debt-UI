@@ -43,6 +43,7 @@ type State = { loggedIn ∷ Boolean
              , hasFoundation ∷ Boolean
              , errorBus ∷ ContainerMsgBus
              , txs      ∷ Array E.TX
+             , numPendingTodo ∷ Int
              , currentScreen ∷ R.Screen
              , history ∷ Array R.Screen }
 
@@ -67,6 +68,7 @@ ui =
                    , hasFoundation: true
                    , errorBus: Nothing
                    , txs: []
+                   , numPendingTodo: 0
                    , currentScreen: R.BalancesScreen
                    , history: []}
 
@@ -161,6 +163,9 @@ ui =
             pure next
           D.NewTX newTx → do
             H.modify (\s → s { txs = s.txs <> [newTx] })
+            pure next
+          D.NumPendingTodo n → do
+            H.modify (_ { numPendingTodo = n })
             pure next
       PreviousScreen next → do
         H.modify (\state → state {currentScreen = (fromMaybe R.BalancesScreen $ A.head state.history), history = (fromMaybe [] $ A.tail state.history)})
@@ -271,12 +276,14 @@ menu state =
 
 menuItem ∷ ∀ p. R.Screen → State → H.HTML p Query
 menuItem screen state =
-  let menuText =
+  let nTodo    = state.numPendingTodo
+      menuText =
         case screen of
           R.SettingsScreen →
             [ HH.i [HP.class_ (HH.ClassName "fa fa-user")][], HH.text "MockId123"]
           R.PendingScreen →
-            [HH.text $ R.getMenuNameFor screen, HH.span_ [HH.text "5"]]
+            [ HH.text $ R.getMenuNameFor screen ]
+            <> (if nTodo > 0 then [HH.span_ [HH.text $ show nTodo]] else [])
           _ →
             [HH.text $ R.getMenuNameFor screen]
   in HH.a

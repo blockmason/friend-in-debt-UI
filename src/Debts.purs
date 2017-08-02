@@ -43,6 +43,7 @@ type Input = ContainerMsgBus
 data Message
   = ScreenChange R.Screen
   | NewTX E.TX
+  | NumPendingTodo Int
 newtype FriendBundle = FriendBundle { id ∷ F.FoundationId, gradient ∷ ICON.GradientCss, balance ∷ Maybe F.Balance }
 
 type State = { friends             ∷ Array F.FoundationId
@@ -203,8 +204,10 @@ component =
       handleTx NewTX s (ScreenChange R.BalancesScreen) $ F.rejectPendingDebt debt
       pure next
     RefreshDebts next → do
-      errorBus ← H.gets _.errorBus
+      pendingTodo ← H.gets _.pendingTodo
+      errorBus    ← H.gets _.errorBus
       loadFriendsAndDebts errorBus
+      H.raise $ NumPendingTodo (length pendingTodo)
       pure next
 
 refreshButton =
