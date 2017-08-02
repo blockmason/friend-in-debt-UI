@@ -157,7 +157,7 @@ component =
         Left  str → pure next
         Right friendId → do
           H.modify (_ { newFriend = Left "" })
-          handleTx NewTX s $ F.createFriendship friendId
+          handleTx NewTX s (ScreenChange R.BalancesScreen) $ F.createFriendship friendId
           pure next
     InputFriend friendStr next → do
       if ((S.length friendStr) > 3) --id should be longer than 3 characters
@@ -186,16 +186,16 @@ component =
     AddDebt debt next → do
       hLog debt
       s ← H.get
-      handleTx NewTX s $ F.newPendingDebt debt
+      handleTx NewTX s (ScreenChange R.BalancesScreen) $ F.newPendingDebt debt
       H.modify (_ { newDebt = Nothing, newCredit = Nothing })
       pure next
     ConfirmPending debt next → do
       s ← H.get
-      handleTx NewTX s $ F.confirmPendingDebt debt
+      handleTx NewTX s (ScreenChange R.BalancesScreen) $ F.confirmPendingDebt debt
       pure next
     RejectPending debt next → do
       s ← H.get
-      handleTx NewTX s $ F.rejectPendingDebt debt
+      handleTx NewTX s (ScreenChange R.BalancesScreen) $ F.rejectPendingDebt debt
       pure next
     RefreshDebts next → do
       errorBus ← H.gets _.errorBus

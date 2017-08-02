@@ -27,10 +27,10 @@ handleCall errorBus blankVal affCall = do
 
 setWatchTx message tx = if E.isBlank tx then pure unit else H.raise $ message tx
 
-handleTx message state fnToRun = do
+handleTx message state homeScreenQuery fnToRun = do
   tx ← handleCall state.errorBus E.blankTx fnToRun
   setWatchTx message tx
---  H.raise $ ScreenChange
+  H.raise homeScreenQuery
 
 hasNetworkError ∷ Array E.TxStatus → Boolean
 hasNetworkError = not ∘ A.null ∘ (A.filter E.hasError)

@@ -10377,10 +10377,14 @@ var PS = {};
       return function (dictMonadAff) {
           return function (message) {
               return function (state) {
-                  return function (fnToRun) {
-                      return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(handleCall(Halogen_Query_HalogenM.bindHalogenM)(Halogen_Query_HalogenM.monadEffHalogenM(dictMonadEff))(Halogen_Query_HalogenM.monadAffHalogenM(dictMonadAff))(state.errorBus)(Network_Eth.blankTx)(fnToRun))(function (v) {
-                          return setWatchTx(message)(v);
-                      });
+                  return function (homeScreenQuery) {
+                      return function (fnToRun) {
+                          return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(handleCall(Halogen_Query_HalogenM.bindHalogenM)(Halogen_Query_HalogenM.monadEffHalogenM(dictMonadEff))(Halogen_Query_HalogenM.monadAffHalogenM(dictMonadAff))(state.errorBus)(Network_Eth.blankTx)(fnToRun))(function (v) {
+                              return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(setWatchTx(message)(v))(function () {
+                                  return Halogen_Query_HalogenM.raise(homeScreenQuery);
+                              });
+                          });
+                      };
                   };
               };
           };
@@ -14139,7 +14143,7 @@ var PS = {};
                               $124.newFriend = new Data_Either.Left("");
                               return $124;
                           }))(function () {
-                              return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(FriendInDebt_Blockchain.handleTx(Control_Monad_Aff.monadEffAff)(Control_Monad_Aff_Class.monadAffAff)(NewTX.create)(v1)(Network_Eth_FriendInDebt.createFriendship(v.value0.value0)))(function () {
+                              return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(FriendInDebt_Blockchain.handleTx(Control_Monad_Aff.monadEffAff)(Control_Monad_Aff_Class.monadAffAff)(NewTX.create)(v1)(new ScreenChange(FriendInDebt_Routes.BalancesScreen.value))(Network_Eth_FriendInDebt.createFriendship(v.value0.value0)))(function () {
                                   return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value1);
                               });
                           });
@@ -14289,7 +14293,7 @@ var PS = {};
           if (v instanceof AddDebt) {
               return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(FriendInDebt_Prelude.hLog(Halogen_Query_HalogenM.monadEffHalogenM(Control_Monad_Aff.monadEffAff))(Network_Eth_FriendInDebt_Types.showDebt)(v.value0))(function () {
                   return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.get(Halogen_Query_HalogenM.monadStateHalogenM))(function (v1) {
-                      return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(FriendInDebt_Blockchain.handleTx(Control_Monad_Aff.monadEffAff)(Control_Monad_Aff_Class.monadAffAff)(NewTX.create)(v1)(Network_Eth_FriendInDebt.newPendingDebt(v.value0)))(function () {
+                      return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(FriendInDebt_Blockchain.handleTx(Control_Monad_Aff.monadEffAff)(Control_Monad_Aff_Class.monadAffAff)(NewTX.create)(v1)(new ScreenChange(FriendInDebt_Routes.BalancesScreen.value))(Network_Eth_FriendInDebt.newPendingDebt(v.value0)))(function () {
                           return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.modify(Halogen_Query_HalogenM.monadStateHalogenM)(function (v2) {
                               var $169 = {};
                               for (var $170 in v2) {
@@ -14309,14 +14313,14 @@ var PS = {};
           };
           if (v instanceof ConfirmPending) {
               return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.get(Halogen_Query_HalogenM.monadStateHalogenM))(function (v1) {
-                  return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(FriendInDebt_Blockchain.handleTx(Control_Monad_Aff.monadEffAff)(Control_Monad_Aff_Class.monadAffAff)(NewTX.create)(v1)(Network_Eth_FriendInDebt.confirmPendingDebt(v.value0)))(function () {
+                  return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(FriendInDebt_Blockchain.handleTx(Control_Monad_Aff.monadEffAff)(Control_Monad_Aff_Class.monadAffAff)(NewTX.create)(v1)(new ScreenChange(FriendInDebt_Routes.BalancesScreen.value))(Network_Eth_FriendInDebt.confirmPendingDebt(v.value0)))(function () {
                       return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value1);
                   });
               });
           };
           if (v instanceof RejectPending) {
               return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.get(Halogen_Query_HalogenM.monadStateHalogenM))(function (v1) {
-                  return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(FriendInDebt_Blockchain.handleTx(Control_Monad_Aff.monadEffAff)(Control_Monad_Aff_Class.monadAffAff)(NewTX.create)(v1)(Network_Eth_FriendInDebt.rejectPendingDebt(v.value0)))(function () {
+                  return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(FriendInDebt_Blockchain.handleTx(Control_Monad_Aff.monadEffAff)(Control_Monad_Aff_Class.monadAffAff)(NewTX.create)(v1)(new ScreenChange(FriendInDebt_Routes.BalancesScreen.value))(Network_Eth_FriendInDebt.rejectPendingDebt(v.value0)))(function () {
                       return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value1);
                   });
               });
