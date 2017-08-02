@@ -131,9 +131,7 @@ ui =
             checkMetamask loggedIn mmStatus
             pure next
           CheckTxs → do
-            hLog "checking Tx"
             txs ← H.gets _.txs
-            hLog txs
             bus ← H.gets _.errorBus
             statii ← H.liftAff $ sequence (MM.checkTxStatus <$> txs)
             if hasNetworkError statii
