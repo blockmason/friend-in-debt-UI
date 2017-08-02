@@ -355,7 +355,10 @@ html {
     border-radius: 1em;
     transition: 1s ease;
     text-align: center;
-    font-size: 14px; }
+    font-size: 14px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis; }
     .header-menu a.active {
       background-color: #e03702; }
     .header-menu a i {
