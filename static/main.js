@@ -8279,6 +8279,10 @@ var PS = {};
           })());
       };
   };
+  var secsToDate = function (n) {
+      return Data_Functor.map(Data_Maybe.functorMaybe)(Data_DateTime_Instant.toDateTime)(Data_DateTime_Instant.instant(Data_Time_Duration.Milliseconds(1000.0 * n)));
+  };
+  var zeroDate = secsToDate(0.0);
   var pfGetTodos = function (v) {
       return v.todo;
   };
@@ -8291,10 +8295,6 @@ var PS = {};
   var pdGetSents = function (v) {
       return v.sent;
   };
-  var numToDate = function (n) {
-      return Data_Functor.map(Data_Maybe.functorMaybe)(Data_DateTime_Instant.toDateTime)(Data_DateTime_Instant.instant(n));
-  };
-  var zeroDate = numToDate(0.0);
   var numAmount = function (v) {
       return v.amount;
   };
@@ -8451,7 +8451,7 @@ var PS = {};
           toConfirm: Network_Eth_Foundation.fiBlankId, 
           debt: mkMoney(rd.amount)(fromIsoCode(rd.currency)), 
           desc: rd.desc, 
-          timestamp: Data_Functor.map(Data_Maybe.functorMaybe)(Data_DateTime_Instant.toDateTime)(Data_DateTime_Instant.instant(rd.timestamp))
+          timestamp: secsToDate(rd.timestamp)
       };
   };
   var rawToBalance = function (fi) {
@@ -8473,7 +8473,7 @@ var PS = {};
               debtor: v.value0, 
               creditor: v.value1, 
               totalDebts: Data_Maybe.fromMaybe(0)(Data_Int.fromNumber(rb.totalDebts)), 
-              mostRecent: Data_Functor.map(Data_Maybe.functorMaybe)(Data_DateTime_Instant.toDateTime)(Data_DateTime_Instant.instant(Data_Time_Duration.Milliseconds(rb.mostRecent * 1000.0)))
+              mostRecent: secsToDate(rb.mostRecent)
           };
       };
   };
@@ -8485,7 +8485,7 @@ var PS = {};
           toConfirm: rd.confirmerId, 
           debt: mkMoney(rd.amount)(fromIsoCode(rd.currency)), 
           desc: rd.desc, 
-          timestamp: Data_Functor.map(Data_Maybe.functorMaybe)(Data_DateTime_Instant.toDateTime)(Data_DateTime_Instant.instant(rd.timestamp))
+          timestamp: secsToDate(rd.timestamp)
       };
   };
   var cDecimals = function (v) {
@@ -8583,7 +8583,6 @@ var PS = {};
   exports["moneyFromDecString"] = moneyFromDecString;
   exports["moneyWhole"] = moneyWhole;
   exports["numAmount"] = numAmount;
-  exports["numToDate"] = numToDate;
   exports["pdGetSents"] = pdGetSents;
   exports["pdGetTodos"] = pdGetTodos;
   exports["pfGetSents"] = pfGetSents;
@@ -8591,6 +8590,7 @@ var PS = {};
   exports["rawConfirmedToDebt"] = rawConfirmedToDebt;
   exports["rawToBalance"] = rawToBalance;
   exports["rawToDebt"] = rawToDebt;
+  exports["secsToDate"] = secsToDate;
   exports["setDebtMoney"] = setDebtMoney;
   exports["setDesc"] = setDesc;
   exports["zeroDate"] = zeroDate;
