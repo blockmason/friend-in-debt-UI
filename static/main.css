@@ -353,7 +353,8 @@ html {
     font-weight: 100;
     text-decoration: none;
     border-radius: 1em;
-    transition: 1s ease; }
+    transition: 1s ease;
+    text-align: center; }
     .header-menu a.active {
       background-color: #e03702; }
 
