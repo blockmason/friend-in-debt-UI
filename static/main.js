@@ -14524,13 +14524,13 @@ var PS = {};
           };
           if (v instanceof RefreshDebts) {
               return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.gets(Halogen_Query_HalogenM.monadStateHalogenM)(function (v1) {
-                  return v1.pendingTodo;
+                  return v1.errorBus;
               }))(function (v1) {
-                  return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.gets(Halogen_Query_HalogenM.monadStateHalogenM)(function (v2) {
-                      return v2.errorBus;
-                  }))(function (v2) {
-                      return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(loadFriendsAndDebts(Halogen_Query_HalogenM.bindHalogenM)(Halogen_Query_HalogenM.monadStateHalogenM)(Halogen_Query_HalogenM.monadEffHalogenM(Control_Monad_Aff.monadEffAff))(Halogen_Query_HalogenM.monadAffHalogenM(Control_Monad_Aff_Class.monadAffAff))(v2))(function () {
-                          return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(Halogen_Query_HalogenM.raise(new NumPendingTodo(Data_Array.length(v1))))(function () {
+                  return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(loadFriendsAndDebts(Halogen_Query_HalogenM.bindHalogenM)(Halogen_Query_HalogenM.monadStateHalogenM)(Halogen_Query_HalogenM.monadEffHalogenM(Control_Monad_Aff.monadEffAff))(Halogen_Query_HalogenM.monadAffHalogenM(Control_Monad_Aff_Class.monadAffAff))(v1))(function () {
+                      return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.gets(Halogen_Query_HalogenM.monadStateHalogenM)(function (v2) {
+                          return v2.pendingTodo;
+                      }))(function (v2) {
+                          return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(Halogen_Query_HalogenM.raise(new NumPendingTodo(Data_Array.length(v2))))(function () {
                               return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value0);
                           });
                       });
@@ -14864,7 +14864,7 @@ var PS = {};
                                   });
                               });
                           };
-                          throw new Error("Failed pattern match at Container line 213, column 3 - line 218, column 16: " + [ maybeBus.constructor.name ]);
+                          throw new Error("Failed pattern match at Container line 214, column 3 - line 219, column 16: " + [ maybeBus.constructor.name ]);
                       };
                   };
               };
@@ -15192,20 +15192,22 @@ var PS = {};
                   });
               };
               if (v.value0 instanceof Debts.NumPendingTodo) {
-                  return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.modify(Halogen_Query_HalogenM.monadStateHalogenM)(function (v1) {
-                      var $125 = {};
-                      for (var $126 in v1) {
-                          if ({}.hasOwnProperty.call(v1, $126)) {
-                              $125[$126] = v1[$126];
+                  return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(FriendInDebt_Prelude.hLog(Halogen_Query_HalogenM.monadEffHalogenM(Control_Monad_Aff.monadEffAff))(Data_Show.showString)("pending todo: " + Data_Show.show(Data_Show.showInt)(v.value0.value0)))(function () {
+                      return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.modify(Halogen_Query_HalogenM.monadStateHalogenM)(function (v1) {
+                          var $125 = {};
+                          for (var $126 in v1) {
+                              if ({}.hasOwnProperty.call(v1, $126)) {
+                                  $125[$126] = v1[$126];
+                              };
                           };
-                      };
-                      $125.numPendingTodo = v.value0.value0;
-                      return $125;
-                  }))(function () {
-                      return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value1);
+                          $125.numPendingTodo = v.value0.value0;
+                          return $125;
+                      }))(function () {
+                          return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value1);
+                      });
                   });
               };
-              throw new Error("Failed pattern match at Container line 159, column 9 - line 169, column 22: " + [ v.value0.constructor.name ]);
+              throw new Error("Failed pattern match at Container line 159, column 9 - line 170, column 22: " + [ v.value0.constructor.name ]);
           };
           if (v instanceof PreviousScreen) {
               return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.modify(Halogen_Query_HalogenM.monadStateHalogenM)(function (state) {
@@ -15222,7 +15224,7 @@ var PS = {};
                   return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value0);
               });
           };
-          throw new Error("Failed pattern match at Container line 105, column 12 - line 172, column 18: " + [ v.constructor.name ]);
+          throw new Error("Failed pattern match at Container line 105, column 12 - line 173, column 18: " + [ v.constructor.name ]);
       };
       return Halogen_Component.lifecycleParentComponent(Data_Either.ordEither(Data_Ord.ordUnit)(Data_Ord.ordVoid))({
           initialState: Data_Function["const"](initialState), 

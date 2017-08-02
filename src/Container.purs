@@ -165,6 +165,7 @@ ui =
             H.modify (\s → s { txs = s.txs <> [newTx] })
             pure next
           D.NumPendingTodo n → do
+            hLog $ "pending todo: " <> show n
             H.modify (_ { numPendingTodo = n })
             pure next
       PreviousScreen next → do

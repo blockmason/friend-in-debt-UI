@@ -200,9 +200,9 @@ component =
       handleTx NewTX s (ScreenChange R.BalancesScreen) $ F.rejectPendingDebt debt
       pure next
     RefreshDebts next → do
-      pendingTodo ← H.gets _.pendingTodo
       errorBus    ← H.gets _.errorBus
       loadFriendsAndDebts errorBus
+      pendingTodo ← H.gets _.pendingTodo
       H.raise $ NumPendingTodo (length pendingTodo)
       pure next
 
