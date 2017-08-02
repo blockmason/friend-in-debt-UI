@@ -28,7 +28,7 @@ import Network.Eth.FriendInDebt as F
 
 import FriendInDebt.Routes      as R
 import FriendInDebt.Config      as C
-import FriendInDebt.Blockchain (hasNetworkError, loadingOverlay)
+import FriendInDebt.Blockchain (hasNetworkError, loadingOverlay, handleCall)
 
 data Query a
   = Init a
@@ -40,7 +40,7 @@ data Query a
 
 type State = { loggedIn ∷ Boolean
              , loading  ∷ Boolean
-             , hasFoundation ∷ Boolean
+             , myId     ∷ Maybe F.FoundationId
              , errorBus ∷ ContainerMsgBus
              , txs      ∷ Array E.TX
              , numPendingTodo ∷ Int
@@ -65,7 +65,7 @@ ui =
     initialState ∷ State
     initialState = { loggedIn: true
                    , loading: true
-                   , hasFoundation: true
+                   , myId: Nothing
                    , errorBus: Nothing
                    , txs: []
                    , numPendingTodo: 0
@@ -79,10 +79,10 @@ ui =
                  "container " <>
                  (R.getRouteNameFor state.currentScreen)  <>
                  (if state.loading then " loading" else "") <>
-                 (if state.loggedIn && state.hasFoundation then "" else " require-login")) ]
+                 (if state.loggedIn && (isJust state.myId) then "" else " require-login")) ]
       [ promptMetamask state.loggedIn
       , loadingOverlay state.loading
-      , promptFoundation state.hasFoundation
+      , promptFoundation (isJust state.myId)
       , topBar state
       , menu state
       , HH.div [ HP.class_ (HH.ClassName "create-debt-bar") ]
@@ -108,9 +108,11 @@ ui =
         H.subscribe $ busEventSource (flip HandleMsg ES.Listening) bus
         H.modify (_ { loggedIn = true, loading = true, errorBus = Just bus })
         H.liftAff $ delay (Milliseconds (toNumber 1500))
+        eb ← H.gets _.errorBus
+        myId ← handleCall eb F.fiBlankId F.foundationId
+        H.modify (_ { myId = Just myId })
         refreshMetamask
         H.modify (_ { loading = false })
---        runTests
         startCheckInterval (Just bus) C.checkMMInterval C.checkTxInterval
         pure next
       HandleMsg msg next → do
@@ -122,7 +124,7 @@ ui =
           FIDError e → do
             case e of
               F.NoFoundationId → do
-                H.modify (_ { hasFoundation = false })
+                H.modify (_ { myId = Nothing })
                 pure next
               _ → do
                 H.modify (_ { loggedIn = false })
@@ -165,7 +167,6 @@ ui =
             H.modify (\s → s { txs = s.txs <> [newTx] })
             pure next
           D.NumPendingTodo n → do
-            hLog $ "pending todo: " <> show n
             H.modify (_ { numPendingTodo = n })
             pure next
       PreviousScreen next → do
@@ -281,7 +282,8 @@ menuItem screen state =
       menuText =
         case screen of
           R.SettingsScreen →
-            [ HH.i [HP.class_ (HH.ClassName "fa fa-user")][], HH.text "MockId123"]
+            [ HH.i [HP.class_ (HH.ClassName "fa fa-user")][]
+            , HH.text $ maybe "" show state.myId ]
           R.PendingScreen →
             [ HH.text $ R.getMenuNameFor screen ]
             <> (if nTodo > 0 then [HH.span_ [HH.text $ show nTodo]] else [])
