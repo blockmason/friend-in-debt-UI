@@ -73,6 +73,13 @@
      &.show-reload {
        display: block;
      }
+
+     i {
+       transition: 0.5s ease;
+     }
+     i:hover {
+       transform: rotate(30deg);
+     }
    }
 }
 

@@ -348,6 +348,10 @@ html {
     text-align: right; }
     .top-bar .reload-button.show-reload {
       display: block; }
+    .top-bar .reload-button i {
+      transition: 0.5s ease; }
+    .top-bar .reload-button i:hover {
+      transform: rotate(30deg); }
 
 .header-menu {
   background: #ff5722;
