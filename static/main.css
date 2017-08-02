@@ -319,9 +319,9 @@ html {
     font-size: 10px;
     text-transform: uppercase;
     color: white;
-    opacity: 0; }
+    display: none; }
     .top-bar .current-transactions.processing {
-      opacity: 1; }
+      display: block; }
   .top-bar .transaction-spinner {
     width: 20px;
     height: 20px;
