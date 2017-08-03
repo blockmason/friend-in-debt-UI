@@ -63,7 +63,7 @@ ui =
   where
 
     initialState ∷ State
-    initialState = { loggedIn: true
+    initialState = { loggedIn: false
                    , loading: true
                    , myId: Nothing
                    , errorBus: Nothing
@@ -80,9 +80,9 @@ ui =
                  (R.getRouteNameFor state.currentScreen)  <>
                  (if state.loading then " loading" else "") <>
                  (if state.loggedIn && (isJust state.myId) then "" else " require-login")) ]
-      [ promptMetamask state.loggedIn
-      , loadingOverlay state.loading
-      , promptFoundation $ isJust state.myId
+      [  loadingOverlay state.loading
+         --, promptMetamask state.loggedIn
+--      , promptFoundation $ isJust state.myId
       , topBar state
       , menu state
       , HH.div [ HP.class_ (HH.ClassName "create-debt-bar") ]
@@ -104,6 +104,8 @@ ui =
     eval ∷ Query ~> H.ParentDSL State Query ChildQuery ChildSlot Void (FIDMonad eff)
     eval = case _ of
       Init next → do
+        H.modify (_ { loading = true })
+        hLog "should show loading overlay"
         bus ← H.liftAff $ Bus.make
         H.subscribe $ busEventSource (flip HandleMsg ES.Listening) bus
         H.modify (_ { loggedIn = true, loading = true, errorBus = Just bus })
