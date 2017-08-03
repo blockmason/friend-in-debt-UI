@@ -33,7 +33,7 @@ import FriendInDebt.Blockchain (hasNetworkError, loadingOverlay, handleCall)
 data Query a
   = Init a
   | HandleMsg ContainerMsg a
-  | RefreshMetamask a
+  | RefreshData a
   | SetScreen R.Screen a
   | PreviousScreen a
   | DebtViewMsg D.Message a
@@ -82,7 +82,7 @@ ui =
                  (if state.loggedIn && (isJust state.myId) then "" else " require-login")) ]
       [ promptMetamask state.loggedIn
       , loadingOverlay state.loading
-      , promptFoundation (isJust state.myId)
+      , promptFoundation $ isJust state.myId
       , topBar state
       , menu state
       , HH.div [ HP.class_ (HH.ClassName "create-debt-bar") ]
@@ -111,8 +111,8 @@ ui =
         eb ← H.gets _.errorBus
         myId ← handleCall eb F.fiBlankId F.foundationId
         H.modify (_ { myId = Just myId })
-        refreshMetamask
         H.modify (_ { loading = false })
+        refreshData
         startCheckInterval (Just bus) C.checkMMInterval C.checkTxInterval
         pure next
       HandleMsg msg next → do
@@ -147,28 +147,28 @@ ui =
                 if A.length pending /= A.length txs
                   then do
                     H.modify (_ { txs = (\(Tuple _ tx) → tx) <$> pending })
-                    refreshMetamask
+                    refreshData
                   else pure unit
             pure next
-      RefreshMetamask next → do
-        refreshMetamask
+      RefreshData next → do
+        refreshData
         pure next
       SetScreen screen next → do
         H.modify (\state → state {history = append [state.currentScreen] state.history })
         H.modify (_ {currentScreen = screen})
         pure next
-      DebtViewMsg msg next →
+      DebtViewMsg msg next → do
         case msg of
-          D.ScreenChange screen → do
-            H.modify (\state → state {history = append [state.currentScreen] state.history })
-            H.modify (_ {currentScreen = screen})
-            pure next
-          D.NewTX newTx → do
+          D.SetLoading onOff →
+            H.modify (\s → s { loading = onOff })
+          D.ScreenChange screen →
+            H.modify (\s → s { history = append [s.currentScreen] s.history
+                             , currentScreen = screen })
+          D.NewTX newTx →
             H.modify (\s → s { txs = s.txs <> [newTx] })
-            pure next
-          D.NumPendingTodo n → do
+          D.NumPendingTodo n →
             H.modify (_ { numPendingTodo = n })
-            pure next
+        pure next
       PreviousScreen next → do
         H.modify (\state → state {currentScreen = (fromMaybe R.BalancesScreen $ A.head state.history), history = (fromMaybe [] $ A.tail state.history)})
         pure next
@@ -180,7 +180,7 @@ promptMetamask loggedIn =
            else HP.class_ (HH.ClassName "active")]
   [
     HH.h6_ [ HH.text "Not logged in to Metamask." ]
-    , HH.button [ HE.onClick $ HE.input_ $ RefreshMetamask
+    , HH.button [ HE.onClick $ HE.input_ $ RefreshData
                 , HP.class_ $ HH.ClassName "btn-info"]
       [ HH.i [HP.class_ (HH.ClassName "fa fa-refresh")][] ]
   ]
@@ -192,13 +192,13 @@ promptFoundation hasFoundation =
            else HP.class_ (HH.ClassName "active")]
   [
     HH.h6_ [ HH.text "No Foundation ID detected." ]
-    , HH.button [ HE.onClick $ HE.input_ $ RefreshMetamask
+    , HH.button [ HE.onClick $ HE.input_ $ RefreshData
                 , HP.class_ $ HH.ClassName "btn-info"]
       [ HH.i [HP.class_ (HH.ClassName "fa fa-user-plus")][], HH.text "Register" ]
   ]
 
-refreshMetamask ∷ ∀ e. H.ParentDSL State Query ChildQuery ChildSlot Void (FIDMonad e) Unit
-refreshMetamask = do
+refreshData ∷ ∀ e. H.ParentDSL State Query ChildQuery ChildSlot Void (FIDMonad e) Unit
+refreshData = do
   mmStatus ← H.liftEff MM.loggedIn
   if mmStatus
     then do _ ← H.query' CP.cp1 unit (D.RefreshDebts unit)
@@ -209,7 +209,7 @@ refreshMetamask = do
 checkMetamask ∷ ∀ e. Boolean → Boolean
               → H.ParentDSL State Query ChildQuery ChildSlot Void (FIDMonad e) Unit
 checkMetamask loggedIn mmStatus =
-  if (loggedIn && mmStatus) then pure unit else refreshMetamask
+  if (loggedIn && mmStatus) then pure unit else refreshData
 
 startCheckInterval maybeBus mmInterval txInterval = do
   case maybeBus of
@@ -259,7 +259,7 @@ topBar state =
           HH.i [HP.class_ (HH.ClassName "transaction-spinner")][],
           HH.span_ [HH.text $ "Immortalizing " <> show (A.length state.txs) <> " items..."]
         ]
-      , HH.a [HP.href "#", HE.onClick $ HE.input_ $ RefreshMetamask , HP.class_ (HH.ClassName $ "col-4 align-self-end reload-button" <> if processing then "" else " show-reload") ]
+      , HH.a [HP.href "#", HE.onClick $ HE.input_ $ RefreshData , HP.class_ (HH.ClassName $ "col-4 align-self-end reload-button" <> if processing then "" else " show-reload") ]
         [
           HH.i [HP.class_ (HH.ClassName "fa fa-refresh")][]
         ]

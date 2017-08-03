@@ -44,6 +44,7 @@ data Message
   = ScreenChange R.Screen
   | NewTX E.TX
   | NumPendingTodo Int
+  | SetLoading Boolean
 newtype FriendBundle = FriendBundle { id ∷ F.FoundationId, gradient ∷ ICON.GradientCss, balance ∷ Maybe F.Balance }
 
 type State = { friends             ∷ Array F.FoundationId
@@ -62,7 +63,6 @@ type State = { friends             ∷ Array F.FoundationId
              , inputName           ∷ String
              , showItemizedDebtFor ∷ Maybe F.FoundationId
              , defaultCurrency     ∷ F.Currency
-             , loading             ∷ Boolean
              , inputChanged        ∷ Boolean
              , errorBus            ∷ ContainerMsgBus }
 
@@ -93,18 +93,12 @@ component =
                        , inputName: ""
                        , showItemizedDebtFor: Nothing
                        , defaultCurrency: F.cUSD
-                       , loading: false
                        , inputChanged: false
                        , errorBus: input }
 
   render ∷ State → H.ComponentHTML Query
   render state =
-    -- if state.loading
-    -- then HH.span_ [ HH.h6_ [ HH.text "Loading debt info..." ]
-    --               , HH.img [ HP.src "loading.gif"
-    --                        , HP.width 25 ] ]
-    -- else
-      HH.div
+    HH.div
       [ HP.class_ $ HH.ClassName "page-container col-12" ]
       [
         page R.FriendsScreen $
@@ -139,10 +133,11 @@ component =
         Nothing → pure next
         Just f  → do
           s ← H.get
-          H.modify (_ { loading = true, showItemizedDebtFor = maybeFriend })
+          H.modify (_ { showItemizedDebtFor = maybeFriend })
+          H.raise $ SetLoading true
           idebts ← handleCall s.errorBus [] (F.itemizedDebts f)
-          H.modify (_ { loading = false
-                      , itemizedDebts = M.insert f idebts s.itemizedDebts })
+          H.modify (_ { itemizedDebts = M.insert f idebts s.itemizedDebts })
+          H.raise $ SetLoading false
           pure next
 
     HandleInput input next → do
@@ -189,11 +184,12 @@ component =
       hLog debt
       pure next
     AddDebt debt next → do
-      H.modify (_ { loading = true })
+      H.raise $ SetLoading true
       hLog debt
       s ← H.get
       handleTx NewTX s (ScreenChange R.BalancesScreen) $ F.newPendingDebt debt
-      H.modify (_ { newDebt = Nothing, newCredit = Nothing, loading = false })
+      H.modify (_ { newDebt = Nothing, newCredit = Nothing })
+      H.raise $ SetLoading false
       pure next
     ConfirmPending debt next → do
       s ← H.get
@@ -216,7 +212,7 @@ refreshButton =
   [ HH.text "Refresh" ]
 
 loadFriendsAndDebts errorBus = do
-  H.modify (_ { loading = true })
+  H.raise $ SetLoading true
   myId           ← handleCall errorBus (F.FoundationId "") F.foundationId
   friends        ← handleCall errorBus [] F.confirmedFriends
   pendingFriends ← handleCall errorBus F.blankPendingFriends F.pendingFriends
@@ -228,8 +224,8 @@ loadFriendsAndDebts errorBus = do
               , pendingSent = F.pdGetSents pendingD
               , pendingTodo = F.pdGetTodos pendingD
               , balances = balances
-              , loading = false
               })
+  H.raise $ SetLoading false
 
 -- structural components
 
@@ -373,7 +369,7 @@ displayBalanceLi state bal =
   let debtsMap = state.itemizedDebts
       me       = state.myId
       creditor = F.balCreditor bal
-      debtor   = F.balCreditor bal
+      debtor   = F.balDebtor bal
       amount   = F.balAmount bal
       totalDebts  = F.balTotalDebts bal
       mostRecent  = maybe "" formatDate $ F.balMostRecent bal
