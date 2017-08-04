@@ -432,8 +432,8 @@ displaySentFriend friend =
         HH.div [HP.class_ $ HH.ClassName "request-details"]
         [
           HH.span_ [HH.text "Friend Request To"],
-          HH.span_ [HH.text $ show friend],
-          HH.span_ [HH.text "2017/07/29 15:35"]
+          HH.span_ [HH.text $ show friend]
+--          , HH.span_ [HH.text "2017/07/29 15:35"]
         ]
       ]
     ]
