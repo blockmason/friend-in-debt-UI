@@ -111,7 +111,8 @@ instance ordMoney ∷ Ord Money where
 moneyFromDecString ∷ Currency → String → Maybe Money
 moneyFromDecString c val = do
   nVal ← N.fromString val
-  pure $ mkMoney ((conversionFactor c) * nVal) c
+  let converted = I.toNumber $ I.floor $ (conversionFactor c) * nVal
+  pure $ mkMoney converted c
 mkMoney ∷ Number → Currency → Money
 mkMoney val currency = Money { amount: val, currency: currency }
 numAmount ∷ Money → Number

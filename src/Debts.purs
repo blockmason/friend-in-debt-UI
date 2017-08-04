@@ -13,6 +13,7 @@ import Data.String as S
 import Data.Map    as M
 import Data.Array (length, filter, zip, fromFoldable, groupBy, sortBy, find)
 import Data.NonEmpty
+import DOM.HTML.Indexed.StepValue (StepValue(..))
 
 import Halogen as H
 import Halogen.HTML as HH
@@ -170,6 +171,8 @@ component =
       pure next
     InputDebtAmount debtType strAmount next → do
       H.modify (\s → s { inputChanged = not s.inputChanged })
+      c ← H.gets _.defaultCurrency
+      hLog $ F.moneyFromDecString c strAmount
       case debtType of
         Debt   → H.modify (_ { newDebtAmount = strAmount})
         Credit → H.modify (_ { newCreditAmount = strAmount})
@@ -202,8 +205,10 @@ component =
       handleTx NewTX s (ScreenChange R.BalancesScreen) $ F.rejectPendingDebt debt
       pure next
     RefreshDebts next → do
+      H.raise $ SetLoading true
       errorBus    ← H.gets _.errorBus
       loadFriendsAndDebts errorBus
+      H.raise $ SetLoading false
       pendingTodo ← H.gets _.pendingTodo
       H.raise $ NumPendingTodo (length pendingTodo)
       pure next
@@ -214,7 +219,6 @@ refreshButton =
   [ HH.text "Refresh" ]
 
 loadFriendsAndDebts errorBus = do
-  H.raise $ SetLoading true
   myId           ← handleCall errorBus (F.FoundationId "") F.foundationId
   friends        ← handleCall errorBus [] F.confirmedFriends
   pendingFriends ← handleCall errorBus F.blankPendingFriends F.pendingFriends
@@ -227,7 +231,6 @@ loadFriendsAndDebts errorBus = do
               , pendingTodo = F.pdGetTodos pendingD
               , balances = balances
               })
-  H.raise $ SetLoading false
 
 -- structural components
 
@@ -629,6 +632,7 @@ inputFDebt debtType _ cur myId friends maybeDebt strAmount =
              , HH.input [ HP.type_ HP.InputNumber
                         , HP.class_ $ HH.ClassName "debt-amount"
                         , HP.value $ strAmount
+                        , HP.step $ Step 0.01
                         , HE.onValueInput (HE.input (\v → InputDebtAmount debtType v))
                         ]
              , HH.span_ [HH.text $ F.cIsoCode cur]
@@ -643,7 +647,7 @@ inputFDebt debtType _ cur myId friends maybeDebt strAmount =
                       (HE.input (\val → InputDebtDetails debtType $ F.setDesc d (S.take 32 val)))
                     , HP.value $ S.take 32 $ F.getDesc d ]
          , HH.button [ HE.onClick $ HE.input_ $ AddDebt (setMoney d strAmount)
-                     , HP.disabled $ isJust $ F.moneyFromDecString cur strAmount
+                     , HP.disabled $ isNothing $ F.moneyFromDecString cur strAmount
                      , HP.class_ $ HH.ClassName "create-debt-button form-control"]
            [ HH.text $ sendMsg ]
          ]

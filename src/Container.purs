@@ -80,9 +80,9 @@ ui =
                  (R.getRouteNameFor state.currentScreen)  <>
                  (if state.loading then " loading" else "") <>
                  (if state.loggedIn && (isJust state.myId) then "" else " require-login")) ]
-      [  loadingOverlay state.loading
-         --, promptMetamask state.loggedIn
---      , promptFoundation $ isJust state.myId
+      [ loadingOverlay state.loading
+      , promptMetamask state.loggedIn
+      , promptFoundation $ isJust state.myId
       , topBar state
       , menu state
       , HH.div [ HP.class_ (HH.ClassName "create-debt-bar") ]
@@ -105,7 +105,6 @@ ui =
     eval = case _ of
       Init next → do
         H.modify (_ { loading = true })
-        hLog "should show loading overlay"
         bus ← H.liftAff $ Bus.make
         H.subscribe $ busEventSource (flip HandleMsg ES.Listening) bus
         H.modify (_ { loggedIn = true, loading = true, errorBus = Just bus })
@@ -113,8 +112,9 @@ ui =
         eb ← H.gets _.errorBus
         myId ← handleCall eb F.fiBlankId F.foundationId
         H.modify (_ { myId = Just myId })
-        H.modify (_ { loading = false })
+        H.modify (_ { loading = true })
         refreshData
+        H.modify (_ { loading = false })
         startCheckInterval (Just bus) C.checkMMInterval C.checkTxInterval
         pure next
       HandleMsg msg next → do
@@ -161,7 +161,8 @@ ui =
         pure next
       DebtViewMsg msg next → do
         case msg of
-          D.SetLoading onOff →
+          D.SetLoading onOff → do
+            hLog $ "Turning loading " <> show onOff
             H.modify (\s → s { loading = onOff })
           D.ScreenChange screen →
             H.modify (\s → s { history = append [s.currentScreen] s.history
