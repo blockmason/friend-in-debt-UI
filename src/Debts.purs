@@ -31,7 +31,7 @@ data Query a
   | HandleInput Input a
   | InputDebtAmount DebtType String a
   | InputDebtDetails DebtType F.Debt a
-  | AddDebt F.Debt a
+  | AddDebt (Maybe F.Debt) a
   | ConfirmPending F.Debt a
   | RejectPending F.Debt a
   | AddFriend (Either String F.FoundationId) a
@@ -182,13 +182,16 @@ component =
       H.modify (\s → s { inputChanged = not s.inputChanged })
       hLog debt
       pure next
-    AddDebt debt next → do
-      H.raise $ SetLoading true
-      hLog debt
-      s ← H.get
-      handleTx NewTX s (ScreenChange R.BalancesScreen) $ F.newPendingDebt debt
-      H.modify (_ { newDebt = Nothing, newCredit = Nothing })
-      H.raise $ SetLoading false
+    AddDebt maybeDebt next → do
+      hLog maybeDebt
+      case maybeDebt of
+        Just debt → do
+          H.raise $ SetLoading true
+          s ← H.get
+          handleTx NewTX s (ScreenChange R.BalancesScreen) $ F.newPendingDebt debt
+          H.modify (_ { newDebt = Nothing, newCredit = Nothing })
+          H.raise $ SetLoading false
+        Nothing   → pure unit
       pure next
     ConfirmPending debt next → do
       s ← H.get
@@ -639,15 +642,13 @@ inputFDebt debtType _ cur myId friends maybeDebt strAmount =
                     , HE.onValueInput
                       (HE.input (\val → InputDebtDetails debtType $ F.setDesc d (S.take 32 val)))
                     , HP.value $ S.take 32 $ F.getDesc d ]
-         , HH.button [ HE.onClick $ HE.input_ $ AddDebt d
-                     , HP.disabled $ F.debtAmount d == 0.0
+         , HH.button [ HE.onClick $ HE.input_ $ AddDebt (setMoney d strAmount)
+                     , HP.disabled $ isJust $ F.moneyFromDecString cur strAmount
                      , HP.class_ $ HH.ClassName "create-debt-button form-control"]
            [ HH.text $ sendMsg ]
          ]
-      where whole ∷ F.Debt → Int
-            whole = F.moneyWhole ∘ F.debtMoney
-            decs  ∷ F.Debt → Int
-            decs  = F.moneyDecimals ∘ F.debtMoney
+      where setMoney ∷ F.Debt → String → Maybe F.Debt
+            setMoney d strA = (F.setDebtMoney d) <$> F.moneyFromDecString cur strA
             counterparty debt dType v = case dType of
               Debt   → F.debtSetCreditor debt (F.fiMkId v)
               Credit → F.debtSetDebtor   debt (F.fiMkId v)
@@ -657,45 +658,3 @@ inputCredit = inputFDebt Credit
 
 numberFromString ∷ String → Number
 numberFromString s = fromMaybe 0.0 (N.fromString s)
---
--- mockFriendNames :: Array String
--- mockFriendNames = ["bob", "tim", "kevin"]
---
--- mockFriends :: Array F.FoundationId
--- mockFriends = [F.FoundationId "jaredbowie", F.FoundationId "TimTime", F.FoundationId "chinmich", F.FoundationId "tom", F.FoundationId "aki", F.FoundationId "brad"]
---
--- mockNameMap :: NameMap
--- mockNameMap = M.insert (F.FoundationId "bob") "Bob Brown" $ M.empty
---
--- fakeDebt :: F.Debt
--- fakeDebt = mockDebt $ F.FoundationId "bob"
---
--- fakeDebts :: Array F.Debt
--- fakeDebts = [fakeDebt, fakeDebt]
---
--- mockMe :: F.FoundationId
--- mockMe = (F.FoundationId "lukezhang")
---
--- fakeFriend :: F.FoundationId
--- fakeFriend = (F.FoundationId "jaredbowie")
---
--- fakeFriend2 :: F.FoundationId
--- fakeFriend2 = (F.FoundationId "timtime")
--- --
--- --
--- -- mockDebtMap :: DebtsMap
--- -- mockDebtMap = M.insert (F.FoundationId "bob") fakeDebt $ M.empty
---
--- mockBalance :: F.Balance
--- mockBalance = F.Balance { debtor: mockMe, creditor: fakeFriend, amount: F.Money {amount: 5.0, currency: F.cUSD}, totalDebts: 13, mostRecent: Nothing}
---
--- mockBalance2 :: F.Balance
--- mockBalance2 = F.Balance { debtor: mockMe, creditor: fakeFriend2, amount: F.Money {amount: 15.0, currency: F.cUSD}, totalDebts: 13, mostRecent: Nothing}
---
--- mockPendingDebts :: F.PendingDebts
--- mockPendingDebts = F.PD {sent: [fakeDebt], todo: [fakeDebt]}
---
--- mockFoundationId :: F.FoundationId
--- mockFoundationId = F.FoundationId "snoopy"
--- mockDebt :: F.FoundationId -> F.Debt
--- mockDebt fid = F.mkDebt mockFoundationId fid fid (F.moneyFromDecString "2.0" F.cUSD) F.NoDebtId "Dinner @ KRBB"

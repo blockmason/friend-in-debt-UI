@@ -14,7 +14,7 @@ import Data.Traversable            (traverse)
 import Data.Format.Money           (formatDecimal)
 import Data.Int                                                    as I
 import Data.Number                                                 as N
-import Data.String                 (localeCompare)
+import Data.String                                                 as S
 import Math                        ((%), abs, pow)
 import Data.Map                                                    as M
 import Data.Array                                                  as A
@@ -108,10 +108,10 @@ instance ordMoney ∷ Ord Money where
   compare (Money m1) (Money m2) = compare m1.amount m2.amount
   --TODO: make the above work with multiple currencies
 
-moneyFromDecString ∷ Currency → String → Money
-moneyFromDecString c val =
-  let amount = (fromMaybe 0.0 $ N.fromString val) * (conversionFactor c)
-  in mkMoney amount c
+moneyFromDecString ∷ Currency → String → Maybe Money
+moneyFromDecString c val = do
+  nVal ← N.fromString val
+  pure $ mkMoney ((conversionFactor c) * nVal) c
 mkMoney ∷ Number → Currency → Money
 mkMoney val currency = Money { amount: val, currency: currency }
 numAmount ∷ Money → Number
@@ -224,7 +224,7 @@ instance showEthAddress ∷ Show EthAddress where
 instance eqEthAddress ∷ Eq EthAddress where
   eq (EthAddress ua1) (EthAddress ua2) = ua1 == ua2
 instance ordEthAddress ∷ Ord EthAddress where
-  compare (EthAddress ua1) (EthAddress ua2) = localeCompare ua1 ua2
+  compare (EthAddress ua1) (EthAddress ua2) = S.localeCompare ua1 ua2
 getAddr ∷ EthAddress → String
 getAddr (EthAddress ea) = ea
 
