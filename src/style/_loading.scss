@@ -98,6 +98,24 @@
   filter: blur(3px);
 }
 
+.container.loading {
+  #noFoundationOverlay {
+    display: none;
+  }
+
+  .page-container,
+  .top-bar,
+  .header-menu,
+  .create-debt-bar,
+  .add-friend-bar {
+    filter: progid:DXImageTransform.Microsoft.Blur(PixelRadius='5');
+    -webkit-filter: url(#blur-filter);
+    filter: url(#blur-filter);
+    -webkit-filter: blur(5px);
+    filter: blur(5px);
+  }
+}
+
 .container.require-login {
   .page-container,
   .top-bar,
@@ -111,7 +129,7 @@
     filter: blur(5px);
   }
 
-  #loadingOverlay {
+  .no-balances {
     display: none;
   }
 }

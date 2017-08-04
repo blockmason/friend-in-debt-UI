@@ -92,6 +92,20 @@ html {
   -webkit-filter: blur(3px);
   filter: blur(3px); }
 
+.container.loading #noFoundationOverlay {
+  display: none; }
+
+.container.loading .page-container,
+.container.loading .top-bar,
+.container.loading .header-menu,
+.container.loading .create-debt-bar,
+.container.loading .add-friend-bar {
+  filter: progid:DXImageTransform.Microsoft.Blur(PixelRadius='5');
+  -webkit-filter: url(#blur-filter);
+  filter: url(#blur-filter);
+  -webkit-filter: blur(5px);
+  filter: blur(5px); }
+
 .container.require-login .page-container,
 .container.require-login .top-bar,
 .container.require-login .header-menu,
@@ -103,7 +117,7 @@ html {
   -webkit-filter: blur(5px);
   filter: blur(5px); }
 
-.container.require-login #loadingOverlay {
+.container.require-login .no-balances {
   display: none; }
 
 #debtLoadingOverlay {
