@@ -35,6 +35,3 @@ instance showContainerMsg ∷ Show ContainerMsg where
   show NetworkError  = "NetworkError accessing blockchain"
 
 type ContainerMsgBus = Maybe (Bus.BusRW ContainerMsg)
-
--- Input field types
-type InputMoney = { whole ∷ Int, decs ∷ Int, debt ∷ F.Debt }
