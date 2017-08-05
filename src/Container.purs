@@ -46,7 +46,9 @@ type State = { loggedIn ∷ Boolean
              , numPendingTodo ∷ Int
              , numPendingFriends ∷ Int
              , currentScreen ∷ R.Screen
-             , history ∷ Array R.Screen }
+             , history  ∷ Array R.Screen
+             , logText  ∷ String
+             }
 
 type ChildQuery = Coproduct1 D.Query
 type ChildSlot = Either1 Unit
@@ -72,7 +74,9 @@ ui =
                    , numPendingTodo: 0
                    , numPendingFriends: 0
                    , currentScreen: R.BalancesScreen
-                   , history: []}
+                   , history: []
+                   , logText: ""
+                   }
 
     render ∷ State → H.ParentHTML Query ChildQuery ChildSlot (FIDMonad eff)
     render state =
@@ -83,6 +87,7 @@ ui =
                  (if state.loading then " loading" else "") <>
                  (if state.loggedIn && (isJust state.myId) then "" else " require-login")) ]
       [ loadingOverlay state.loading
+      , loggerOverlay true state.logText
       , promptMetamask state.loggedIn
       , promptFoundation $ isJust state.myId
       , topBar state
@@ -106,14 +111,17 @@ ui =
     eval ∷ Query ~> H.ParentDSL State Query ChildQuery ChildSlot Void (FIDMonad eff)
     eval = case _ of
       Init next → do
+        divLog "BEFORE LOADING"
         H.modify (_ { loading = true })
         bus ← H.liftAff $ Bus.make
         H.subscribe $ busEventSource (flip HandleMsg ES.Listening) bus
         H.modify (_ { loggedIn = true, loading = true, errorBus = Just bus })
         H.liftAff $ delay (Milliseconds (toNumber 1500))
+        divLog "AFTER WEB3 LOAD INTERVAL"
         eb ← H.gets _.errorBus
         myId ← handleCall eb F.fiBlankId F.foundationId
         H.modify (_ { myId = Just myId })
+        divLog $ "FoundationId: " <> show myId
         refreshData
         startCheckInterval (Just bus) C.checkMMInterval C.checkTxInterval
         pure next
@@ -311,3 +319,8 @@ menuItem screen state =
 -- randomLoadingText ∷ String
 -- randomLoadingText =
 --   ["Interacting with Blockchain", "Waiting for Node Response", "Committing Data", "Transmitting", "Processing", "Waiting for Nodes"]
+
+loggerOverlay onOff logText =
+  if onOff
+  then HH.div [ HP.id_ "loggerOverlay"] [ HH.text logText ]
+  else HH.div_ []

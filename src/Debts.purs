@@ -35,7 +35,8 @@ data Query a
   | AddDebt (Maybe F.Debt) a
   | ConfirmPending F.Debt a
   | RejectPending F.Debt a
-  | AddFriend (Either String F.FoundationId) a
+  | AddFriend String a
+  | ConfirmFriend F.FoundationId a
   | InputFriend String a
   | ShowItemizedDebtFor (Maybe F.FoundationId) a
 
@@ -62,7 +63,7 @@ type State = { friends             ∷ Array F.FoundationId
              , newCreditAmount     ∷ String
              , newDebt             ∷ Maybe F.Debt
              , newCredit           ∷ Maybe F.Debt
-             , newFriend           ∷ Either String F.FoundationId
+             , newFriend           ∷ String
              , userName            ∷ Either F.FoundationId F.UserName
              , inputName           ∷ String
              , showItemizedDebtFor ∷ Maybe F.FoundationId
@@ -90,7 +91,7 @@ component =
                        , myId: F.fiBlankId
                        , pendingSent: []
                        , pendingTodo: []
-                       , newFriend: Left ""
+                       , newFriend: ""
                        , newDebtAmount: ""
                        , newCreditAmount: ""
                        , newDebt: Nothing
@@ -156,20 +157,24 @@ component =
         _ → do
           H.modify (_ { errorBus = input })
           pure next
-    AddFriend eitherFriendId next → do
+    ConfirmFriend friend next → do
       s ← H.get
-      case eitherFriendId of
-        Left  str → pure next
-        Right friendId → do
-          H.raise $ SetLoading true
-          H.modify (_ { newFriend = Left "" })
-          handleTx NewTX s (ScreenChange R.BalancesScreen) $ F.createFriendship friendId
-          H.raise $ SetLoading false
-          pure next
+      H.raise $ SetLoading true
+      handleTx NewTX s (ScreenChange R.BalancesScreen) $ F.createFriendship friend
+      H.raise $ SetLoading false
+      pure next
+    AddFriend friendStr next → do
+      s ← H.get
+      H.raise $ SetLoading true
+      H.modify (_ { newFriend = "" })
+      handleTx NewTX s (ScreenChange R.BalancesScreen) $
+        F.createFriendship $ F.fiMkId friendStr
+      H.raise $ SetLoading false
+      pure next
     InputFriend friendStr next → do
-      if F.fiStrValidId friendStr
-        then H.modify (_ { newFriend = Right $ F.fiMkId friendStr})
-        else H.modify (_ { newFriend = Left $ S.toLower friendStr })
+      if F.fiStrValidId (S.toLower friendStr) || S.length friendStr < 4
+        then H.modify (_ { newFriend = S.toLower friendStr })
+        else H.modify (_ { newFriend = "" })
       pure next
     InputDebtAmount debtType strAmount next → do
       H.modify (\s → s { inputChanged = not s.inputChanged })
@@ -582,7 +587,7 @@ cancelButton fd = HH.button [ HP.class_ $ HH.ClassName "fa fa-close"
 
 confirmFriendshipButton :: F.FoundationId -> H.ComponentHTML Query
 confirmFriendshipButton friend =
-  HH.button [ HE.onClick $ HE.input_ $ AddFriend $ Right friend
+  HH.button [ HE.onClick $ HE.input_ $ ConfirmFriend friend
             , HP.class_ $ HH.ClassName "confirm-friend-button"]
             [ HH.i [HP.class_ $ HH.ClassName "fa fa-check"][] ]
 
@@ -593,7 +598,7 @@ addFriendWidget state =
     HH.h6 [ HP.class_ $ HH.ClassName "modal-title"][HH.text "Add New Friend"],
     HH.label [][HH.text "Friend's FoundationID"],
     HH.input [ HP.type_ HP.InputText
-             , HP.value $ inputVal state.newFriend
+             , HP.value $ state.newFriend
              , HP.class_ $ HH.ClassName "form-control"
              , HP.placeholder $ "johndoe"
              , HE.onValueInput
@@ -601,10 +606,9 @@ addFriendWidget state =
              ]
   , HH.button [ HE.onClick $ HE.input_ $ AddFriend state.newFriend
               , HP.class_ $ HH.ClassName "form-control"
-              , HP.enabled $ F.fiStrValidId $ inputVal state.newFriend ]
+              , HP.enabled $ F.fiStrValidId state.newFriend ]
     [ HH.text "Add Friend by FoundationId" ]
   ]
-  where inputVal = either id show
 
 nonZero ∷ F.Debt → Boolean
 nonZero fd = ((F.numAmount ∘ F.debtMoney) fd) /= 0.0

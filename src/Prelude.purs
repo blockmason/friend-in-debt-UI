@@ -3,6 +3,7 @@ module FriendInDebt.Prelude
   , (∨), (∧), (⨁), (⊹)
   , flipCompose, applyRight, applyLeft
   , hLog
+  , divLog
   , type (⨁), type (⊹), type (×)
   , module Prelude
   , module Control.Alt
@@ -99,3 +100,5 @@ infixr 5 coproduct as ⨁
 infixr 4 type Tuple as ×
 
 hLog = H.liftEff ∘ logShow
+
+divLog logText = H.modify (_ { logText = logText })
