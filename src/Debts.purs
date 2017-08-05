@@ -200,7 +200,9 @@ component =
       pure next
     ConfirmPending debt next → do
       s ← H.get
+      H.raise $ SetLoading true
       handleTx NewTX s (ScreenChange R.BalancesScreen) $ F.confirmPendingDebt debt
+      H.raise $ SetLoading false
       pure next
     RejectPending debt next → do
       s ← H.get
