@@ -112,9 +112,7 @@ ui =
         eb ← H.gets _.errorBus
         myId ← handleCall eb F.fiBlankId F.foundationId
         H.modify (_ { myId = Just myId })
-        H.modify (_ { loading = true })
         refreshData
-        H.modify (_ { loading = false })
         startCheckInterval (Just bus) C.checkMMInterval C.checkTxInterval
         pure next
       HandleMsg msg next → do
@@ -202,12 +200,14 @@ promptFoundation hasFoundation =
 
 refreshData ∷ ∀ e. H.ParentDSL State Query ChildQuery ChildSlot Void (FIDMonad e) Unit
 refreshData = do
+  H.modify (_ { loading = true, loggedIn = true })
   mmStatus ← H.liftEff MM.loggedIn
   if mmStatus
     then do _ ← H.query' CP.cp1 unit (D.RefreshDebts unit)
             newmmStatus ← H.liftEff MM.loggedIn
             H.modify (_ { loggedIn = newmmStatus })
     else do H.modify (_ { loggedIn = mmStatus })
+  H.modify (_ { loading = false })
 
 checkMetamask ∷ ∀ e. Boolean → Boolean
               → H.ParentDSL State Query ChildQuery ChildSlot Void (FIDMonad e) Unit
