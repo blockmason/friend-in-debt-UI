@@ -87,7 +87,7 @@ ui =
                  (if state.loading then " loading" else "") <>
                  (if state.loggedIn && (isJust state.myId) then "" else " require-login")) ]
       [ loadingOverlay state.loading
-      , loggerOverlay false state.logText
+      , loggerOverlay true state.logText
       , promptMetamask state.loggedIn
       , promptFoundation $ isJust state.myId
       , topBar state
