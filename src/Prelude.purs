@@ -101,4 +101,4 @@ infixr 4 type Tuple as ×
 
 hLog = H.liftEff ∘ logShow
 
-divLog logText = H.modify (_ { logText = logText })
+divLog logLine = H.modify (\s → s { logText = s.logText <> [show logLine] })

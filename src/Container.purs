@@ -47,7 +47,7 @@ type State = { loggedIn ∷ Boolean
              , numPendingFriends ∷ Int
              , currentScreen ∷ R.Screen
              , history  ∷ Array R.Screen
-             , logText  ∷ String
+             , logText  ∷ Array String
              }
 
 type ChildQuery = Coproduct1 D.Query
@@ -75,7 +75,7 @@ ui =
                    , numPendingFriends: 0
                    , currentScreen: R.BalancesScreen
                    , history: []
-                   , logText: ""
+                   , logText: []
                    }
 
     render ∷ State → H.ParentHTML Query ChildQuery ChildSlot (FIDMonad eff)
@@ -111,17 +111,15 @@ ui =
     eval ∷ Query ~> H.ParentDSL State Query ChildQuery ChildSlot Void (FIDMonad eff)
     eval = case _ of
       Init next → do
-        divLog "BEFORE LOADING"
         H.modify (_ { loading = true })
+        runWeb3Tests 500
         bus ← H.liftAff $ Bus.make
         H.subscribe $ busEventSource (flip HandleMsg ES.Listening) bus
         H.modify (_ { loggedIn = true, loading = true, errorBus = Just bus })
         H.liftAff $ delay (Milliseconds (toNumber C.web3Delay))
-        divLog "AFTER WEB3 LOAD INTERVAL"
         eb ← H.gets _.errorBus
         myId ← handleCall eb F.fiBlankId F.foundationId
         H.modify (_ { myId = Just myId })
-        divLog $ "FoundationId: " <> show myId
         refreshData
         startCheckInterval (Just bus) C.checkMMInterval C.checkTxInterval
         pure next
@@ -322,5 +320,32 @@ menuItem screen state =
 
 loggerOverlay onOff logText =
   if onOff
-  then HH.div [ HP.id_ "loggerOverlay"] [ HH.text logText ]
+  then HH.div [ HP.id_ "loggerOverlay"] $
+       map (\text → HH.p_ [HH.text text] ) logText
   else HH.div_ []
+
+runWeb3Tests delayTimeMs = do
+  H.liftAff $ delay (Milliseconds (toNumber delayTimeMs))
+  li ← H.liftEff MM.loggedIn
+  divLog li
+  H.liftAff $ delay (Milliseconds (toNumber delayTimeMs))
+  li ← H.liftEff MM.loggedIn
+  divLog li
+  H.liftAff $ delay (Milliseconds (toNumber delayTimeMs))
+  li ← H.liftEff MM.loggedIn
+  divLog li
+  H.liftAff $ delay (Milliseconds (toNumber delayTimeMs))
+  li ← H.liftEff MM.loggedIn
+  divLog li
+  H.liftAff $ delay (Milliseconds (toNumber delayTimeMs))
+  li ← H.liftEff MM.loggedIn
+  divLog li
+  H.liftAff $ delay (Milliseconds (toNumber delayTimeMs))
+  li ← H.liftEff MM.loggedIn
+  divLog li
+  H.liftAff $ delay (Milliseconds (toNumber delayTimeMs))
+  li ← H.liftEff MM.loggedIn
+  divLog li
+  H.liftAff $ delay (Milliseconds (toNumber delayTimeMs))
+  li ← H.liftEff MM.loggedIn
+  divLog li
