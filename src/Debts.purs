@@ -168,8 +168,8 @@ component =
           pure next
     InputFriend friendStr next → do
       if ((S.length friendStr) > 3) --id should be longer than 3 characters
-        then H.modify (_ { newFriend = Right $ F.FoundationId friendStr })
-        else H.modify (_ { newFriend = Left friendStr })
+        then H.modify (_ { newFriend = Right $ F.FoundationId $ S.toLower friendStr })
+        else H.modify (_ { newFriend = Left $ S.toLower friendStr })
       pure next
     InputDebtAmount debtType strAmount next → do
       H.modify (\s → s { inputChanged = not s.inputChanged })
@@ -191,6 +191,7 @@ component =
       hLog maybeDebt
       case maybeDebt of
         Just debt → do
+          H.modify (_ { newDebtAmount = "", newCreditAmount = ""})
           H.raise $ SetLoading true
           s ← H.get
           handleTx NewTX s (ScreenChange R.BalancesScreen) $ F.newPendingDebt debt
