@@ -8122,7 +8122,7 @@ var PS = {};
       return Data_String.take(1)(Data_String.toLower(Data_Show.show(showFoundationId)(fid)));
   };
   var fiMkId = function (str) {
-      return str;
+      return FoundationId(Data_String.toLower(str));
   };
   var fiGetId = function (v) {
       return v;
