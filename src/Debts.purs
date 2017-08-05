@@ -45,6 +45,7 @@ data Message
   = ScreenChange R.Screen
   | NewTX E.TX
   | NumPendingTodo Int
+  | NumPendingFriends Int
   | SetLoading Boolean
 newtype FriendBundle = FriendBundle { id ∷ F.FoundationId, gradient ∷ ICON.GradientCss, balance ∷ Maybe F.Balance }
 
@@ -157,12 +158,13 @@ component =
           pure next
     AddFriend eitherFriendId next → do
       s ← H.get
-      hLog eitherFriendId
       case eitherFriendId of
         Left  str → pure next
         Right friendId → do
+          H.raise $ SetLoading true
           H.modify (_ { newFriend = Left "" })
           handleTx NewTX s (ScreenChange R.BalancesScreen) $ F.createFriendship friendId
+          H.raise $ SetLoading false
           pure next
     InputFriend friendStr next → do
       if ((S.length friendStr) > 3) --id should be longer than 3 characters
@@ -209,8 +211,9 @@ component =
       errorBus    ← H.gets _.errorBus
       loadFriendsAndDebts errorBus
       H.raise $ SetLoading false
-      pendingTodo ← H.gets _.pendingTodo
-      H.raise $ NumPendingTodo (length pendingTodo)
+      s ← H.get
+      H.raise $ NumPendingTodo    (length s.pendingTodo)
+      H.raise $ NumPendingFriends (length s.pendingFriendsTodo)
       pure next
 
 refreshButton =

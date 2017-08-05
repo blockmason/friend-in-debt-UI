@@ -44,6 +44,7 @@ type State = { loggedIn ∷ Boolean
              , errorBus ∷ ContainerMsgBus
              , txs      ∷ Array E.TX
              , numPendingTodo ∷ Int
+             , numPendingFriends ∷ Int
              , currentScreen ∷ R.Screen
              , history ∷ Array R.Screen }
 
@@ -69,6 +70,7 @@ ui =
                    , errorBus: Nothing
                    , txs: []
                    , numPendingTodo: 0
+                   , numPendingFriends: 0
                    , currentScreen: R.BalancesScreen
                    , history: []}
 
@@ -169,6 +171,8 @@ ui =
             H.modify (\s → s { txs = s.txs <> [newTx] })
           D.NumPendingTodo n →
             H.modify (_ { numPendingTodo = n })
+          D.NumPendingFriends n →
+            H.modify (_ { numPendingFriends = n })
         pure next
       PreviousScreen next → do
         H.modify (\state → state {currentScreen = (fromMaybe R.BalancesScreen $ A.head state.history), history = (fromMaybe [] $ A.tail state.history)})
@@ -285,6 +289,7 @@ menu state =
 menuItem ∷ ∀ p. R.Screen → State → H.HTML p Query
 menuItem screen state =
   let nTodo    = state.numPendingTodo
+      nFriends = state.numPendingFriends
       menuText =
         case screen of
           R.SettingsScreen →
@@ -292,7 +297,9 @@ menuItem screen state =
             , HH.text $ maybe "" show state.myId ]
           R.PendingScreen →
             [ HH.text $ R.getMenuNameFor screen ]
-            <> (if nTodo > 0 then [HH.span_ [HH.text $ show nTodo]] else [])
+            <> (if (nTodo + nFriends) > 0
+                then [HH.span_ [HH.text $ show (nTodo + nFriends)]]
+                else [])
           _ →
             [HH.text $ R.getMenuNameFor screen]
   in HH.a
