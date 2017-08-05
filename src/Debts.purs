@@ -167,8 +167,8 @@ component =
           H.raise $ SetLoading false
           pure next
     InputFriend friendStr next → do
-      if ((S.length friendStr) > 3) --id should be longer than 3 characters
-        then H.modify (_ { newFriend = Right $ F.FoundationId $ S.toLower friendStr })
+      if F.fiStrValidId friendStr
+        then H.modify (_ { newFriend = Right $ F.fiMkId friendStr})
         else H.modify (_ { newFriend = Left $ S.toLower friendStr })
       pure next
     InputDebtAmount debtType strAmount next → do
@@ -600,7 +600,8 @@ addFriendWidget state =
                (HE.input (\val → InputFriend val))
              ]
   , HH.button [ HE.onClick $ HE.input_ $ AddFriend state.newFriend
-              , HP.class_ $ HH.ClassName "form-control"]
+              , HP.class_ $ HH.ClassName "form-control"
+              , HP.enabled $ F.fiStrValidId $ inputVal state.newFriend ]
     [ HH.text "Add Friend by FoundationId" ]
   ]
   where inputVal = either id show
