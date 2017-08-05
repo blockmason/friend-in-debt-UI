@@ -116,7 +116,7 @@ ui =
         bus ← H.liftAff $ Bus.make
         H.subscribe $ busEventSource (flip HandleMsg ES.Listening) bus
         H.modify (_ { loggedIn = true, loading = true, errorBus = Just bus })
-        H.liftAff $ delay (Milliseconds (toNumber 1500))
+        H.liftAff $ delay (Milliseconds (toNumber C.web3Delay))
         divLog "AFTER WEB3 LOAD INTERVAL"
         eb ← H.gets _.errorBus
         myId ← handleCall eb F.fiBlankId F.foundationId
