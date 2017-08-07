@@ -35,6 +35,7 @@
     text-transform: uppercase;
     color: white;
     display: none;
+    text-align: right;
 
     &.processing {
       display: block;
@@ -47,7 +48,7 @@
      border-radius: 50%;
      margin: auto;
      position: absolute;
-     left: -1.5em;
+     right: 11em;
      top: 1.3em;
      margin: auto;
 

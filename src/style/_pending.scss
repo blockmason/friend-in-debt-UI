@@ -25,9 +25,21 @@
     line-height: 3em;
     padding-right: 1em;
     margin-right: 1em;
+
+    @media (max-width: $small) {
+      font-size: 12px;
+    }
   }
 
   .request-details {
+    span {
+      font-size: 14px;
+      
+      @media (max-width: $small) {
+        font-size: 10px;
+      }
+    }
+
     span:first-child {
       font-size: 10px;
       display: block;

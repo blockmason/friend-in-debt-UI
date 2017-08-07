@@ -317,7 +317,10 @@ html {
   margin: 0 0.1em; }
   .show-cents .amount-row .debt-amount:first-of-type {
     width: 40%;
-    text-align: right; }
+    text-align: left; }
+  .show-cents .amount-row > span {
+    font-size: 10px;
+    line-height: 20px; }
 
 .top-bar {
   background: #ff5722;
@@ -342,7 +345,8 @@ html {
     font-size: 10px;
     text-transform: uppercase;
     color: white;
-    display: none; }
+    display: none;
+    text-align: right; }
     .top-bar .current-transactions.processing {
       display: block; }
   .top-bar .transaction-spinner {
@@ -351,7 +355,7 @@ html {
     border-radius: 50%;
     margin: auto;
     position: absolute;
-    left: -1.5em;
+    right: 11em;
     top: 1.3em;
     margin: auto;
     border: 1px solid;
@@ -1246,6 +1250,15 @@ html {
   line-height: 3em;
   padding-right: 1em;
   margin-right: 1em; }
+  @media (max-width: 544px) {
+    .pending-screen-container .card-title {
+      font-size: 12px; } }
+
+.pending-screen-container .request-details span {
+  font-size: 14px; }
+  @media (max-width: 544px) {
+    .pending-screen-container .request-details span {
+      font-size: 10px; } }
 
 .pending-screen-container .request-details span:first-child {
   font-size: 10px;

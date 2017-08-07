@@ -270,7 +270,7 @@ topBar state =
           HH.a [HP.href "#", HP.class_ (HH.ClassName "close-pop-button"), HE.onClick $ HE.input_ $ PreviousScreen]
           [HH.i [ HP.class_ (HH.ClassName "fa fa-chevron-left")][], HH.text " Back"]
         ]
-      , HH.div [HP.class_ (HH.ClassName $ "col-4 align-self-end current-transactions" <> if processing then " processing" else "") ]
+      , HH.div [HP.class_ (HH.ClassName $ "col-5 align-self-end current-transactions" <> if processing then " processing" else "") ]
         [
           HH.i [HP.class_ (HH.ClassName "transaction-spinner")][]
         , HH.span_ [HH.text $
