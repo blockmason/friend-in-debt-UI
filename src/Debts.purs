@@ -665,6 +665,7 @@ inputFDebt debtType _ cur myId friends maybeDebt strAmount =
              ((\f → HH.option_ [ HH.text $ F.fiGetId f ]) <$> friends)
          , HH.input [ HP.type_ HP.InputText
                     , HP.placeholder $ "Enter debt memo here"
+                    , HP.attr (HH.AttrName "maxlength") "32"
                     , HE.onValueInput
                       (HE.input (\val → InputDebtDetails debtType $ F.setDesc d (S.take 32 val)))
                     , HP.value $ S.take 32 $ F.getDesc d ]
