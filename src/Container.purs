@@ -115,11 +115,7 @@ ui =
         bus ← H.liftAff $ Bus.make
         H.subscribe $ busEventSource (flip HandleMsg ES.Listening) bus
         H.modify (_ { loggedIn = true, loading = true, errorBus = Just bus })
-        H.liftAff $ delay (Milliseconds (toNumber C.web3Delay))
-        eb ← H.gets _.errorBus
-        myId ← handleCall eb F.fiBlankId F.foundationId
-        H.modify (_ { myId = Just myId })
-        refreshData
+        loadWeb3Loop C.web3Delay 10
         startCheckInterval (Just bus) C.checkMMInterval C.checkTxInterval
         pure next
       HandleMsg msg next → do
@@ -178,6 +174,8 @@ ui =
             H.modify (_ { numPendingTodo = n })
           D.NumPendingFriends n →
             H.modify (_ { numPendingFriends = n })
+          D.LoadId fid →
+            H.modify (_ { myId = Just fid })
         pure next
       PreviousScreen next → do
         H.modify (\state → state {currentScreen = (fromMaybe R.BalancesScreen $ A.head state.history), history = (fromMaybe [] $ A.tail state.history)})
@@ -348,3 +346,14 @@ runWeb3Tests delayTimeMs = do
   H.liftAff $ delay (Milliseconds (toNumber delayTimeMs))
   li ← H.liftEff MM.loggedIn
   divLog li
+
+--keep checking if metamask is loaded
+loadWeb3Loop delayMs numTriesLeft =
+  if numTriesLeft > 0
+    then do
+      H.liftAff $ delay (Milliseconds (toNumber C.web3Delay))
+      mmLoggedIn ← H.liftEff MM.loggedIn
+      if mmLoggedIn
+        then refreshData
+        else loadWeb3Loop delayMs (numTriesLeft - 1)
+    else pure unit

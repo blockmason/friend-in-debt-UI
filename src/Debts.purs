@@ -37,6 +37,7 @@ data Query a
   | RejectPending F.Debt a
   | AddFriend String a
   | ConfirmFriend F.FoundationId a
+  | CancelFriend F.FoundationId a
   | InputFriend String a
   | ShowItemizedDebtFor (Maybe F.FoundationId) a
 
@@ -48,6 +49,7 @@ data Message
   | NumPendingTodo Int
   | NumPendingFriends Int
   | SetLoading Boolean
+  | LoadId F.FoundationId
 newtype FriendBundle = FriendBundle { id ∷ F.FoundationId, gradient ∷ ICON.GradientCss, balance ∷ Maybe F.Balance }
 
 type State = { friends             ∷ Array F.FoundationId
@@ -141,10 +143,10 @@ component =
         Just f  → do
           s ← H.get
           H.modify (_ { showItemizedDebtFor = maybeFriend })
-          H.raise $ SetLoading true
+--          H.raise $ SetLoading true
           idebts ← handleCall s.errorBus [] (F.itemizedDebts f)
           H.modify (_ { itemizedDebts = M.insert f idebts s.itemizedDebts })
-          H.raise $ SetLoading false
+--          H.raise $ SetLoading false
           pure next
 
     HandleInput input next → do
@@ -159,17 +161,21 @@ component =
           pure next
     ConfirmFriend friend next → do
       s ← H.get
-      H.raise $ SetLoading true
+--      H.raise $ SetLoading true
       handleTx NewTX s (ScreenChange R.BalancesScreen) $ F.createFriendship friend
-      H.raise $ SetLoading false
+--      H.raise $ SetLoading false
+      pure next
+    CancelFriend friend next → do
+      s ← H.get
+      handleTx NewTX s (ScreenChange R.BalancesScreen) $ F.deleteFriendship friend
       pure next
     AddFriend friendStr next → do
       s ← H.get
-      H.raise $ SetLoading true
+--      H.raise $ SetLoading true
       H.modify (_ { newFriend = "" })
       handleTx NewTX s (ScreenChange R.BalancesScreen) $
         F.createFriendship $ F.fiMkId friendStr
-      H.raise $ SetLoading false
+--      H.raise $ SetLoading false
       pure next
     InputFriend friendStr next → do
       if F.fiStrValidId (S.toLower friendStr) || S.length friendStr < 4
@@ -197,18 +203,18 @@ component =
       case maybeDebt of
         Just debt → do
           H.modify (_ { newDebtAmount = "", newCreditAmount = ""})
-          H.raise $ SetLoading true
+--          H.raise $ SetLoading true
           s ← H.get
           handleTx NewTX s (ScreenChange R.BalancesScreen) $ F.newPendingDebt debt
           H.modify (_ { newDebt = Nothing, newCredit = Nothing })
-          H.raise $ SetLoading false
+--          H.raise $ SetLoading false
         Nothing   → pure unit
       pure next
     ConfirmPending debt next → do
       s ← H.get
-      H.raise $ SetLoading true
+--      H.raise $ SetLoading true
       handleTx NewTX s (ScreenChange R.BalancesScreen) $ F.confirmPendingDebt debt
-      H.raise $ SetLoading false
+--      H.raise $ SetLoading false
       pure next
     RejectPending debt next → do
       s ← H.get
@@ -242,6 +248,7 @@ loadFriendsAndDebts errorBus = do
               , pendingTodo = F.pdGetTodos pendingD
               , balances = balances
               })
+  H.raise $ LoadId myId
 
 -- structural components
 
@@ -461,8 +468,9 @@ displayTodoFriendLi friend =
       (displayTodoFriend friend))
   [
     HH.div [HP.class_ $ HH.ClassName "row action-buttons row align-items-center"][
-      HH.div [HP.class_ $ HH.ClassName "col-1"][confirmFriendshipButton friend]
-    ]
+      HH.div [HP.class_ $ HH.ClassName "col-1"][cancelFriendshipButton friend]
+      , HH.div [HP.class_ $ HH.ClassName "col-1"][confirmFriendshipButton friend]
+      ]
   ]
 
 displayTodoFriend ::  F.FoundationId → Array (H.ComponentHTML Query)
@@ -577,19 +585,22 @@ moneyClass fd = "debt-amount"
 
 confirmButton ∷ F.Debt → H.ComponentHTML Query
 confirmButton fd = HH.button [ HP.class_ $ HH.ClassName "fa fa-check"
-                             , HE.onClick $ HE.input_ $ ConfirmPending fd]
-                             []
+                             , HE.onClick $ HE.input_ $ ConfirmPending fd] []
 
 cancelButton ∷ F.Debt → H.ComponentHTML Query
 cancelButton fd = HH.button [ HP.class_ $ HH.ClassName "fa fa-close"
-                             , HE.onClick $ HE.input_ $ RejectPending fd]
-                            []
+                             , HE.onClick $ HE.input_ $ RejectPending fd] []
 
 confirmFriendshipButton :: F.FoundationId -> H.ComponentHTML Query
 confirmFriendshipButton friend =
   HH.button [ HE.onClick $ HE.input_ $ ConfirmFriend friend
             , HP.class_ $ HH.ClassName "confirm-friend-button"]
             [ HH.i [HP.class_ $ HH.ClassName "fa fa-check"][] ]
+
+cancelFriendshipButton :: F.FoundationId -> H.ComponentHTML Query
+cancelFriendshipButton friend =
+  HH.button [ HE.onClick $ HE.input_ $ CancelFriend friend
+            , HP.class_ $ HH.ClassName "fa fa-close"] []
 
 addFriendWidget ∷ State → H.ComponentHTML Query
 addFriendWidget state =

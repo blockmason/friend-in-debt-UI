@@ -7,8 +7,8 @@ import Data.Formatter.DateTime  as DTF
 import Data.Array               as A
 import Control.Monad.Aff.Bus    as Bus
 import Halogen                  as H
-import Halogen.HTML            as HH
-import Halogen.HTML.Properties as HP
+import Halogen.HTML             as HH
+import Halogen.HTML.Properties  as HP
 import Network.Eth              as E
 import Network.Eth.FriendInDebt as F
 
