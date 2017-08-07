@@ -24,6 +24,7 @@ import FriendInDebt.Blockchain          (handleCall, handleTx, hasNetworkError, 
 import Network.Eth.FriendInDebt         as F
 import Network.Eth                      as E
 import UI.IconGenerator as ICON
+import UI.UIStatesKit as UIStates
 
 import FriendInDebt.Routes              as R
 
@@ -43,12 +44,15 @@ data Query a
 
 type Input = ContainerMsgBus
 
+newtype LoadingTarget = LoadingTarget { selector ∷ String, preventInteraction ∷ Boolean}
+newtype ErrorFlash = ErrorFlash { message ∷ String, intrusive ∷ String }
+
 data Message
   = ScreenChange R.Screen
   | NewTX E.TX
   | NumPendingTodo Int
   | NumPendingFriends Int
-  | SetLoading Boolean
+  | SetLoading LoadingTarget
   | LoadId F.FoundationId
 newtype FriendBundle = FriendBundle { id ∷ F.FoundationId, gradient ∷ ICON.GradientCss, balance ∷ Maybe F.Balance }
 
@@ -221,10 +225,12 @@ component =
       handleTx NewTX s (ScreenChange R.BalancesScreen) $ F.rejectPendingDebt debt
       pure next
     RefreshDebts next → do
-      H.raise $ SetLoading true
+      H.liftEff $ UIStates.toggleLoading(".page-container")
+
+      -- H.raise $ SetLoading {selector: "page-container", preventInteraction: true}
       errorBus    ← H.gets _.errorBus
       loadFriendsAndDebts errorBus
-      H.raise $ SetLoading false
+      -- H.raise $ SetLoading false
       s ← H.get
       H.raise $ NumPendingTodo    (length s.pendingTodo)
       H.raise $ NumPendingFriends (length s.pendingFriendsTodo)

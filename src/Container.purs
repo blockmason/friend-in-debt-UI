@@ -166,9 +166,10 @@ ui =
         pure next
       DebtViewMsg msg next → do
         case msg of
-          D.SetLoading onOff → do
-            hLog $ "Turning loading " <> show onOff
-            H.modify (\s → s { loading = onOff })
+          D.SetLoading onOff →
+
+            hLog $ "Turning loading "
+            -- H.modify (\s → s { loading = onOff })
           D.ScreenChange screen →
             H.modify (\s → s { history = append [s.currentScreen] s.history
                              , currentScreen = screen })
