@@ -1244,7 +1244,7 @@ html {
     position: relative; }
   @media (max-width: 544px) {
     .pending-screen-container li {
-      height: auto; } }
+      height: auto !important; } }
 
 .pending-screen-container .card-title {
   font-size: 18px;
@@ -1299,7 +1299,12 @@ html {
 
 @media (max-width: 544px) {
   .pending-screen-container .debt-details {
-    width: 100%; } }
+    margin: 0;
+    border: 0;
+    margin-bottom: 10px; }
+    .pending-screen-container .debt-details div {
+      width: 100%;
+      border: 0 !important; } }
 
 .pending-screen-container .debt-details .debtor {
   font-size: 10px;
@@ -1331,6 +1336,9 @@ html {
     font-size: 9px; }
   .pending-screen-container .debt-details .amount .money-span {
     font-weight: 100; }
+  @media (max-width: 544px) {
+    .pending-screen-container .debt-details .amount {
+      position: inherit; } }
 
 .pending-screen-container .todo-debt-row .action-buttons {
   position: absolute;
