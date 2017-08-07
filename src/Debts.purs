@@ -401,7 +401,7 @@ displayBalanceLi state bal =
       friendToShow = state.showItemizedDebtFor
       expandClass = (\f → if f == curFriend then "expand-itemized" else "hide-itemized") <$> friendToShow
   in
-    HH.li [HP.class_ $ HH.ClassName $ "balance-row row" <> fromMaybe "" expandClass,
+    HH.li [HP.class_ $ HH.ClassName $ "balance-row row " <> fromMaybe "" expandClass,
            HE.onClick $ HE.input_ $ ShowItemizedDebtFor $ Just curFriend]
     $ [
       HH.div [HP.class_ $ HH.ClassName "col-4 debt-excerpt"][

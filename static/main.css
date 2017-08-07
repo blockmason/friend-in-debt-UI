@@ -1017,19 +1017,19 @@ html {
   margin-left: 0; }
 
 .show-add-friend-screen .logo-section {
-  margin-left: -23em; }
+  margin-left: -55%; }
 
 .show-create-debt-screen .go-back-section {
   margin-left: 0; }
 
 .show-create-debt-screen .logo-section {
-  margin-left: -23em; }
+  margin-left: -55%; }
 
 .show-itemized-debts-screen .go-back-section {
   margin-left: 0; }
 
 .show-itemized-debts-screen .logo-section {
-  margin-left: -23em; }
+  margin-left: -55%; }
 
 .show-itemized-debts-screen .balances-screen-container {
   transform: none;
