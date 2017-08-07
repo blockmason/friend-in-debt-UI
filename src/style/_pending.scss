@@ -4,7 +4,7 @@
 
 .pending-screen-container {
   li {
-    height: 5em;
+    height: auto;
     background: white;
     border-radius: 5px;
     overflow: hidden;
@@ -13,40 +13,24 @@
     padding: 10px 30px;
 
     &.todo-debt-row, &.sent-debt-row {
-      height: 7em;
+      height: auto;
       position: relative;
-    }
-
-    @media (max-width: $small) {
-      height: auto !important;
     }
   }
 
   .card-title {
-    font-size: 18px;
+    font-size: 14px;
+    border-bottom: 1px solid #eee;
     font-weight: 100;
-    border-right: 1px solid #eee;
-    line-height: 3em;
     padding-right: 1em;
     margin-right: 1em;
-
-    @media (max-width: $small) {
-      font-size: 12px;
-      width: 100%;
-      border: 0;
-      padding: 0;
-      margin: 0;
-      border-bottom: 1px solid #eee;
-    }
+    margin-bottom: 0;
+    width: 100%;
   }
 
   .request-details {
     span {
       font-size: 14px;
-
-      @media (max-width: $small) {
-        font-size: 10px;
-      }
     }
 
     span:first-child {
@@ -54,10 +38,6 @@
       display: block;
       border-bottom: 1px solid #eee;
       text-transform: uppercase;
-
-      @media (max-width: $small) {
-        border: 0;
-      }
     }
 
     span:last-child {
@@ -68,11 +48,6 @@
   }
 
   .friend-details {
-    @media (max-width: $small) {
-      margin: 0;
-      border: 0;
-      padding-left: 0;
-    }
   }
 
   .confirm-friend-button {
@@ -88,31 +63,24 @@
   }
 
   .debt-details {
-    @media (max-width: $small) {
-      margin: 0;
-      border: 0;
-      margin-bottom: 10px;
+    width: 100%;
 
-      div {
-        width: 100%;
-        border: 0 !important;
+    .debt-relationship {
+      padding: 0;
+      border-right: 1px solid #eee;
+
+      span {
+          font-size: 9px;
+          margin-top: 0;
+          display: block;
+          color: #777;
       }
     }
 
     .debtor {
       font-size: 10px;
       display: block;
-      border-bottom: 1px solid #eee;
       text-transform: uppercase;
-      width: 100%;
-
-      &:after {
-        content: ' owe';
-      }
-
-      @media (max-width: $small) {
-        font-size: 9px;
-      }
     }
 
     .creditor {
@@ -127,29 +95,19 @@
     }
 
     .amount {
-      position: absolute;
-      left: 1em;
-      top: 3.8em;
-      border-top: 1px solid #ddd;
-
       .currency-span {
         font-size: 9px;
       }
       .money-span {
         font-weight: 100;
       }
-
-      @media (max-width: $small) {
-        position: inherit;
-      }
     }
   }
 
   .todo-debt-row {
     .action-buttons {
-      position: absolute;
-      right: 0;
     }
+
     button {
       background: none;
       border: 1px solid #ddd;
