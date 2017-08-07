@@ -88,8 +88,8 @@ ui =
                  (if state.loggedIn && (isJust state.myId) then "" else " require-login")) ]
       [ loadingOverlay state.loading
       , loggerOverlay false state.logText
-      , promptMetamask state.loggedIn
-      , promptFoundation $ isJust state.myId
+      , promptMetamask $ not state.loggedIn
+      , promptFoundation $ (isNothing state.myId) && state.loggedIn
       , topBar state
       , menu state
       , HH.div [ HP.class_ (HH.ClassName "create-debt-bar") ]
@@ -186,10 +186,10 @@ ui =
         pure next
 
 promptMetamask ∷ ∀ p. Boolean → H.HTML p Query
-promptMetamask loggedIn =
+promptMetamask notLoggedIn =
   HH.div [ HP.id_ "metamaskOverlay"
-         , if loggedIn then HP.class_ (HH.ClassName "in-active")
-           else HP.class_ (HH.ClassName "active")]
+         , if notLoggedIn then HP.class_ (HH.ClassName "active")
+           else HP.class_ (HH.ClassName "in-active")]
   [
     HH.h6_ [ HH.text "Not logged in to Metamask." ]
     , HH.button [ HE.onClick $ HE.input_ $ RefreshData
@@ -198,10 +198,10 @@ promptMetamask loggedIn =
   ]
 
 promptFoundation ∷ ∀ p. Boolean → H.HTML p Query
-promptFoundation hasFoundation =
+promptFoundation noFoundation =
   HH.div [ HP.id_ "noFoundationOverlay"
-         , if hasFoundation then HP.class_ (HH.ClassName "in-active")
-           else HP.class_ (HH.ClassName "active")]
+         , if noFoundation then HP.class_ (HH.ClassName "active")
+           else HP.class_ (HH.ClassName "in-active") ]
   [
     HH.h6_ [ HH.text "No Foundation ID detected." ]
     , HH.button [ HE.onClick $ HE.input_ $ RefreshData

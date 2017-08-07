@@ -15187,20 +15187,20 @@ var PS = {};
           });
       });
   });
-  var promptMetamask = function (loggedIn) {
+  var promptMetamask = function (notLoggedIn) {
       return Halogen_HTML_Elements.div([ Halogen_HTML_Properties.id_("metamaskOverlay"), (function () {
-          if (loggedIn) {
-              return Halogen_HTML_Properties.class_("in-active");
+          if (notLoggedIn) {
+              return Halogen_HTML_Properties.class_("active");
           };
-          return Halogen_HTML_Properties.class_("active");
+          return Halogen_HTML_Properties.class_("in-active");
       })() ])([ Halogen_HTML_Elements.h6_([ Halogen_HTML_Core.text("Not logged in to Metamask.") ]), Halogen_HTML_Elements.button([ Halogen_HTML_Events.onClick(Halogen_HTML_Events.input_(RefreshData.create)), Halogen_HTML_Properties.class_("btn-info") ])([ Halogen_HTML_Elements.i([ Halogen_HTML_Properties.class_("fa fa-refresh") ])([  ]) ]) ]);
   };
-  var promptFoundation = function (hasFoundation) {
+  var promptFoundation = function (noFoundation) {
       return Halogen_HTML_Elements.div([ Halogen_HTML_Properties.id_("noFoundationOverlay"), (function () {
-          if (hasFoundation) {
-              return Halogen_HTML_Properties.class_("in-active");
+          if (noFoundation) {
+              return Halogen_HTML_Properties.class_("active");
           };
-          return Halogen_HTML_Properties.class_("active");
+          return Halogen_HTML_Properties.class_("in-active");
       })() ])([ Halogen_HTML_Elements.h6_([ Halogen_HTML_Core.text("No Foundation ID detected.") ]), Halogen_HTML_Elements.button([ Halogen_HTML_Events.onClick(Halogen_HTML_Events.input_(RefreshData.create)), Halogen_HTML_Properties.class_("btn-info") ])([ Halogen_HTML_Elements.i([ Halogen_HTML_Properties.class_("fa fa-user-plus") ])([  ]), Halogen_HTML_Core.text("Register") ]) ]);
   };
   var menuItem = function (screen) {
@@ -15296,7 +15296,7 @@ var PS = {};
                   return "";
               };
               return " require-login";
-          })())))) ])([ FriendInDebt_Blockchain.loadingOverlay(state.loading), loggerOverlay(false)(state.logText), promptMetamask(state.loggedIn), promptFoundation(Data_Maybe.isJust(state.myId)), topBar(state), menu(state), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("create-debt-bar") ])([ Halogen_HTML_Elements.a([ Halogen_HTML_Properties.href("#"), Halogen_HTML_Properties.class_(""), Halogen_HTML_Events.onClick(Halogen_HTML_Events.input_(SetScreen.create(FriendInDebt_Routes.CreateDebtScreen.value))) ])([ Halogen_HTML_Elements.i([ Halogen_HTML_Properties.class_("fa fa-plus") ])([  ]), Halogen_HTML_Core.text("Add New Debt") ]) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("add-friend-bar") ])([ Halogen_HTML_Elements.a([ Halogen_HTML_Properties.href("#"), Halogen_HTML_Properties.class_(""), Halogen_HTML_Events.onClick(Halogen_HTML_Events.input_(SetScreen.create(FriendInDebt_Routes.AddFriendScreen.value))) ])([ Halogen_HTML_Elements.i([ Halogen_HTML_Properties.class_("fa fa-plus") ])([  ]), Halogen_HTML_Core.text("Add New Friend") ]) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("row") ])([ Halogen_HTML["slot'"](Halogen_Component_ChildPath.cp1)(Data_Unit.unit)(Debts.component)(state.errorBus)(Halogen_HTML_Events.input(DebtViewMsg.create)) ]) ]);
+          })())))) ])([ FriendInDebt_Blockchain.loadingOverlay(state.loading), loggerOverlay(false)(state.logText), promptMetamask(!state.loggedIn), promptFoundation(Data_Maybe.isNothing(state.myId) && state.loggedIn), topBar(state), menu(state), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("create-debt-bar") ])([ Halogen_HTML_Elements.a([ Halogen_HTML_Properties.href("#"), Halogen_HTML_Properties.class_(""), Halogen_HTML_Events.onClick(Halogen_HTML_Events.input_(SetScreen.create(FriendInDebt_Routes.CreateDebtScreen.value))) ])([ Halogen_HTML_Elements.i([ Halogen_HTML_Properties.class_("fa fa-plus") ])([  ]), Halogen_HTML_Core.text("Add New Debt") ]) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("add-friend-bar") ])([ Halogen_HTML_Elements.a([ Halogen_HTML_Properties.href("#"), Halogen_HTML_Properties.class_(""), Halogen_HTML_Events.onClick(Halogen_HTML_Events.input_(SetScreen.create(FriendInDebt_Routes.AddFriendScreen.value))) ])([ Halogen_HTML_Elements.i([ Halogen_HTML_Properties.class_("fa fa-plus") ])([  ]), Halogen_HTML_Core.text("Add New Friend") ]) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("row") ])([ Halogen_HTML["slot'"](Halogen_Component_ChildPath.cp1)(Data_Unit.unit)(Debts.component)(state.errorBus)(Halogen_HTML_Events.input(DebtViewMsg.create)) ]) ]);
       };
       var initialState = {
           loggedIn: false, 
