@@ -401,10 +401,9 @@ displayBalanceLi state bal =
       friendToShow = state.showItemizedDebtFor
       expandClass = (\f → if f == curFriend then "expand-itemized" else "hide-itemized") <$> friendToShow
   in
-    HH.li [HP.class_ $ HH.ClassName $ "balance-row row " <> fromMaybe "" expandClass,
+    HH.li [HP.class_ $ HH.ClassName $ "balance-row row" <> fromMaybe "" expandClass,
            HE.onClick $ HE.input_ $ ShowItemizedDebtFor $ Just curFriend]
     $ [
-      HH.div [HP.class_ $ HH.ClassName "highlight"][],
       HH.div [HP.class_ $ HH.ClassName "col-4 debt-excerpt"][
         HH.div [HP.class_ $ HH.ClassName "row debt-amount"][moneySpan amount],
         HH.div [HP.class_ $ HH.ClassName "row label-row"][HH.small_[HH.text "last"]],
@@ -445,7 +444,7 @@ displaySentFriendLi friend =
 displaySentFriend :: F.FoundationId → Array (H.ComponentHTML Query)
 displaySentFriend friend =
     [
-      HH.div [HP.class_ $ HH.ClassName "col friend-details"]
+      HH.div [HP.class_ $ HH.ClassName "row friend-details"]
       [
         HH.div [HP.class_ $ HH.ClassName "request-details"]
         [
@@ -468,21 +467,20 @@ displayTodoFriendLi friend =
       (displayTodoFriend friend))
   [
     HH.div [HP.class_ $ HH.ClassName "row action-buttons row align-items-center"][
-      HH.div [HP.class_ $ HH.ClassName "col-1"][cancelFriendshipButton friend]
-      , HH.div [HP.class_ $ HH.ClassName "col-1"][confirmFriendshipButton friend]
+      HH.div [HP.class_ $ HH.ClassName ""][cancelFriendshipButton friend]
+      , HH.div [HP.class_ $ HH.ClassName ""][confirmFriendshipButton friend]
       ]
   ]
 
 displayTodoFriend ::  F.FoundationId → Array (H.ComponentHTML Query)
 displayTodoFriend friend =
     [
-      HH.div [HP.class_ $ HH.ClassName "col friend-details"]
+      HH.div [HP.class_ $ HH.ClassName "row friend-details"]
       [
         HH.div [HP.class_ $ HH.ClassName "request-details"]
         [
           HH.span_ [HH.text "Friend Request From"],
-          HH.span_ [HH.text $ show friend],
-          HH.span_ [HH.text "2017/07/29 15:35"]
+          HH.span_ [HH.text $ show friend]
         ]
       ]
     ]

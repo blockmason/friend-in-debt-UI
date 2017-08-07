@@ -1054,15 +1054,13 @@ html {
   background: white;
   border-radius: 5px;
   overflow: hidden;
-  margin-bottom: 10px;
-  transition: all 0.7s ease; }
+  transition: all 0.7s ease;
+  border-left: 5px solid orange;
+  margin: 0;
+  margin-bottom: 10px; }
 
 .balance-row:hover .highlight {
   filter: brightness(1.1); }
-
-.balance-row .highlight {
-  background: orange;
-  flex: 0 0 2.333333%; }
 
 .balance-row small {
   font-weight: 500;
@@ -1255,13 +1253,16 @@ html {
 .pending-screen-container .request-details span:first-child {
   font-size: 10px;
   display: block;
-  border-bottom: 1px solid #eee;
+  margin-top: 1em;
   text-transform: uppercase; }
 
 .pending-screen-container .request-details span:last-child {
   display: block;
-  font-size: 9px;
+  font-size: 14px;
   font-weight: 100; }
+
+.pending-screen-container .todo-friend-row .action-buttons {
+  width: 100%; }
 
 .pending-screen-container .confirm-friend-button {
   background: none;

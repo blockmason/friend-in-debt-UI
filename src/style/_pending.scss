@@ -36,15 +36,19 @@
     span:first-child {
       font-size: 10px;
       display: block;
-      border-bottom: 1px solid #eee;
+      margin-top: 1em;
       text-transform: uppercase;
     }
 
     span:last-child {
       display: block;
-      font-size: 9px;
+      font-size: 14px;
       font-weight: 100;
     }
+  }
+
+  .todo-friend-row .action-buttons {
+    width: 100%;
   }
 
   .friend-details {

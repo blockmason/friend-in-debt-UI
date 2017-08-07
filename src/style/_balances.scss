@@ -13,17 +13,14 @@
   background: white;
   border-radius: 5px;
   overflow: hidden;
-  margin-bottom: 10px;
   transition: all 0.7s ease;
+  border-left: 5px solid orange;
+  margin: 0;
+  margin-bottom: 10px;
 }
 
 .balance-row:hover .highlight {
   filter: brightness(1.1);
-}
-
-.balance-row .highlight {
-  background: orange;
-  flex: 0 0 2.333333%;
 }
 
 .balance-row small {
