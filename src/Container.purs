@@ -113,10 +113,10 @@ ui =
     eval ∷ Query ~> H.ParentDSL State Query ChildQuery ChildSlot Void (FIDMonad eff)
     eval = case _ of
       Init next → do
-        H.modify (_ { loading = true })
+        H.liftEff $ UIStates.toggleLoading(".container")
         bus ← H.liftAff $ Bus.make
         H.subscribe $ busEventSource (flip HandleMsg ES.Listening) bus
-        H.modify (_ { loggedIn = true, loading = true, errorBus = Just bus })
+        H.modify (_ { loggedIn = true, errorBus = Just bus })
         loadWeb3Loop C.web3Delay 30
         startCheckInterval (Just bus) C.checkMMInterval C.checkTxInterval
         pure next
@@ -124,7 +124,8 @@ ui =
         case msg of
           NetworkError → do
             hLog NetworkError
-            H.modify (_ { loggedIn = false, loading = false })
+            H.liftEff $ UIStates.clearAllLoading Nothing
+            H.modify (_ { loggedIn = false })
             pure next
           FIDError e → do
             case e of
@@ -133,7 +134,8 @@ ui =
                 pure next
               F.NetworkError → do
                 hLog F.NetworkError
-                H.modify (_ { loggedIn = false, loading = false })
+                H.liftEff $ UIStates.clearAllLoading Nothing
+                H.modify (_ { loggedIn = false })
                 pure next
               _ → do
                 H.modify (_ { loggedIn = false })
@@ -210,14 +212,15 @@ promptFoundation noFoundation =
 
 refreshData ∷ ∀ e. H.ParentDSL State Query ChildQuery ChildSlot Void (FIDMonad e) Unit
 refreshData = do
-  H.modify (_ { loading = true, loggedIn = true })
+  H.modify (_ { loggedIn = true })
+  H.liftEff $ UIStates.toggleLoading(".container")
   mmStatus ← H.liftEff MM.loggedIn
   if mmStatus
     then do _ ← H.query' CP.cp1 unit (D.RefreshDebts unit)
             newmmStatus ← H.liftEff MM.loggedIn
             H.modify (_ { loggedIn = newmmStatus })
     else do H.modify (_ { loggedIn = mmStatus })
-  H.modify (_ { loading = false })
+  H.liftEff $ UIStates.toggleLoading(".container")
 
 checkMetamask ∷ ∀ e. Boolean → Boolean
               → H.ParentDSL State Query ChildQuery ChildSlot Void (FIDMonad e) Unit

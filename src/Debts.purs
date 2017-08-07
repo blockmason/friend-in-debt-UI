@@ -173,7 +173,9 @@ component =
       pure next
     CancelFriend friend next → do
       s ← H.get
+      H.liftEff $ UIStates.toggleLoading(".cancel-friend-button")
       handleTx NewTX s (ScreenChange R.BalancesScreen) $ F.deleteFriendship friend
+      H.liftEff $ UIStates.toggleLoading(".cancel-friend-button")
       pure next
     AddFriend friendStr next → do
       s ← H.get
@@ -625,7 +627,7 @@ confirmFriendshipButton friend =
 cancelFriendshipButton :: F.FoundationId -> H.ComponentHTML Query
 cancelFriendshipButton friend =
   HH.button [ HE.onClick $ HE.input_ $ CancelFriend friend
-            , HP.class_ $ HH.ClassName ""]
+            , HP.class_ $ HH.ClassName "cancel-friend-button"]
               [ HH.i [HP.class_ $ HH.ClassName "fa fa-close"][]]
 
 addFriendWidget ∷ State → H.ComponentHTML Query

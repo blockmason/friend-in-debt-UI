@@ -31,26 +31,27 @@ html {
   min-height: 50vh; }
 
 /* loading overlays */
-.loading:before {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  width: 1.5em;
-  height: 1.5em;
-  border-radius: 100%;
-  border: 3px solid orange;
-  border-right-color: rgba(255, 255, 255, 0.2);
-  animation: spinner-bubble 0.8s linear 0s infinite;
-  margin: auto;
-  opacity: 0;
-  z-index: 2; }
-
-.loading * {
-  transition: opacity 1s ease;
-  opacity: 0; }
+.loading {
+  color: transparent; }
+  .loading:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 1.5em;
+    height: 1.5em;
+    border-radius: 100%;
+    border: 3px solid orange;
+    border-right-color: rgba(255, 255, 255, 0.2);
+    animation: spinner-bubble 0.8s linear 0s infinite;
+    margin: auto;
+    opacity: 0;
+    z-index: 2; }
+  .loading * {
+    transition: opacity 1s ease;
+    opacity: 0; }
 
 .loading-spinner {
   color: #f00;
@@ -149,11 +150,14 @@ html {
     .create-debt-container input[type=text]::placeholder, .create-debt-container input[type=number]::placeholder, .create-debt-container select::placeholder {
       color: #aaa; }
   .create-debt-container button {
-    text-transform: uppercase; }
+    text-transform: uppercase;
+    position: relative; }
     .create-debt-container button:hover {
       background-color: #0275d8;
       color: white;
       border-color: #0275d8; }
+    .create-debt-container button.loading {
+      color: #0275d8 !important; }
 
 .add-friend {
   background: white;
@@ -198,11 +202,14 @@ html {
     .add-friend input[type=text]::placeholder, .add-friend input[type=number]::placeholder, .add-friend select::placeholder {
       color: #aaa; }
   .add-friend button {
-    text-transform: uppercase; }
+    text-transform: uppercase;
+    position: relative; }
     .add-friend button:hover {
       background-color: orange;
       color: white;
       border-color: orange; }
+    .add-friend button.loading {
+      color: orange !important; }
 
 .create-debt-container ul {
   padding: 0;
