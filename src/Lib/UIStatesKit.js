@@ -16,17 +16,19 @@ exports.toggleErrorImpl = function(selector) {
   }
 }
 
-exports.clearAllErrorsImpl = function() {
+exports.clearAllErrorsImpl = function(parentSelector) {
   return function() {
-      document.querySelectorAll('.error').forEach( function(el){
+      var parent = parentSelector ? document.querySelector(parentSelector) : document
+      parent.querySelectorAll('.error').forEach( function(el){
       el.classList.remove('error');
     });
   }
 }
 
-exports.clearAllLoadingImpl = function() {
+exports.clearAllLoadingImpl = function(parentSelector) {
   return function() {
-      document.querySelectorAll('.loading').forEach( function(el){
+      var parent = parentSelector ? document.querySelector(parentSelector) : document
+      parent.querySelectorAll('.loading').forEach( function(el){
       el.classList.remove('loading');
     });
   }
