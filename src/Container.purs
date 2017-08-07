@@ -84,13 +84,13 @@ ui =
                HP.class_ (HH.ClassName $
                  "container " <>
                  (R.getRouteNameFor state.currentScreen)  <>
-                 (if state.loading then " loading" else "") <>
                  (if state.loggedIn && (isJust state.myId) then "" else " require-login")) ]
-      [ loadingOverlay state.loading
-      , loggerOverlay false state.logText
-      , promptMetamask $ not state.loggedIn
-      , promptFoundation $ (isNothing state.myId) && state.loggedIn
-      , topBar state
+      [
+      -- loadingOverlay state.loading
+      -- , loggerOverlay false state.logText
+      -- , promptMetamask $ not state.loggedIn
+      -- , promptFoundation $ (isNothing state.myId) && state.loggedIn
+       topBar state
       , menu state
       , HH.div [ HP.class_ (HH.ClassName "create-debt-bar") ]
       [
@@ -166,10 +166,6 @@ ui =
         pure next
       DebtViewMsg msg next → do
         case msg of
-          D.SetLoading onOff →
-
-            hLog $ "Turning loading "
-            -- H.modify (\s → s { loading = onOff })
           D.ScreenChange screen →
             H.modify (\s → s { history = append [s.currentScreen] s.history
                              , currentScreen = screen })

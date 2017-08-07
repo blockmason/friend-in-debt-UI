@@ -44,7 +44,6 @@ data Query a
 
 type Input = ContainerMsgBus
 
-newtype LoadingTarget = LoadingTarget { selector ∷ String, preventInteraction ∷ Boolean}
 newtype ErrorFlash = ErrorFlash { message ∷ String, intrusive ∷ String }
 
 data Message
@@ -52,7 +51,6 @@ data Message
   | NewTX E.TX
   | NumPendingTodo Int
   | NumPendingFriends Int
-  | SetLoading LoadingTarget
   | LoadId F.FoundationId
 newtype FriendBundle = FriendBundle { id ∷ F.FoundationId, gradient ∷ ICON.GradientCss, balance ∷ Maybe F.Balance }
 
@@ -225,9 +223,7 @@ component =
       handleTx NewTX s (ScreenChange R.BalancesScreen) $ F.rejectPendingDebt debt
       pure next
     RefreshDebts next → do
-      H.liftEff $ UIStates.toggleLoading(".page-container")
-
-      -- H.raise $ SetLoading {selector: "page-container", preventInteraction: true}
+      -- H.liftEff $ UIStates.toggleLoading(".page-container")
       errorBus    ← H.gets _.errorBus
       loadFriendsAndDebts errorBus
       -- H.raise $ SetLoading false
