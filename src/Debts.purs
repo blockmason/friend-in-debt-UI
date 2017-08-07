@@ -619,7 +619,8 @@ confirmFriendshipButton friend =
 cancelFriendshipButton :: F.FoundationId -> H.ComponentHTML Query
 cancelFriendshipButton friend =
   HH.button [ HE.onClick $ HE.input_ $ CancelFriend friend
-            , HP.class_ $ HH.ClassName "fa fa-close"] []
+            , HP.class_ $ HH.ClassName ""]
+              [ HH.i [HP.class_ $ HH.ClassName "fa fa-close"][]]
 
 addFriendWidget ∷ State → H.ComponentHTML Query
 addFriendWidget state =

@@ -1264,11 +1264,12 @@ html {
 .pending-screen-container .todo-friend-row .action-buttons {
   width: 100%; }
 
-.pending-screen-container .confirm-friend-button {
+.pending-screen-container button {
   background: none;
   border: 1px solid #ddd;
-  border-radius: 5px; }
-  .pending-screen-container .confirm-friend-button:hover {
+  border-radius: 5px;
+  margin-right: 0.5em; }
+  .pending-screen-container button:hover {
     background: #8bc34a;
     color: white;
     border-color: white; }
@@ -1302,7 +1303,8 @@ html {
 .pending-screen-container .todo-debt-row button {
   background: none;
   border: 1px solid #ddd;
-  border-radius: 5px; }
+  border-radius: 5px;
+  margin-right: 0.5em; }
   .pending-screen-container .todo-debt-row button:hover {
     background: #8bc34a;
     color: white;
