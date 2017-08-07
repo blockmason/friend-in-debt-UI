@@ -115,7 +115,7 @@ ui =
         bus ← H.liftAff $ Bus.make
         H.subscribe $ busEventSource (flip HandleMsg ES.Listening) bus
         H.modify (_ { loggedIn = true, loading = true, errorBus = Just bus })
-        loadWeb3Loop C.web3Delay 10
+        loadWeb3Loop C.web3Delay 30
         startCheckInterval (Just bus) C.checkMMInterval C.checkTxInterval
         pure next
       HandleMsg msg next → do
