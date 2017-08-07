@@ -44,6 +44,9 @@ exports.getMyFoundationIdImpl = function(callback) {
             return instance.getMyFoundationId.call();
         }).then(function(res) {
             callback(b2s(res.valueOf()))();
+        }).catch(function(e) {
+            console.log("error");
+            callback("ERR");
         });
     };
 };

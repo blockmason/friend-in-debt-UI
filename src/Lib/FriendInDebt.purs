@@ -103,7 +103,10 @@ foundationId ∷ MonadF FoundationId
 foundationId = do
   checkAndInit
   fid ← liftAff $ makeAff (\err succ → getMyFoundationIdImpl succ)
-  if fid == "" then throwError NoFoundationId else pure $ FoundationId fid
+  case fid of
+    "ERR" → throwError NetworkError
+    ""    → throwError NoFoundationId
+    _     → pure $ FoundationId fid
 
 createFriendship ∷ FoundationId → MonadF E.TX
 createFriendship (FoundationId newFriend) = do

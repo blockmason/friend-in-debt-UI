@@ -122,12 +122,16 @@ ui =
         case msg of
           NetworkError → do
             hLog NetworkError
-            H.modify (_ { loggedIn = false })
+            H.modify (_ { loggedIn = false, loading = false })
             pure next
           FIDError e → do
             case e of
               F.NoFoundationId → do
                 H.modify (_ { myId = Nothing })
+                pure next
+              F.NetworkError → do
+                hLog F.NetworkError
+                H.modify (_ { loggedIn = false, loading = false })
                 pure next
               _ → do
                 H.modify (_ { loggedIn = false })
@@ -351,9 +355,15 @@ runWeb3Tests delayTimeMs = do
 loadWeb3Loop delayMs numTriesLeft =
   if numTriesLeft > 0
     then do
-      H.liftAff $ delay (Milliseconds (toNumber C.web3Delay))
+      hLog "Retrying"
+      H.liftAff $ delay (Milliseconds (toNumber delayMs))
       mmLoggedIn ← H.liftEff MM.loggedIn
       if mmLoggedIn
         then refreshData
         else loadWeb3Loop delayMs (numTriesLeft - 1)
-    else pure unit
+    else do
+      b ← H.gets _.errorBus
+      case b of
+        Nothing  → pure unit
+        Just bus → H.liftAff $ Bus.write NetworkError bus
+      pure unit
