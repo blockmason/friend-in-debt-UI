@@ -612,6 +612,7 @@ addFriendWidget state =
              , HP.value $ state.newFriend
              , HP.class_ $ HH.ClassName "form-control"
              , HP.placeholder $ "johndoe"
+             , HP.attr (HH.AttrName "maxlength") "32"
              , HE.onValueInput
                (HE.input (\val → InputFriend val))
              ]
