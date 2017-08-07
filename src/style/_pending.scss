@@ -4,7 +4,7 @@
 
 .pending-screen-container {
   li {
-    height: 5em;
+    height: auto;
     background: white;
     border-radius: 5px;
     overflow: hidden;
@@ -13,39 +13,52 @@
     padding: 10px 30px;
 
     &.todo-debt-row, &.sent-debt-row {
-      height: 7em;
+      height: auto;
       position: relative;
     }
   }
 
   .card-title {
-    font-size: 18px;
+    font-size: 14px;
+    border-bottom: 1px solid #eee;
     font-weight: 100;
-    border-right: 1px solid #eee;
-    line-height: 3em;
     padding-right: 1em;
     margin-right: 1em;
+    margin-bottom: 0;
+    width: 100%;
   }
 
   .request-details {
+    span {
+      font-size: 14px;
+    }
+
     span:first-child {
       font-size: 10px;
       display: block;
-      border-bottom: 1px solid #eee;
+      margin-top: 1em;
       text-transform: uppercase;
     }
 
     span:last-child {
       display: block;
-      font-size: 9px;
+      font-size: 14px;
       font-weight: 100;
     }
   }
 
-  .confirm-friend-button {
+  .todo-friend-row .action-buttons {
+    width: 100%;
+  }
+
+  .friend-details {
+  }
+
+  button {
     background: none;
     border: 1px solid #ddd;
     border-radius: 5px;
+    margin-right: 0.5em;
 
     &:hover {
       background: #8bc34a;
@@ -55,16 +68,24 @@
   }
 
   .debt-details {
+    width: 100%;
+
+    .debt-relationship {
+      padding: 0;
+      border-right: 1px solid #eee;
+
+      span {
+          font-size: 9px;
+          margin-top: 0;
+          display: block;
+          color: #777;
+      }
+    }
+
     .debtor {
       font-size: 10px;
       display: block;
-      border-bottom: 1px solid #eee;
       text-transform: uppercase;
-      width: 100%;
-
-      &:after {
-        content: ' owe';
-      }
     }
 
     .creditor {
@@ -74,12 +95,11 @@
       width: 100%;
     }
 
-    .amount {
-      position: absolute;
-      left: 1em;
-      top: 3.8em;
-      border-top: 1px solid #ddd;
+    .desc {
+      font-size: 10px;
+    }
 
+    .amount {
       .currency-span {
         font-size: 9px;
       }
@@ -91,13 +111,13 @@
 
   .todo-debt-row {
     .action-buttons {
-      position: absolute;
-      right: 0;
     }
+
     button {
       background: none;
       border: 1px solid #ddd;
       border-radius: 5px;
+      margin-right: 0.5em;
 
       &:hover {
         background: #8bc34a;

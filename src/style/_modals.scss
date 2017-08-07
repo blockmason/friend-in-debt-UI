@@ -94,11 +94,11 @@ $modals: (
 
   .debt-amount:first-of-type {
     width: 40%;
-    text-align: right;
+    text-align: left;
   }
 
-  // & > span {
-  //   line-height: 2em;
-  //   padding-left: 10px;
-  // }
+  & > span {
+    font-size: 10px;
+    line-height: 20px;
+  }
 }

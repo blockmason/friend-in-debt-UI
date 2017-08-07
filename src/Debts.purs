@@ -411,7 +411,6 @@ displayBalanceLi state bal =
     HH.li [HP.class_ $ HH.ClassName $ "balance-row row " <> fromMaybe "" expandClass,
            HE.onClick $ HE.input_ $ ShowItemizedDebtFor $ Just curFriend]
     $ [
-      HH.div [HP.class_ $ HH.ClassName "highlight"][],
       HH.div [HP.class_ $ HH.ClassName "col-4 debt-excerpt"][
         HH.div [HP.class_ $ HH.ClassName "row debt-amount"][moneySpan amount],
         HH.div [HP.class_ $ HH.ClassName "row label-row"][HH.small_[HH.text "last"]],
@@ -452,7 +451,7 @@ displaySentFriendLi friend =
 displaySentFriend :: F.FoundationId → Array (H.ComponentHTML Query)
 displaySentFriend friend =
     [
-      HH.div [HP.class_ $ HH.ClassName "col friend-details"]
+      HH.div [HP.class_ $ HH.ClassName "row friend-details"]
       [
         HH.div [HP.class_ $ HH.ClassName "request-details"]
         [
@@ -475,21 +474,20 @@ displayTodoFriendLi friend =
       (displayTodoFriend friend))
   [
     HH.div [HP.class_ $ HH.ClassName "row action-buttons row align-items-center"][
-      HH.div [HP.class_ $ HH.ClassName "col-1"][cancelFriendshipButton friend]
-      , HH.div [HP.class_ $ HH.ClassName "col-1"][confirmFriendshipButton friend]
+      HH.div [HP.class_ $ HH.ClassName ""][cancelFriendshipButton friend]
+      , HH.div [HP.class_ $ HH.ClassName ""][confirmFriendshipButton friend]
       ]
   ]
 
 displayTodoFriend ::  F.FoundationId → Array (H.ComponentHTML Query)
 displayTodoFriend friend =
     [
-      HH.div [HP.class_ $ HH.ClassName "col friend-details"]
+      HH.div [HP.class_ $ HH.ClassName "row friend-details"]
       [
         HH.div [HP.class_ $ HH.ClassName "request-details"]
         [
           HH.span_ [HH.text "Friend Request From"],
-          HH.span_ [HH.text $ show friend],
-          HH.span_ [HH.text "2017/07/29 15:35"]
+          HH.span_ [HH.text $ show friend]
         ]
       ]
     ]
@@ -512,10 +510,17 @@ displaySentDebt me fd =
     [
       HH.div [HP.class_ $ HH.ClassName "row debt-details align-items-center"]
       [
-        HH.div [HP.class_ $ HH.ClassName "debtor"][idSpan me fd'.debtor],
-        HH.div [HP.class_ $ HH.ClassName "creditor"][idSpan me fd'.creditor],
-        HH.div [HP.class_ $ HH.ClassName "desc"][descSpan fd],
-        HH.div [HP.class_ $ HH.ClassName "amount"][debtAmountSpan fd]
+        HH.div [HP.class_ $ HH.ClassName "col-4 debt-relationship"]
+        [
+          HH.div [HP.class_ $ HH.ClassName "debtor"][idSpan me fd'.debtor],
+          debtRelationshipSpan me fd,
+          HH.div [HP.class_ $ HH.ClassName "creditor"][idSpan me fd'.creditor]
+        ]
+        , HH.div [HP.class_ $ HH.ClassName "col-8 debt-desc"]
+        [
+          HH.div [HP.class_ $ HH.ClassName "desc"][descSpan fd],
+          HH.div [HP.class_ $ HH.ClassName "amount"][debtAmountSpan fd]
+        ]
       ]
     ]
 
@@ -530,9 +535,9 @@ displayTodoLi me fd =
       (cardHeader "To Confirm:")
       ((displayTodo me) fd))
   [
-    HH.div [HP.class_ $ HH.ClassName "row action-buttons row align-items-center"][
-      HH.div [HP.class_ $ HH.ClassName "col-1"][cancelButton fd],
-      HH.div [HP.class_ $ HH.ClassName "col-1"][confirmButton fd]
+    HH.div [HP.class_ $ HH.ClassName "row action-buttons align-items-end"][
+      HH.div [HP.class_ $ HH.ClassName ""][cancelButton fd],
+      HH.div [HP.class_ $ HH.ClassName ""][confirmButton fd]
     ]
   ]
 
@@ -543,10 +548,17 @@ displayTodo me fd =
     [
       HH.div [HP.class_ $ HH.ClassName "row debt-details row align-items-center"]
       [
-        HH.div [HP.class_ $ HH.ClassName "debtor"][idSpan me fd'.debtor],
-        HH.div [HP.class_ $ HH.ClassName "creditor"][idSpan me fd'.creditor],
-        HH.div [HP.class_ $ HH.ClassName "desc"][descSpan fd],
-        HH.div [HP.class_ $ HH.ClassName "amount"][debtAmountSpan fd]
+        HH.div [HP.class_ $ HH.ClassName "col-4 debt-relationship"]
+        [
+          HH.div [HP.class_ $ HH.ClassName "debtor"][idSpan me fd'.debtor],
+          debtRelationshipSpan me fd,
+          HH.div [HP.class_ $ HH.ClassName "creditor"][idSpan me fd'.creditor]
+        ]
+        , HH.div [HP.class_ $ HH.ClassName "col-8 debt-desc"]
+        [
+          HH.div [HP.class_ $ HH.ClassName "desc"][descSpan fd],
+          HH.div [HP.class_ $ HH.ClassName "amount"][debtAmountSpan fd]
+        ]
       ]
     ]
 
@@ -556,6 +568,13 @@ cardHeader title =
   [
     HH.h3 [HP.class_ $ HH.ClassName "row card-title"][HH.text title]
   ]
+
+debtRelationshipSpan ∷ F.FoundationId → F.Debt → H.ComponentHTML Query
+debtRelationshipSpan me fd =
+  let relationship = if (F.debtDebtor fd) == me then "owe" else "owes"
+  in
+    HH.span_ [HH.text relationship]
+
 
 idSpan :: F.FoundationId → F.FoundationId → H.ComponentHTML Query
 idSpan me idToDisplay =
@@ -607,7 +626,8 @@ confirmFriendshipButton friend =
 cancelFriendshipButton :: F.FoundationId -> H.ComponentHTML Query
 cancelFriendshipButton friend =
   HH.button [ HE.onClick $ HE.input_ $ CancelFriend friend
-            , HP.class_ $ HH.ClassName "fa fa-close"] []
+            , HP.class_ $ HH.ClassName ""]
+              [ HH.i [HP.class_ $ HH.ClassName "fa fa-close"][]]
 
 addFriendWidget ∷ State → H.ComponentHTML Query
 addFriendWidget state =

@@ -21,7 +21,7 @@ html {
 
 .container {
   background-image: url("45-degree-fabric-light.png");
-  width: 550px;
+  max-width: 550px;
   box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.3);
   height: 100vh;
   overflow-y: scroll; }
@@ -314,7 +314,10 @@ html {
   margin: 0 0.1em; }
   .show-cents .amount-row .debt-amount:first-of-type {
     width: 40%;
-    text-align: right; }
+    text-align: left; }
+  .show-cents .amount-row > span {
+    font-size: 10px;
+    line-height: 20px; }
 
 .top-bar {
   background: #ff5722;
@@ -339,7 +342,8 @@ html {
     font-size: 10px;
     text-transform: uppercase;
     color: white;
-    display: none; }
+    display: none;
+    text-align: right; }
     .top-bar .current-transactions.processing {
       display: block; }
   .top-bar .transaction-spinner {
@@ -348,7 +352,7 @@ html {
     border-radius: 50%;
     margin: auto;
     position: absolute;
-    left: -1.5em;
+    right: 11em;
     top: 1.3em;
     margin: auto;
     border: 1px solid;
@@ -385,28 +389,30 @@ html {
     border-radius: 1em;
     transition: 1s ease;
     text-align: center;
-    font-size: 14px;
+    font-size: 70%;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis; }
     .header-menu a.active {
       background-color: #e03702; }
+      .header-menu a.active span {
+        background: #791d00; }
     .header-menu a i {
       margin-right: 5px; }
     .header-menu a span {
-      width: 10px;
-      height: 10px;
       border-radius: 50%;
+      position: absolute;
       background-color: white;
       color: #ff5722;
-      padding: 0 5px;
+      padding: 0 5%;
       margin-left: 5px;
-      font-weight: 600; }
+      font-weight: 600;
+      right: 0; }
 
 .create-debt-bar, .add-friend-bar {
   transition: all 0.8s ease-out;
   position: fixed;
-  bottom: 1em; }
+  bottom: 2vh; }
   .create-debt-bar a, .add-friend-bar a {
     float: right;
     margin-right: 2em;
@@ -461,7 +467,8 @@ html {
   padding: 0; }
 
 .show-balances-screen .balances-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-balances-screen .friends-screen-container {
   transform: translateX(-3000px);
@@ -470,7 +477,8 @@ html {
   padding: 0; }
 
 .show-balances-screen .balances-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-balances-screen .pending-screen-container {
   transform: translateX(-3000px);
@@ -479,7 +487,8 @@ html {
   padding: 0; }
 
 .show-balances-screen .balances-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-balances-screen .settings-screen-container {
   transform: translateX(-3000px);
@@ -488,7 +497,8 @@ html {
   padding: 0; }
 
 .show-balances-screen .balances-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-balances-screen .add-friend-screen-container {
   transform: translateX(-3000px);
@@ -497,7 +507,8 @@ html {
   padding: 0; }
 
 .show-balances-screen .balances-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-balances-screen .create-debt-screen-container {
   transform: translateX(-3000px);
@@ -506,7 +517,8 @@ html {
   padding: 0; }
 
 .show-balances-screen .balances-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-balances-screen .itemized-debts-screen-container {
   transform: translateX(-3000px);
@@ -515,7 +527,8 @@ html {
   padding: 0; }
 
 .show-balances-screen .balances-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-balances-screen .go-back-section {
   margin-left: -34em; }
@@ -533,7 +546,8 @@ html {
   padding: 0; }
 
 .show-friends-screen .friends-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-friends-screen .friends-screen-container {
   transform: translateX(-3000px);
@@ -542,7 +556,8 @@ html {
   padding: 0; }
 
 .show-friends-screen .friends-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-friends-screen .pending-screen-container {
   transform: translateX(-3000px);
@@ -551,7 +566,8 @@ html {
   padding: 0; }
 
 .show-friends-screen .friends-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-friends-screen .settings-screen-container {
   transform: translateX(-3000px);
@@ -560,7 +576,8 @@ html {
   padding: 0; }
 
 .show-friends-screen .friends-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-friends-screen .add-friend-screen-container {
   transform: translateX(-3000px);
@@ -569,7 +586,8 @@ html {
   padding: 0; }
 
 .show-friends-screen .friends-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-friends-screen .create-debt-screen-container {
   transform: translateX(-3000px);
@@ -578,7 +596,8 @@ html {
   padding: 0; }
 
 .show-friends-screen .friends-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-friends-screen .itemized-debts-screen-container {
   transform: translateX(-3000px);
@@ -587,7 +606,8 @@ html {
   padding: 0; }
 
 .show-friends-screen .friends-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-friends-screen .go-back-section {
   margin-left: -34em; }
@@ -605,7 +625,8 @@ html {
   padding: 0; }
 
 .show-pending-screen .pending-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-pending-screen .friends-screen-container {
   transform: translateX(-3000px);
@@ -614,7 +635,8 @@ html {
   padding: 0; }
 
 .show-pending-screen .pending-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-pending-screen .pending-screen-container {
   transform: translateX(-3000px);
@@ -623,7 +645,8 @@ html {
   padding: 0; }
 
 .show-pending-screen .pending-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-pending-screen .settings-screen-container {
   transform: translateX(-3000px);
@@ -632,7 +655,8 @@ html {
   padding: 0; }
 
 .show-pending-screen .pending-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-pending-screen .add-friend-screen-container {
   transform: translateX(-3000px);
@@ -641,7 +665,8 @@ html {
   padding: 0; }
 
 .show-pending-screen .pending-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-pending-screen .create-debt-screen-container {
   transform: translateX(-3000px);
@@ -650,7 +675,8 @@ html {
   padding: 0; }
 
 .show-pending-screen .pending-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-pending-screen .itemized-debts-screen-container {
   transform: translateX(-3000px);
@@ -659,7 +685,8 @@ html {
   padding: 0; }
 
 .show-pending-screen .pending-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-pending-screen .go-back-section {
   margin-left: -34em; }
@@ -677,7 +704,8 @@ html {
   padding: 0; }
 
 .show-settings-screen .settings-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-settings-screen .friends-screen-container {
   transform: translateX(-3000px);
@@ -686,7 +714,8 @@ html {
   padding: 0; }
 
 .show-settings-screen .settings-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-settings-screen .pending-screen-container {
   transform: translateX(-3000px);
@@ -695,7 +724,8 @@ html {
   padding: 0; }
 
 .show-settings-screen .settings-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-settings-screen .settings-screen-container {
   transform: translateX(-3000px);
@@ -704,7 +734,8 @@ html {
   padding: 0; }
 
 .show-settings-screen .settings-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-settings-screen .add-friend-screen-container {
   transform: translateX(-3000px);
@@ -713,7 +744,8 @@ html {
   padding: 0; }
 
 .show-settings-screen .settings-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-settings-screen .create-debt-screen-container {
   transform: translateX(-3000px);
@@ -722,7 +754,8 @@ html {
   padding: 0; }
 
 .show-settings-screen .settings-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-settings-screen .itemized-debts-screen-container {
   transform: translateX(-3000px);
@@ -731,7 +764,8 @@ html {
   padding: 0; }
 
 .show-settings-screen .settings-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-settings-screen .go-back-section {
   margin-left: -34em; }
@@ -749,7 +783,8 @@ html {
   padding: 0; }
 
 .show-add-friend-screen .add-friend-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-add-friend-screen .friends-screen-container {
   transform: translateX(-3000px);
@@ -758,7 +793,8 @@ html {
   padding: 0; }
 
 .show-add-friend-screen .add-friend-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-add-friend-screen .pending-screen-container {
   transform: translateX(-3000px);
@@ -767,7 +803,8 @@ html {
   padding: 0; }
 
 .show-add-friend-screen .add-friend-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-add-friend-screen .settings-screen-container {
   transform: translateX(-3000px);
@@ -776,7 +813,8 @@ html {
   padding: 0; }
 
 .show-add-friend-screen .add-friend-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-add-friend-screen .add-friend-screen-container {
   transform: translateX(-3000px);
@@ -785,7 +823,8 @@ html {
   padding: 0; }
 
 .show-add-friend-screen .add-friend-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-add-friend-screen .create-debt-screen-container {
   transform: translateX(-3000px);
@@ -794,7 +833,8 @@ html {
   padding: 0; }
 
 .show-add-friend-screen .add-friend-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-add-friend-screen .itemized-debts-screen-container {
   transform: translateX(-3000px);
@@ -803,7 +843,8 @@ html {
   padding: 0; }
 
 .show-add-friend-screen .add-friend-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-add-friend-screen .go-back-section {
   margin-left: -34em; }
@@ -821,7 +862,8 @@ html {
   padding: 0; }
 
 .show-create-debt-screen .create-debt-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-create-debt-screen .friends-screen-container {
   transform: translateX(-3000px);
@@ -830,7 +872,8 @@ html {
   padding: 0; }
 
 .show-create-debt-screen .create-debt-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-create-debt-screen .pending-screen-container {
   transform: translateX(-3000px);
@@ -839,7 +882,8 @@ html {
   padding: 0; }
 
 .show-create-debt-screen .create-debt-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-create-debt-screen .settings-screen-container {
   transform: translateX(-3000px);
@@ -848,7 +892,8 @@ html {
   padding: 0; }
 
 .show-create-debt-screen .create-debt-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-create-debt-screen .add-friend-screen-container {
   transform: translateX(-3000px);
@@ -857,7 +902,8 @@ html {
   padding: 0; }
 
 .show-create-debt-screen .create-debt-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-create-debt-screen .create-debt-screen-container {
   transform: translateX(-3000px);
@@ -866,7 +912,8 @@ html {
   padding: 0; }
 
 .show-create-debt-screen .create-debt-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-create-debt-screen .itemized-debts-screen-container {
   transform: translateX(-3000px);
@@ -875,7 +922,8 @@ html {
   padding: 0; }
 
 .show-create-debt-screen .create-debt-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-create-debt-screen .go-back-section {
   margin-left: -34em; }
@@ -893,7 +941,8 @@ html {
   padding: 0; }
 
 .show-itemized-debts-screen .itemized-debts-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-itemized-debts-screen .friends-screen-container {
   transform: translateX(-3000px);
@@ -902,7 +951,8 @@ html {
   padding: 0; }
 
 .show-itemized-debts-screen .itemized-debts-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-itemized-debts-screen .pending-screen-container {
   transform: translateX(-3000px);
@@ -911,7 +961,8 @@ html {
   padding: 0; }
 
 .show-itemized-debts-screen .itemized-debts-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-itemized-debts-screen .settings-screen-container {
   transform: translateX(-3000px);
@@ -920,7 +971,8 @@ html {
   padding: 0; }
 
 .show-itemized-debts-screen .itemized-debts-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-itemized-debts-screen .add-friend-screen-container {
   transform: translateX(-3000px);
@@ -929,7 +981,8 @@ html {
   padding: 0; }
 
 .show-itemized-debts-screen .itemized-debts-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-itemized-debts-screen .create-debt-screen-container {
   transform: translateX(-3000px);
@@ -938,7 +991,8 @@ html {
   padding: 0; }
 
 .show-itemized-debts-screen .itemized-debts-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-itemized-debts-screen .itemized-debts-screen-container {
   transform: translateX(-3000px);
@@ -947,7 +1001,8 @@ html {
   padding: 0; }
 
 .show-itemized-debts-screen .itemized-debts-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-itemized-debts-screen .go-back-section {
   margin-left: -34em; }
@@ -962,19 +1017,19 @@ html {
   margin-left: 0; }
 
 .show-add-friend-screen .logo-section {
-  margin-left: -23em; }
+  margin-left: -55%; }
 
 .show-create-debt-screen .go-back-section {
   margin-left: 0; }
 
 .show-create-debt-screen .logo-section {
-  margin-left: -23em; }
+  margin-left: -55%; }
 
 .show-itemized-debts-screen .go-back-section {
   margin-left: 0; }
 
 .show-itemized-debts-screen .logo-section {
-  margin-left: -23em; }
+  margin-left: -55%; }
 
 .show-itemized-debts-screen .balances-screen-container {
   transform: none;
@@ -986,25 +1041,26 @@ html {
 .show-friends-screen .add-friend-bar {
   transform: none; }
 
-.all-balances-container ul {
+.balances-screen-container ul {
   list-style: none;
   padding: 1em;
   overflow: hidden; }
+  @media (max-width: 544px) {
+    .balances-screen-container ul {
+      padding: 0; } }
 
 .balance-row {
   height: 140px;
   background: white;
   border-radius: 5px;
   overflow: hidden;
-  margin-bottom: 10px;
-  transition: all 0.7s ease; }
+  transition: all 0.7s ease;
+  border-left: 5px solid orange;
+  margin: 0;
+  margin-bottom: 10px; }
 
 .balance-row:hover .highlight {
   filter: brightness(1.1); }
-
-.balance-row .highlight {
-  background: orange;
-  flex: 0 0 2.333333%; }
 
 .balance-row small {
   font-weight: 500;
@@ -1044,7 +1100,7 @@ html {
 
 .no-balances {
   color: white;
-  height: 80vh;
+  height: 65vh;
   width: 100%;
   color: white;
   z-index: 99;
@@ -1171,7 +1227,7 @@ html {
   margin: 0; }
 
 .pending-screen-container li {
-  height: 5em;
+  height: auto;
   background: white;
   border-radius: 5px;
   overflow: hidden;
@@ -1179,70 +1235,76 @@ html {
   transition: all 0.7s ease;
   padding: 10px 30px; }
   .pending-screen-container li.todo-debt-row, .pending-screen-container li.sent-debt-row {
-    height: 7em;
+    height: auto;
     position: relative; }
 
 .pending-screen-container .card-title {
-  font-size: 18px;
+  font-size: 14px;
+  border-bottom: 1px solid #eee;
   font-weight: 100;
-  border-right: 1px solid #eee;
-  line-height: 3em;
   padding-right: 1em;
-  margin-right: 1em; }
+  margin-right: 1em;
+  margin-bottom: 0;
+  width: 100%; }
+
+.pending-screen-container .request-details span {
+  font-size: 14px; }
 
 .pending-screen-container .request-details span:first-child {
   font-size: 10px;
   display: block;
-  border-bottom: 1px solid #eee;
+  margin-top: 1em;
   text-transform: uppercase; }
 
 .pending-screen-container .request-details span:last-child {
   display: block;
-  font-size: 9px;
+  font-size: 14px;
   font-weight: 100; }
 
-.pending-screen-container .confirm-friend-button {
+.pending-screen-container .todo-friend-row .action-buttons {
+  width: 100%; }
+
+.pending-screen-container button {
   background: none;
   border: 1px solid #ddd;
-  border-radius: 5px; }
-  .pending-screen-container .confirm-friend-button:hover {
+  border-radius: 5px;
+  margin-right: 0.5em; }
+  .pending-screen-container button:hover {
     background: #8bc34a;
     color: white;
     border-color: white; }
 
-.pending-screen-container .debt-details .debtor {
-  font-size: 10px;
-  display: block;
-  border-bottom: 1px solid #eee;
-  text-transform: uppercase;
+.pending-screen-container .debt-details {
   width: 100%; }
-  .pending-screen-container .debt-details .debtor:after {
-    content: ' owe'; }
-
-.pending-screen-container .debt-details .creditor {
-  font-size: 10px;
-  display: block;
-  text-transform: uppercase;
-  width: 100%; }
-
-.pending-screen-container .debt-details .amount {
-  position: absolute;
-  left: 1em;
-  top: 3.8em;
-  border-top: 1px solid #ddd; }
+  .pending-screen-container .debt-details .debt-relationship {
+    padding: 0;
+    border-right: 1px solid #eee; }
+    .pending-screen-container .debt-details .debt-relationship span {
+      font-size: 9px;
+      margin-top: 0;
+      display: block;
+      color: #777; }
+  .pending-screen-container .debt-details .debtor {
+    font-size: 10px;
+    display: block;
+    text-transform: uppercase; }
+  .pending-screen-container .debt-details .creditor {
+    font-size: 10px;
+    display: block;
+    text-transform: uppercase;
+    width: 100%; }
+  .pending-screen-container .debt-details .desc {
+    font-size: 10px; }
   .pending-screen-container .debt-details .amount .currency-span {
     font-size: 9px; }
   .pending-screen-container .debt-details .amount .money-span {
     font-weight: 100; }
 
-.pending-screen-container .todo-debt-row .action-buttons {
-  position: absolute;
-  right: 0; }
-
 .pending-screen-container .todo-debt-row button {
   background: none;
   border: 1px solid #ddd;
-  border-radius: 5px; }
+  border-radius: 5px;
+  margin-right: 0.5em; }
   .pending-screen-container .todo-debt-row button:hover {
     background: #8bc34a;
     color: white;
