@@ -12296,8 +12296,6 @@ var PS = {};
   var FriendInDebt_Types = PS["FriendInDebt.Types"];
   var Halogen = PS["Halogen"];
   var Halogen_HTML = PS["Halogen.HTML"];
-  var Halogen_HTML_Core = PS["Halogen.HTML.Core"];
-  var Halogen_HTML_Elements = PS["Halogen.HTML.Elements"];
   var Halogen_HTML_Properties = PS["Halogen.HTML.Properties"];
   var Halogen_Query_HalogenM = PS["Halogen.Query.HalogenM"];
   var Network_Eth = PS["Network.Eth"];
@@ -12311,8 +12309,8 @@ var PS = {};
           return Halogen_Query_HalogenM.raise(message(tx));
       };
   };
-  var hasNetworkError = function ($17) {
-      return !Data_Array["null"](Data_Array.filter(Network_Eth.hasError)($17));
+  var hasNetworkError = function ($16) {
+      return !Data_Array["null"](Data_Array.filter(Network_Eth.hasError)($16));
   };
   var handleCall = function (dictBind) {
       return function (dictMonadEff) {
@@ -12362,8 +12360,8 @@ var PS = {};
           };
       };
   };
-  var formatDate = function ($18) {
-      return Data_Either.either(Data_Function["const"](""))(Control_Category.id(Control_Category.categoryFn))(Data_Formatter_DateTime.formatDateTime("YYYY-MM-DD")($18));
+  var formatDate = function ($17) {
+      return Data_Either.either(Data_Function["const"](""))(Control_Category.id(Control_Category.categoryFn))(Data_Formatter_DateTime.formatDateTime("YYYY-MM-DD")($17));
   };
   exports["formatDate"] = formatDate;
   exports["handleCall"] = handleCall;
@@ -15178,7 +15176,7 @@ var PS = {};
                                   });
                               });
                           };
-                          throw new Error("Failed pattern match at Container line 231, column 3 - line 236, column 16: " + [ maybeBus.constructor.name ]);
+                          throw new Error("Failed pattern match at Container line 228, column 3 - line 233, column 16: " + [ maybeBus.constructor.name ]);
                       };
                   };
               };
@@ -15284,7 +15282,7 @@ var PS = {};
                   if (v instanceof Data_Maybe.Just) {
                       return Control_Monad_Aff_Class.liftAff(Halogen_Query_HalogenM.monadAffHalogenM(Control_Monad_Aff_Class.monadAffAff))(Control_Monad_Aff_Bus.write(FriendInDebt_Types.NetworkError.value)(v.value0));
                   };
-                  throw new Error("Failed pattern match at Container line 368, column 7 - line 370, column 58: " + [ v.constructor.name ]);
+                  throw new Error("Failed pattern match at Container line 361, column 7 - line 363, column 58: " + [ v.constructor.name ]);
               })())(function () {
                   return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(Data_Unit.unit);
               });
@@ -15312,7 +15310,6 @@ var PS = {};
       };
       var initialState = {
           loggedIn: false, 
-          loading: true, 
           myId: Data_Maybe.Nothing.value, 
           errorBus: Data_Maybe.Nothing.value, 
           txs: [  ], 
@@ -15441,7 +15438,7 @@ var PS = {};
                                       if (v2 instanceof Data_Maybe.Just) {
                                           return Control_Monad_Aff_Class.liftAff(Halogen_Query_HalogenM.monadAffHalogenM(Control_Monad_Aff_Class.monadAffAff))(Control_Monad_Aff_Bus.write(FriendInDebt_Types.NetworkError.value)(v2.value0));
                                       };
-                                      throw new Error("Failed pattern match at Container line 153, column 20 - line 155, column 63: " + [ v2.constructor.name ]);
+                                      throw new Error("Failed pattern match at Container line 150, column 20 - line 152, column 63: " + [ v2.constructor.name ]);
                                   };
                                   var pending = Data_Array.filter(function (v4) {
                                       return Network_Eth.notDone(v4.value0);
@@ -15471,7 +15468,7 @@ var PS = {};
                       });
                   });
               };
-              throw new Error("Failed pattern match at Container line 124, column 9 - line 163, column 22: " + [ v.value0.constructor.name ]);
+              throw new Error("Failed pattern match at Container line 121, column 9 - line 160, column 22: " + [ v.value0.constructor.name ]);
           };
           if (v instanceof RefreshData) {
               return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(refreshData)(function () {
@@ -15566,7 +15563,7 @@ var PS = {};
                           return $165;
                       });
                   };
-                  throw new Error("Failed pattern match at Container line 172, column 9 - line 183, column 45: " + [ v.value0.constructor.name ]);
+                  throw new Error("Failed pattern match at Container line 169, column 9 - line 180, column 45: " + [ v.value0.constructor.name ]);
               })())(function () {
                   return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value1);
               });
@@ -15586,7 +15583,7 @@ var PS = {};
                   return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value0);
               });
           };
-          throw new Error("Failed pattern match at Container line 114, column 12 - line 187, column 18: " + [ v.constructor.name ]);
+          throw new Error("Failed pattern match at Container line 111, column 12 - line 184, column 18: " + [ v.constructor.name ]);
       };
       return Halogen_Component.lifecycleParentComponent(Data_Either.ordEither(Data_Ord.ordUnit)(Data_Ord.ordVoid))({
           initialState: Data_Function["const"](initialState), 

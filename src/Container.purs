@@ -28,7 +28,7 @@ import Network.Eth.FriendInDebt as F
 
 import FriendInDebt.Routes      as R
 import FriendInDebt.Config      as C
-import FriendInDebt.Blockchain (hasNetworkError, loadingOverlay, handleCall)
+import FriendInDebt.Blockchain (hasNetworkError, handleCall)
 
 import UI.UIStatesKit as UIStates
 
@@ -41,7 +41,6 @@ data Query a
   | DebtViewMsg D.Message a
 
 type State = { loggedIn ∷ Boolean
-             , loading  ∷ Boolean
              , myId     ∷ Maybe F.FoundationId
              , errorBus ∷ ContainerMsgBus
              , txs      ∷ Array E.TX
@@ -69,7 +68,6 @@ ui =
 
     initialState ∷ State
     initialState = { loggedIn: false
-                   , loading: true
                    , myId: Nothing
                    , errorBus: Nothing
                    , txs: []
@@ -88,7 +86,6 @@ ui =
                  (R.getRouteNameFor state.currentScreen)  <>
                  (if state.loggedIn && (isJust state.myId) then "" else " require-login")) ]
       [
-      -- loadingOverlay state.loading
       -- , loggerOverlay false state.logText
       -- , promptMetamask $ not state.loggedIn
       -- , promptFoundation $ (isNothing state.myId) && state.loggedIn
@@ -316,10 +313,6 @@ menuItem screen state =
           HP.class_ (HH.ClassName $ "col-3 " <> if screen == state.currentScreen then "active" else ""),
           HE.onClick $ HE.input_ $ SetScreen screen] $ menuText
 
-
--- randomLoadingText ∷ String
--- randomLoadingText =
---   ["Interacting with Blockchain", "Waiting for Node Response", "Committing Data", "Transmitting", "Processing", "Waiting for Nodes"]
 
 loggerOverlay onOff logText =
   if onOff

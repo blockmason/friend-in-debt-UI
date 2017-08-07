@@ -39,13 +39,3 @@ hasNetworkError = not ∘ A.null ∘ (A.filter E.hasError)
 
 formatDate ∷ DateTime → String
 formatDate = (either (const "") id) ∘ (DTF.formatDateTime "YYYY-MM-DD")
-
-loadingOverlay ∷ ∀ p i. Boolean → H.HTML p i
-loadingOverlay loading =
-  HH.div [ HP.id_ "loadingOverlay"
-         , if loading then HP.class_ (HH.ClassName "active")
-           else HP.class_ (HH.ClassName "in-active")]
-  [
-    HH.i [HP.class_ (HH.ClassName "loading-spinner")][],
-    HH.h6_ [ HH.text "Loading..." ]
-  ]
