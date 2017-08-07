@@ -3,6 +3,7 @@
 
 var Debt;
 var Friend;
+var Foundation;
 
 var debtAbi;
 var debtContract;
@@ -28,6 +29,8 @@ exports.initImpl = function(dummyVal) {
         Debt.setProvider(web3.currentProvider);
         Friend = TruffleContract(friendConfig);
         Friend.setProvider(web3.currentProvider);
+        Foundation = TruffleContract(foundationConfig);
+        Foundation.setProvider(web3.currentProvider);
     };
 };
 
@@ -35,6 +38,18 @@ exports.initImpl = function(dummyVal) {
 exports.currentUserImpl = function(dummyVal) {
     return function() {
         return web3.eth.accounts[0];
+    };
+};
+
+exports.nameInUseImpl = function(callback) {
+    return function(foundationId) {
+        return function() {
+            Foundation.deployed().then(function(instance) {
+                return instance.resolveToAddresses.call(foundationId);
+            }).then(function(res) {
+                callback(res.valueOf().length > 0)();
+            });
+        };
     };
 };
 

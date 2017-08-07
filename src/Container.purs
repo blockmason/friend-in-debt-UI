@@ -134,6 +134,7 @@ ui =
                 H.modify (_ { loggedIn = false, loading = false })
                 pure next
               _ → do
+                hLog "some FID problem"
                 H.modify (_ { loggedIn = false })
                 pure next
           CheckMetamask → do
@@ -167,7 +168,6 @@ ui =
       DebtViewMsg msg next → do
         case msg of
           D.SetLoading onOff → do
-            hLog $ "Turning loading " <> show onOff
             H.modify (\s → s { loading = onOff })
           D.ScreenChange screen →
             H.modify (\s → s { history = append [s.currentScreen] s.history
@@ -211,13 +211,13 @@ promptFoundation noFoundation =
 
 refreshData ∷ ∀ e. H.ParentDSL State Query ChildQuery ChildSlot Void (FIDMonad e) Unit
 refreshData = do
-  H.modify (_ { loading = true, loggedIn = true })
+  H.modify (_ { loading = true })
   mmStatus ← H.liftEff MM.loggedIn
   if mmStatus
     then do _ ← H.query' CP.cp1 unit (D.RefreshDebts unit)
             newmmStatus ← H.liftEff MM.loggedIn
             H.modify (_ { loggedIn = newmmStatus })
-    else do H.modify (_ { loggedIn = mmStatus })
+    else do H.modify (_ { loggedIn = false })
   H.modify (_ { loading = false })
 
 checkMetamask ∷ ∀ e. Boolean → Boolean
@@ -240,11 +240,12 @@ startCheckInterval maybeBus mmInterval txInterval = do
               pure unit
 
 runTests = do
-  (H.liftAff $ F.runMonadF $ F.foundationId)       >>= hLog
-  (H.liftAff $ F.runMonadF $ F.confirmedFriends)   >>= hLog
-  (H.liftAff $ F.runMonadF $ F.pendingFriends)     >>= hLog
-  (H.liftAff $ F.runMonadF $ F.pendingDebts)       >>= hLog
-  (H.liftAff $ F.runMonadF $ F.debtBalances)       >>= hLog
+  (H.liftAff $ F.runMonadF $ F.nameInUse "timtime")       >>= hLog
+--  (H.liftAff $ F.runMonadF $ F.foundationId)       >>= hLog
+--  (H.liftAff $ F.runMonadF $ F.confirmedFriends)   >>= hLog
+--  (H.liftAff $ F.runMonadF $ F.pendingFriends)     >>= hLog
+--  (H.liftAff $ F.runMonadF $ F.pendingDebts)       >>= hLog
+--  (H.liftAff $ F.runMonadF $ F.debtBalances)       >>= hLog
   pure unit
 
 mkFriends = do
@@ -359,7 +360,9 @@ loadWeb3Loop delayMs numTriesLeft =
       H.liftAff $ delay (Milliseconds (toNumber delayMs))
       mmLoggedIn ← H.liftEff MM.loggedIn
       if mmLoggedIn
-        then refreshData
+        then do
+          refreshData
+          H.modify (_ { loggedIn = true })
         else loadWeb3Loop delayMs (numTriesLeft - 1)
     else do
       b ← H.gets _.errorBus

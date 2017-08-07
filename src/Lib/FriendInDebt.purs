@@ -6,6 +6,8 @@ module Network.Eth.FriendInDebt
        , module Network.Eth.Foundation
 
        , foundationId
+       , nameInUse
+
        , confirmedFriends
        , createFriendship
        , confirmFriendship
@@ -63,6 +65,7 @@ type DebtLookupFn' = ∀ e. (Array RawConfirmed → Eff e Unit) → StringId →
 type NameLookupFn = ∀ e. (String → Eff e Unit) → StringId → Eff e Unit
 type FriendsLookupFn = ∀ e. ((Array StringId) → Eff e Unit) → StringId → Eff e Unit
 type PendingFriendsFn = ∀ e. ((Array PendingFriend) → Eff e Unit) → StringAddr → Eff e Unit
+type CheckNameFn = ∀ e. (Boolean → Eff e Unit) → StringAddr    → Eff e Unit
 type ZeroArgTx = ∀ e. (E.RawTx → Eff e Unit)                   → Eff e Unit
 type OneArgTx  = ∀ e. (E.RawTx → Eff e Unit) → String          → Eff e Unit
 type TwoArgTx  = ∀ e. (E.RawTx → Eff e Unit) → String → String → Eff e Unit
@@ -72,6 +75,7 @@ type HandleDebtTx = ∀ e. (E.RawTx → Eff e Unit) → StringId → StringId �
 foreign import initImpl ∷ ∀ e. Unit → Eff e Unit
 foreign import currentUserImpl ∷ ∀ e. Unit → Eff e StringAddr
 foreign import getMyFoundationIdImpl ∷ IdLookupFn
+foreign import nameInUseImpl ∷ CheckNameFn
 
 foreign import friendsImpl ∷ FriendsLookupFn
 foreign import pendingFriendshipsImpl ∷ PendingFriendsFn
@@ -98,6 +102,12 @@ currentUser ∷ MonadF E.EthAddress
 currentUser = do
   checkAndInit
   E.eaMkAddr <$> (liftEff $ currentUserImpl unit)
+
+nameInUse ∷ String → MonadF Boolean
+nameInUse foundationName = do
+  checkAndInit
+  x ← liftAff $ makeAff (\_ s → nameInUseImpl s foundationName)
+  pure x
 
 foundationId ∷ MonadF FoundationId
 foundationId = do
