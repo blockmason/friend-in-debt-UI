@@ -1,5 +1,8 @@
 @import url("http://fonts.googleapis.com/css?family=Lato:100,300,400,700,900");
 
+$small: 544px;
+$medium: 768px;
+
 /* general */
 body {
   height: 100%;
@@ -25,7 +28,7 @@ html {
 .container {
   // background-image: linear-gradient(-180deg, #0F2422 0%, #1C4737 100%);
   background-image: url('45-degree-fabric-light.png');
-  width: 550px;
+  max-width: 550px;
   box-shadow: 0 0 5px 5px rgba(0,0,0,0.3);
   height: 100vh;
   overflow-y: scroll;
@@ -33,4 +36,8 @@ html {
 
 .page-container {
   margin-top: 10px;
+}
+
+.main-view {
+  margin-right: 0;
 }

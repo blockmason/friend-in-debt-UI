@@ -21,13 +21,16 @@ html {
 
 .container {
   background-image: url("45-degree-fabric-light.png");
-  width: 550px;
+  max-width: 550px;
   box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.3);
   height: 100vh;
   overflow-y: scroll; }
 
 .page-container {
   margin-top: 10px; }
+
+.main-view {
+  margin-right: 0; }
 
 /* loading overlays */
 #metamaskOverlay, #noFoundationOverlay {
@@ -385,28 +388,30 @@ html {
     border-radius: 1em;
     transition: 1s ease;
     text-align: center;
-    font-size: 14px;
+    font-size: 70%;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis; }
     .header-menu a.active {
       background-color: #e03702; }
+      .header-menu a.active span {
+        background: #791d00; }
     .header-menu a i {
       margin-right: 5px; }
     .header-menu a span {
-      width: 10px;
-      height: 10px;
       border-radius: 50%;
+      position: absolute;
       background-color: white;
       color: #ff5722;
-      padding: 0 5px;
+      padding: 0 5%;
       margin-left: 5px;
-      font-weight: 600; }
+      font-weight: 600;
+      right: 0; }
 
 .create-debt-bar, .add-friend-bar {
   transition: all 0.8s ease-out;
   position: fixed;
-  bottom: 1em; }
+  bottom: 2vh; }
   .create-debt-bar a, .add-friend-bar a {
     float: right;
     margin-right: 2em;
@@ -461,7 +466,8 @@ html {
   padding: 0; }
 
 .show-balances-screen .balances-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-balances-screen .friends-screen-container {
   transform: translateX(-3000px);
@@ -470,7 +476,8 @@ html {
   padding: 0; }
 
 .show-balances-screen .balances-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-balances-screen .pending-screen-container {
   transform: translateX(-3000px);
@@ -479,7 +486,8 @@ html {
   padding: 0; }
 
 .show-balances-screen .balances-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-balances-screen .settings-screen-container {
   transform: translateX(-3000px);
@@ -488,7 +496,8 @@ html {
   padding: 0; }
 
 .show-balances-screen .balances-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-balances-screen .add-friend-screen-container {
   transform: translateX(-3000px);
@@ -497,7 +506,8 @@ html {
   padding: 0; }
 
 .show-balances-screen .balances-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-balances-screen .create-debt-screen-container {
   transform: translateX(-3000px);
@@ -506,7 +516,8 @@ html {
   padding: 0; }
 
 .show-balances-screen .balances-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-balances-screen .itemized-debts-screen-container {
   transform: translateX(-3000px);
@@ -515,7 +526,8 @@ html {
   padding: 0; }
 
 .show-balances-screen .balances-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-balances-screen .go-back-section {
   margin-left: -34em; }
@@ -533,7 +545,8 @@ html {
   padding: 0; }
 
 .show-friends-screen .friends-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-friends-screen .friends-screen-container {
   transform: translateX(-3000px);
@@ -542,7 +555,8 @@ html {
   padding: 0; }
 
 .show-friends-screen .friends-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-friends-screen .pending-screen-container {
   transform: translateX(-3000px);
@@ -551,7 +565,8 @@ html {
   padding: 0; }
 
 .show-friends-screen .friends-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-friends-screen .settings-screen-container {
   transform: translateX(-3000px);
@@ -560,7 +575,8 @@ html {
   padding: 0; }
 
 .show-friends-screen .friends-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-friends-screen .add-friend-screen-container {
   transform: translateX(-3000px);
@@ -569,7 +585,8 @@ html {
   padding: 0; }
 
 .show-friends-screen .friends-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-friends-screen .create-debt-screen-container {
   transform: translateX(-3000px);
@@ -578,7 +595,8 @@ html {
   padding: 0; }
 
 .show-friends-screen .friends-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-friends-screen .itemized-debts-screen-container {
   transform: translateX(-3000px);
@@ -587,7 +605,8 @@ html {
   padding: 0; }
 
 .show-friends-screen .friends-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-friends-screen .go-back-section {
   margin-left: -34em; }
@@ -605,7 +624,8 @@ html {
   padding: 0; }
 
 .show-pending-screen .pending-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-pending-screen .friends-screen-container {
   transform: translateX(-3000px);
@@ -614,7 +634,8 @@ html {
   padding: 0; }
 
 .show-pending-screen .pending-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-pending-screen .pending-screen-container {
   transform: translateX(-3000px);
@@ -623,7 +644,8 @@ html {
   padding: 0; }
 
 .show-pending-screen .pending-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-pending-screen .settings-screen-container {
   transform: translateX(-3000px);
@@ -632,7 +654,8 @@ html {
   padding: 0; }
 
 .show-pending-screen .pending-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-pending-screen .add-friend-screen-container {
   transform: translateX(-3000px);
@@ -641,7 +664,8 @@ html {
   padding: 0; }
 
 .show-pending-screen .pending-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-pending-screen .create-debt-screen-container {
   transform: translateX(-3000px);
@@ -650,7 +674,8 @@ html {
   padding: 0; }
 
 .show-pending-screen .pending-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-pending-screen .itemized-debts-screen-container {
   transform: translateX(-3000px);
@@ -659,7 +684,8 @@ html {
   padding: 0; }
 
 .show-pending-screen .pending-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-pending-screen .go-back-section {
   margin-left: -34em; }
@@ -677,7 +703,8 @@ html {
   padding: 0; }
 
 .show-settings-screen .settings-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-settings-screen .friends-screen-container {
   transform: translateX(-3000px);
@@ -686,7 +713,8 @@ html {
   padding: 0; }
 
 .show-settings-screen .settings-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-settings-screen .pending-screen-container {
   transform: translateX(-3000px);
@@ -695,7 +723,8 @@ html {
   padding: 0; }
 
 .show-settings-screen .settings-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-settings-screen .settings-screen-container {
   transform: translateX(-3000px);
@@ -704,7 +733,8 @@ html {
   padding: 0; }
 
 .show-settings-screen .settings-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-settings-screen .add-friend-screen-container {
   transform: translateX(-3000px);
@@ -713,7 +743,8 @@ html {
   padding: 0; }
 
 .show-settings-screen .settings-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-settings-screen .create-debt-screen-container {
   transform: translateX(-3000px);
@@ -722,7 +753,8 @@ html {
   padding: 0; }
 
 .show-settings-screen .settings-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-settings-screen .itemized-debts-screen-container {
   transform: translateX(-3000px);
@@ -731,7 +763,8 @@ html {
   padding: 0; }
 
 .show-settings-screen .settings-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-settings-screen .go-back-section {
   margin-left: -34em; }
@@ -749,7 +782,8 @@ html {
   padding: 0; }
 
 .show-add-friend-screen .add-friend-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-add-friend-screen .friends-screen-container {
   transform: translateX(-3000px);
@@ -758,7 +792,8 @@ html {
   padding: 0; }
 
 .show-add-friend-screen .add-friend-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-add-friend-screen .pending-screen-container {
   transform: translateX(-3000px);
@@ -767,7 +802,8 @@ html {
   padding: 0; }
 
 .show-add-friend-screen .add-friend-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-add-friend-screen .settings-screen-container {
   transform: translateX(-3000px);
@@ -776,7 +812,8 @@ html {
   padding: 0; }
 
 .show-add-friend-screen .add-friend-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-add-friend-screen .add-friend-screen-container {
   transform: translateX(-3000px);
@@ -785,7 +822,8 @@ html {
   padding: 0; }
 
 .show-add-friend-screen .add-friend-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-add-friend-screen .create-debt-screen-container {
   transform: translateX(-3000px);
@@ -794,7 +832,8 @@ html {
   padding: 0; }
 
 .show-add-friend-screen .add-friend-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-add-friend-screen .itemized-debts-screen-container {
   transform: translateX(-3000px);
@@ -803,7 +842,8 @@ html {
   padding: 0; }
 
 .show-add-friend-screen .add-friend-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-add-friend-screen .go-back-section {
   margin-left: -34em; }
@@ -821,7 +861,8 @@ html {
   padding: 0; }
 
 .show-create-debt-screen .create-debt-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-create-debt-screen .friends-screen-container {
   transform: translateX(-3000px);
@@ -830,7 +871,8 @@ html {
   padding: 0; }
 
 .show-create-debt-screen .create-debt-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-create-debt-screen .pending-screen-container {
   transform: translateX(-3000px);
@@ -839,7 +881,8 @@ html {
   padding: 0; }
 
 .show-create-debt-screen .create-debt-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-create-debt-screen .settings-screen-container {
   transform: translateX(-3000px);
@@ -848,7 +891,8 @@ html {
   padding: 0; }
 
 .show-create-debt-screen .create-debt-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-create-debt-screen .add-friend-screen-container {
   transform: translateX(-3000px);
@@ -857,7 +901,8 @@ html {
   padding: 0; }
 
 .show-create-debt-screen .create-debt-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-create-debt-screen .create-debt-screen-container {
   transform: translateX(-3000px);
@@ -866,7 +911,8 @@ html {
   padding: 0; }
 
 .show-create-debt-screen .create-debt-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-create-debt-screen .itemized-debts-screen-container {
   transform: translateX(-3000px);
@@ -875,7 +921,8 @@ html {
   padding: 0; }
 
 .show-create-debt-screen .create-debt-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-create-debt-screen .go-back-section {
   margin-left: -34em; }
@@ -893,7 +940,8 @@ html {
   padding: 0; }
 
 .show-itemized-debts-screen .itemized-debts-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-itemized-debts-screen .friends-screen-container {
   transform: translateX(-3000px);
@@ -902,7 +950,8 @@ html {
   padding: 0; }
 
 .show-itemized-debts-screen .itemized-debts-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-itemized-debts-screen .pending-screen-container {
   transform: translateX(-3000px);
@@ -911,7 +960,8 @@ html {
   padding: 0; }
 
 .show-itemized-debts-screen .itemized-debts-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-itemized-debts-screen .settings-screen-container {
   transform: translateX(-3000px);
@@ -920,7 +970,8 @@ html {
   padding: 0; }
 
 .show-itemized-debts-screen .itemized-debts-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-itemized-debts-screen .add-friend-screen-container {
   transform: translateX(-3000px);
@@ -929,7 +980,8 @@ html {
   padding: 0; }
 
 .show-itemized-debts-screen .itemized-debts-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-itemized-debts-screen .create-debt-screen-container {
   transform: translateX(-3000px);
@@ -938,7 +990,8 @@ html {
   padding: 0; }
 
 .show-itemized-debts-screen .itemized-debts-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-itemized-debts-screen .itemized-debts-screen-container {
   transform: translateX(-3000px);
@@ -947,7 +1000,8 @@ html {
   padding: 0; }
 
 .show-itemized-debts-screen .itemized-debts-screen-container {
-  transform: none; }
+  transform: none;
+  height: auto; }
 
 .show-itemized-debts-screen .go-back-section {
   margin-left: -34em; }
@@ -986,10 +1040,13 @@ html {
 .show-friends-screen .add-friend-bar {
   transform: none; }
 
-.all-balances-container ul {
+.balances-screen-container ul {
   list-style: none;
   padding: 1em;
   overflow: hidden; }
+  @media (max-width: 544px) {
+    .balances-screen-container ul {
+      padding: 0; } }
 
 .balance-row {
   height: 140px;
@@ -1044,7 +1101,7 @@ html {
 
 .no-balances {
   color: white;
-  height: 80vh;
+  height: 65vh;
   width: 100%;
   color: white;
   z-index: 99;

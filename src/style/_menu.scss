@@ -96,13 +96,17 @@
     border-radius: 1em;
     transition: 1s ease;
     text-align: center;
-    font-size: 14px;
+    font-size: 70%;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
 
     &.active {
       background-color: #e03702;
+
+      span {
+        background: #791d00;
+      }
     }
 
     i {
@@ -110,14 +114,14 @@
     }
 
     span {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background-color: white;
-      color: #ff5722;
-      padding: 0 5px;
-      margin-left: 5px;
-      font-weight: 600;
+        border-radius: 50%;
+        position: absolute;
+        background-color: white;
+        color: #ff5722;
+        padding: 0 5%;
+        margin-left: 5px;
+        font-weight: 600;
+        right: 0;
     }
   }
 }
@@ -125,7 +129,7 @@
 .create-debt-bar, .add-friend-bar {
   transition: all 0.8s ease-out;
   position: fixed;
-  bottom: 1em;
+  bottom: 2vh;
 
   a {
     float: right;

@@ -31,7 +31,7 @@ $modals: (
       }
 
       .#{$name}-container {
-        transform: none;
+        transform: none; height: auto;
       }
     }
 

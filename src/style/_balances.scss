@@ -1,7 +1,11 @@
-.all-balances-container ul {
+.balances-screen-container ul {
   list-style: none;
   padding: 1em;
   overflow: hidden;
+
+  @media (max-width: $small) {
+    padding: 0;
+  }
 }
 
 .balance-row {
@@ -68,7 +72,7 @@
 
 .no-balances {
     color: white;
-    height: 80vh;
+    height: 65vh;
     width: 100%;
     color: white;
     z-index: 99;
@@ -79,5 +83,5 @@
 }
 
 .loading .no-balances {
-  display: none;  
+  display: none;
 }

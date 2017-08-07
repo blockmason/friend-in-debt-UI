@@ -102,7 +102,7 @@ ui =
         HH.a [HP.href "#", HP.class_ (HH.ClassName ""), HE.onClick $ HE.input_ $ SetScreen R.AddFriendScreen] [
         HH.i [ HP.class_ (HH.ClassName "fa fa-plus")][], HH.text "Add New Friend"]
       ]
-      , HH.div [ HP.class_ (HH.ClassName "row")]
+      , HH.div [ HP.class_ (HH.ClassName "row main-view")]
         [
           HH.slot' CP.cp1 unit D.component state.errorBus $ HE.input DebtViewMsg
         ]
@@ -276,7 +276,7 @@ topBar state =
         , HH.span_ [HH.text $
                     "Writing " <> show (A.length state.txs) <> " " <> itemStr <> "..."]
         ]
-      , HH.a [HP.href "#", HE.onClick $ HE.input_ $ RefreshData , HP.class_ (HH.ClassName $ "col-4 align-self-end reload-button" <> if processing then "" else " show-reload") ]
+      , HH.a [HP.href "#", HE.onClick $ HE.input_ $ RefreshData , HP.class_ (HH.ClassName $ "col-5 align-self-end reload-button" <> if processing then "" else " show-reload") ]
         [
           HH.i [HP.class_ (HH.ClassName "fa fa-refresh")][]
         ]
