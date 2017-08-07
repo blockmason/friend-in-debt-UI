@@ -1242,6 +1242,9 @@ html {
   .pending-screen-container li.todo-debt-row, .pending-screen-container li.sent-debt-row {
     height: 7em;
     position: relative; }
+  @media (max-width: 544px) {
+    .pending-screen-container li {
+      height: auto; } }
 
 .pending-screen-container .card-title {
   font-size: 18px;
@@ -1252,7 +1255,12 @@ html {
   margin-right: 1em; }
   @media (max-width: 544px) {
     .pending-screen-container .card-title {
-      font-size: 12px; } }
+      font-size: 12px;
+      width: 100%;
+      border: 0;
+      padding: 0;
+      margin: 0;
+      border-bottom: 1px solid #eee; } }
 
 .pending-screen-container .request-details span {
   font-size: 14px; }
@@ -1265,11 +1273,20 @@ html {
   display: block;
   border-bottom: 1px solid #eee;
   text-transform: uppercase; }
+  @media (max-width: 544px) {
+    .pending-screen-container .request-details span:first-child {
+      border: 0; } }
 
 .pending-screen-container .request-details span:last-child {
   display: block;
   font-size: 9px;
   font-weight: 100; }
+
+@media (max-width: 544px) {
+  .pending-screen-container .friend-details {
+    margin: 0;
+    border: 0;
+    padding-left: 0; } }
 
 .pending-screen-container .confirm-friend-button {
   background: none;
@@ -1280,6 +1297,10 @@ html {
     color: white;
     border-color: white; }
 
+@media (max-width: 544px) {
+  .pending-screen-container .debt-details {
+    width: 100%; } }
+
 .pending-screen-container .debt-details .debtor {
   font-size: 10px;
   display: block;
@@ -1288,12 +1309,18 @@ html {
   width: 100%; }
   .pending-screen-container .debt-details .debtor:after {
     content: ' owe'; }
+  @media (max-width: 544px) {
+    .pending-screen-container .debt-details .debtor {
+      font-size: 9px; } }
 
 .pending-screen-container .debt-details .creditor {
   font-size: 10px;
   display: block;
   text-transform: uppercase;
   width: 100%; }
+
+.pending-screen-container .debt-details .desc {
+  font-size: 10px; }
 
 .pending-screen-container .debt-details .amount {
   position: absolute;
