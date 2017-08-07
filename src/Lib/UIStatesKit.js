@@ -1,8 +1,9 @@
 exports.toggleLoadingImpl = function(selector) {
   return function() {
     if (selector) {
-      var el = document.querySelector(selector);
-      el.classList.toggle("loading");
+      document.querySelectorAll(selector).forEach( function(el){
+        el.classList.toggle('loading');
+      });
     }
   }
 }
@@ -10,8 +11,9 @@ exports.toggleLoadingImpl = function(selector) {
 exports.toggleErrorImpl = function(selector) {
   return function() {
       if (selector) {
-      var el = document.querySelector(selector);
-      el.classList.toggle("error");
+        document.querySelectorAll(selector).forEach( function(el){
+          el.classList.toggle('error');
+        });
     }
   }
 }

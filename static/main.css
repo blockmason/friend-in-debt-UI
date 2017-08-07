@@ -27,7 +27,8 @@ html {
   overflow-y: scroll; }
 
 .page-container {
-  margin-top: 10px; }
+  margin-top: 10px;
+  min-height: 50vh; }
 
 /* loading overlays */
 .loading:before {
@@ -37,29 +38,19 @@ html {
   right: 0;
   top: 0;
   bottom: 0;
+  width: 1.5em;
+  height: 1.5em;
   border-radius: 100%;
-  box-shadow: 0 0 0 3px;
+  border: 3px solid orange;
+  border-right-color: rgba(255, 255, 255, 0.2);
   animation: spinner-bubble 0.8s linear 0s infinite;
   margin: auto;
-  width: 0.3em;
-  height: 0.3em;
   opacity: 0;
-  z-index: 2;
-  color: orange; }
-
-.loading:after {
-  content: '';
-  background: rgba(0, 0, 0, 0.3);
-  height: 100%;
-  width: 100%;
-  z-index: 1;
-  position: absolute;
-  left: 0;
-  top: 0; }
+  z-index: 2; }
 
 .loading * {
-  transition: opacity 0.5s;
-  opacity: 0.3; }
+  transition: opacity 1s ease;
+  opacity: 0; }
 
 .loading-spinner {
   color: #f00;
@@ -93,13 +84,11 @@ html {
 
 @keyframes spinner-bubble {
   from {
-    width: 0.3em;
-    height: 0.3em;
-    opacity: 1; }
+    opacity: 1;
+    transform: rotate(0deg); }
   to {
-    width: 1.5em;
-    height: 1.5em;
-    opacity: 0.3; } }
+    opacity: 0.3;
+    transform: rotate(360deg); } }
 
 @keyframes color-change {
   0% {
@@ -1189,10 +1178,10 @@ html {
   background: none;
   border: 1px solid #ddd;
   border-radius: 5px;
-  margin-right: 0.5em; }
+  margin-right: 0.5em;
+  position: relative; }
   .pending-screen-container button:hover {
-    background: #8bc34a;
-    color: white;
+    color: #8bc34a;
     border-color: white; }
 
 .pending-screen-container .debt-details {

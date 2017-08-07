@@ -145,10 +145,12 @@ component =
         Just f  → do
           s ← H.get
           H.modify (_ { showItemizedDebtFor = maybeFriend })
---          H.raise $ SetLoading true
+          H.liftEff $ UIStates.toggleLoading(".itemized-debts")
+
           idebts ← handleCall s.errorBus [] (F.itemizedDebts f)
           H.modify (_ { itemizedDebts = M.insert f idebts s.itemizedDebts })
---          H.raise $ SetLoading false
+          H.liftEff $ UIStates.toggleLoading(".itemized-debts")
+
           pure next
 
     HandleInput input next → do
@@ -163,9 +165,11 @@ component =
           pure next
     ConfirmFriend friend next → do
       s ← H.get
---      H.raise $ SetLoading true
+
+      H.liftEff $ UIStates.toggleLoading(".confirm-friend-button")
       handleTx NewTX s (ScreenChange R.BalancesScreen) $ F.createFriendship friend
---      H.raise $ SetLoading false
+      H.liftEff $ UIStates.toggleLoading(".confirm-friend-button")
+
       pure next
     CancelFriend friend next → do
       s ← H.get
@@ -173,11 +177,11 @@ component =
       pure next
     AddFriend friendStr next → do
       s ← H.get
---      H.raise $ SetLoading true
+      H.liftEff $ UIStates.toggleLoading(".add-friend-button")
       H.modify (_ { newFriend = "" })
       handleTx NewTX s (ScreenChange R.BalancesScreen) $
         F.createFriendship $ F.fiMkId friendStr
---      H.raise $ SetLoading false
+      H.liftEff $ UIStates.toggleLoading(".add-friend-button")
       pure next
     InputFriend friendStr next → do
       if F.fiStrValidId (S.toLower friendStr) || S.length friendStr < 4
@@ -205,28 +209,28 @@ component =
       case maybeDebt of
         Just debt → do
           H.modify (_ { newDebtAmount = "", newCreditAmount = ""})
---          H.raise $ SetLoading true
+          H.liftEff $ UIStates.toggleLoading(".create-debt-button")
           s ← H.get
           handleTx NewTX s (ScreenChange R.BalancesScreen) $ F.newPendingDebt debt
           H.modify (_ { newDebt = Nothing, newCredit = Nothing })
---          H.raise $ SetLoading false
+          H.liftEff $ UIStates.toggleLoading(".create-debt-button")
         Nothing   → pure unit
       pure next
     ConfirmPending debt next → do
       s ← H.get
---      H.raise $ SetLoading true
+      H.liftEff $ UIStates.toggleLoading(".confirm-pending-button")
       handleTx NewTX s (ScreenChange R.BalancesScreen) $ F.confirmPendingDebt debt
---      H.raise $ SetLoading false
+      H.liftEff $ UIStates.toggleLoading(".confirm-pending-button")
       pure next
     RejectPending debt next → do
       s ← H.get
       handleTx NewTX s (ScreenChange R.BalancesScreen) $ F.rejectPendingDebt debt
       pure next
     RefreshDebts next → do
-      -- H.liftEff $ UIStates.toggleLoading(".page-container")
+      H.liftEff $ UIStates.toggleLoading(".page-container")
       errorBus    ← H.gets _.errorBus
       loadFriendsAndDebts errorBus
-      -- H.raise $ SetLoading false
+      H.liftEff $ UIStates.toggleLoading(".page-container")
       s ← H.get
       H.raise $ NumPendingTodo    (length s.pendingTodo)
       H.raise $ NumPendingFriends (length s.pendingFriendsTodo)
@@ -605,7 +609,7 @@ moneyClass ∷ F.Debt → String
 moneyClass fd = "debt-amount"
 
 confirmButton ∷ F.Debt → H.ComponentHTML Query
-confirmButton fd = HH.button [ HP.class_ $ HH.ClassName "fa fa-check"
+confirmButton fd = HH.button [ HP.class_ $ HH.ClassName "fa fa-check confirm-pending-button"
                              , HE.onClick $ HE.input_ $ ConfirmPending fd] []
 
 cancelButton ∷ F.Debt → H.ComponentHTML Query
@@ -639,7 +643,7 @@ addFriendWidget state =
                (HE.input (\val → InputFriend val))
              ]
   , HH.button [ HE.onClick $ HE.input_ $ AddFriend state.newFriend
-              , HP.class_ $ HH.ClassName "form-control"
+              , HP.class_ $ HH.ClassName "form-control add-friend-button"
               , HP.enabled $ F.fiStrValidId state.newFriend ]
     [ HH.text "Add Friend by FoundationId" ]
   ]

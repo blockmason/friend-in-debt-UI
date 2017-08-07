@@ -30,6 +30,8 @@ import FriendInDebt.Routes      as R
 import FriendInDebt.Config      as C
 import FriendInDebt.Blockchain (hasNetworkError, loadingOverlay, handleCall)
 
+import UI.UIStatesKit as UIStates
+
 data Query a
   = Init a
   | HandleMsg ContainerMsg a
