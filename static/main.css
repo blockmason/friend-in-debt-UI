@@ -57,10 +57,7 @@ html {
     display: block;
     border: 1px solid #eee;
     border-radius: 5px;
-    background: transparent;
-    position: absolute;
-    top: 0;
-    left: 0; }
+    background: transparent; }
 
 #no-errors {
   display: none; }
@@ -74,7 +71,10 @@ html {
   width: 100vw;
   height: 1.5em;
   font-size: 12px;
-  padding-left: 1em; }
+  padding-left: 1em;
+  position: absolute;
+  top: 0;
+  left: 0; }
 
 .loading {
   color: transparent; }
