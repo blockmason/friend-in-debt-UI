@@ -188,6 +188,8 @@ html {
   .create-debt-container input, .create-debt-container select {
     width: 100%;
     margin-bottom: 2em; }
+  .create-debt-container input.error {
+    border: 1px solid red !important; }
   .create-debt-container input[type=text], .create-debt-container input[type=number], .create-debt-container select {
     border: 0;
     background: none;
@@ -240,6 +242,8 @@ html {
   .add-friend input, .add-friend select {
     width: 100%;
     margin-bottom: 2em; }
+  .add-friend input.error {
+    border: 1px solid red !important; }
   .add-friend input[type=text], .add-friend input[type=number], .add-friend select {
     border: 0;
     background: none;

@@ -187,6 +187,7 @@ component =
 
           H.modify (_ { nameNoExist = true, newFriend = "" })
           hLog $ friendStr <> " does not exist."
+          H.liftEff $ UIStates.toggleError(".add-friend-input")
         else do
           H.liftEff $ UIStates.toggleLoading(".add-friend-button")
           handleTx NewTX s (ScreenChange R.BalancesScreen) $
@@ -655,7 +656,7 @@ addFriendWidget state =
     HH.label [][HH.text "Friend's FoundationID"],
     HH.input [ HP.type_ HP.InputText
              , HP.value $ state.newFriend
-             , HP.class_ $ HH.ClassName "form-control"
+             , HP.class_ $ HH.ClassName "form-control add-friend-input"
              , HP.placeholder $ "johndoe"
              , HP.attr (HH.AttrName "maxlength") "32"
              , HE.onValueInput
