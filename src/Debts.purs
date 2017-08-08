@@ -70,7 +70,7 @@ type State = { friends             ∷ Array F.FoundationId
              , newFriend           ∷ String
              , userName            ∷ Either F.FoundationId F.UserName
              , inputName           ∷ String
-             , nameInUse           ∷ Boolean
+             , nameNoExist         ∷ Boolean
              , showItemizedDebtFor ∷ Maybe F.FoundationId
              , defaultCurrency     ∷ F.Currency
              , inputChanged        ∷ Boolean
@@ -103,7 +103,7 @@ component =
                        , newCredit: Nothing
                        , userName: (Right "")
                        , inputName: ""
-                       , nameInUse: false
+                       , nameNoExist: false
                        , showItemizedDebtFor: Nothing
                        , defaultCurrency: F.cUSD
                        , inputChanged: false
@@ -182,10 +182,11 @@ component =
     AddFriend friendStr next → do
       s ← H.get
       nameInUse ← handleCall s.errorBus false $ F.nameInUse friendStr
-      if nameInUse
+      if not nameInUse
         then do
-          H.modify (_ { nameInUse = true })
-          hLog $ friendStr <> " is already in use."
+
+          H.modify (_ { nameNoExist = true, newFriend = "" })
+          hLog $ friendStr <> " does not exist."
         else do
           H.liftEff $ UIStates.toggleLoading(".add-friend-button")
           handleTx NewTX s (ScreenChange R.BalancesScreen) $
@@ -194,7 +195,7 @@ component =
           H.liftEff $ UIStates.toggleLoading(".add-friend-button")
       pure next
     InputFriend friendStr next → do
-      H.modify (_ { nameInUse = false })
+      H.modify (_ { nameNoExist = false })
       if F.fiStrValidId (S.toLower friendStr) || S.length friendStr < 4
         then H.modify (_ { newFriend = S.toLower friendStr })
         else H.modify (_ { newFriend = "" })
