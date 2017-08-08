@@ -224,7 +224,7 @@ refreshData = do
     then do _ ← H.query' CP.cp1 unit (D.RefreshDebts unit)
             newmmStatus ← H.liftEff MM.loggedIn
             currentError ← H.gets _.errorToDisplay
-            let errorToDisplay = if newmmStatus then currentError else Just CheckMetamask
+            let errorToDisplay = if newmmStatus then Nothing else Just CheckMetamask
             H.modify (_ { loggedIn = newmmStatus, errorToDisplay = errorToDisplay })
     else do H.modify (_ { loggedIn = false, errorToDisplay = Just CheckMetamask  })
   H.liftEff $ UIStates.toggleLoading(".container")

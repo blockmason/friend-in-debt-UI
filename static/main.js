@@ -15267,7 +15267,7 @@ var PS = {};
                           }))(function (v3) {
                               var errorToDisplay = (function () {
                                   if (v2) {
-                                      return v3;
+                                      return Data_Maybe.Nothing.value;
                                   };
                                   return new Data_Maybe.Just(FriendInDebt_Types.CheckMetamask.value);
                               })();
