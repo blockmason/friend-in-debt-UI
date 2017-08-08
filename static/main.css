@@ -1013,6 +1013,10 @@ html {
 .show-friends-screen .add-friend-bar {
   transform: none; }
 
+.show-create-debt-screen .create-debt-screen-container {
+  transform: none;
+  height: 300px; }
+
 .balances-screen-container ul {
   list-style: none;
   padding: 1em;
@@ -1138,15 +1142,22 @@ html {
   font-size: 10px;
   width: 100%; }
   .timeline-event:before {
-    content: '';
-    border: 3px solid #03a9f4;
-    background: white;
+    content: attr(data-timestamp);
+    background: #4caf50;
     border-radius: 50%;
-    height: 30px;
-    width: 30px;
+    height: 2.5em;
+    width: 2.5em;
     display: block;
     position: absolute;
-    left: 4.5em; }
+    left: 3.8em;
+    text-align: center;
+    line-height: 10px;
+    padding-top: 7px;
+    text-transform: uppercase;
+    color: white;
+    font-size: 12px; }
+  .timeline-event.negative:before {
+    background: #F44336; }
 
 .show-balances-screen .itemized-debts {
   display: none; }

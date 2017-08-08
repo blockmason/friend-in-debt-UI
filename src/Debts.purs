@@ -20,7 +20,7 @@ import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
 import Halogen.HTML.Events as HE
 
-import FriendInDebt.Blockchain          (handleCall, handleTx, hasNetworkError, formatDate)
+import FriendInDebt.Blockchain          (handleCall, handleTx, hasNetworkError, formatDate, shortDate)
 import Network.Eth.FriendInDebt         as F
 import Network.Eth                      as E
 import UI.IconGenerator as ICON
@@ -236,7 +236,9 @@ component =
       pure next
     RejectPending debt next → do
       s ← H.get
+      H.liftEff $ UIStates.toggleLoading(".reject-pending-button")
       handleTx NewTX s (ScreenChange R.BalancesScreen) $ F.rejectPendingDebt debt
+      H.liftEff $ UIStates.toggleLoading(".reject-pending-button")
       pure next
     RefreshDebts next → do
       H.liftEff $ UIStates.toggleLoading(".page-container")
@@ -326,8 +328,8 @@ pendingPage state =
 
 
 -- Itemized Debts for Friend Page
-displayItemizedDebtTimeline :: Maybe F.FoundationId → DebtsMap → F.FoundationId → H.ComponentHTML Query
-displayItemizedDebtTimeline friendToShow debtsMap curFriend =
+displayItemizedDebtTimeline :: Maybe F.FoundationId → DebtsMap → Boolean → H.ComponentHTML Query
+displayItemizedDebtTimeline friendToShow debtsMap amIcreditor =
   case friendToShow of
     Just f →
       HH.div
@@ -336,13 +338,17 @@ displayItemizedDebtTimeline friendToShow debtsMap curFriend =
           HH.div [HP.class_ $ HH.ClassName "row"][HH.text "Debt History:"],
           HH.div [HP.class_ $ HH.ClassName "row"][HH.h6_ [HH.text $ show f]],
           HH.ul [HP.class_ $ HH.ClassName "row debt-timeline"]
-            $ itemizedDebtLi <$> (fromMaybe [] $ M.lookup f debtsMap)
+            $ (itemizedDebtLi amIcreditor) <$> (fromMaybe [] $ M.lookup f debtsMap)
         ]
     Nothing → HH.div_ [ HH.text "" ]
 
-itemizedDebtLi ∷ F.Debt → H.ComponentHTML Query
-itemizedDebtLi fd =
-  HH.li [HP.class_ $ HH.ClassName "timeline-event"] $ itemizedDebt fd
+itemizedDebtLi ∷ Boolean → F.Debt → H.ComponentHTML Query
+itemizedDebtLi amIcreditor fd =
+  let mostRecent  = maybe "" shortDate $ F.debtTimestamp fd
+  in
+    HH.li [HP.class_ $ HH.ClassName $ "timeline-event " <> (if amIcreditor then "positive" else "negative"),
+           HP.attr (HH.AttrName "data-timestamp") mostRecent
+          ] $ itemizedDebt fd
 
 itemizedDebt :: F.Debt → Array (H.ComponentHTML Query)
 itemizedDebt fd =
@@ -415,6 +421,7 @@ displayBalanceLi state bal =
       totalDebts  = F.balTotalDebts bal
       mostRecent  = maybe "" formatDate $ F.balMostRecent bal
       curFriend = if creditor == me then debtor else creditor
+      amIcreditor  = if creditor == me then true else false
       status    = if creditor == me then "Holds debts from:" else "Is owing..."
       friendToShow = state.showItemizedDebtFor
       expandClass = (\f → if f == curFriend then "expand-itemized" else "hide-itemized") <$> friendToShow
@@ -445,7 +452,7 @@ displayBalanceLi state bal =
           HH.div [HP.class_ $ HH.ClassName "col thin-item"][HH.text $ show totalDebts <> " debts"]
         ]
       ],
-      (displayItemizedDebtTimeline friendToShow debtsMap curFriend)
+      (displayItemizedDebtTimeline friendToShow debtsMap amIcreditor)
     ]
 
 -- Pending Friendships
@@ -625,7 +632,7 @@ confirmButton fd = HH.button [ HP.class_ $ HH.ClassName "fa fa-check confirm-pen
                              , HE.onClick $ HE.input_ $ ConfirmPending fd] []
 
 cancelButton ∷ F.Debt → H.ComponentHTML Query
-cancelButton fd = HH.button [ HP.class_ $ HH.ClassName "fa fa-close"
+cancelButton fd = HH.button [ HP.class_ $ HH.ClassName "fa fa-close reject-pending-button"
                              , HE.onClick $ HE.input_ $ RejectPending fd] []
 
 confirmFriendshipButton :: F.FoundationId -> H.ComponentHTML Query

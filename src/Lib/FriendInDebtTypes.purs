@@ -207,6 +207,7 @@ debtSetCreditor (Debt d) creditor = Debt $ d { creditor = creditor }
 debtDebtor (Debt d ) = d.debtor
 debtCreditor (Debt d ) = d.creditor
 debtGetId (Debt d) = d.debtId
+debtTimestamp (Debt d) = d.timestamp
 setDebt ∷ Debt → Number → Currency → Debt
 setDebt (Debt fd) val currency = Debt $ fd { debt = mkMoney val currency }
 setDebtMoney ∷ Debt → Money → Debt
