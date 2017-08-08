@@ -9,7 +9,7 @@
 }
 
 .balance-row {
-  height: 140px;
+  height: 115px;
   background: white;
   border-radius: 5px;
   overflow: hidden;
@@ -17,6 +17,10 @@
   border-left: 5px solid orange;
   margin: 0;
   margin-bottom: 10px;
+
+  h6 {
+    font-size: 12px;
+  }
 }
 
 .balance-row:hover .highlight {
