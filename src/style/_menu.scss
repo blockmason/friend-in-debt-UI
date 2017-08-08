@@ -131,6 +131,7 @@
   transition: all 0.8s ease-out;
   position: fixed;
   bottom: 2vh;
+  z-index: 3;
 
   a {
     float: right;

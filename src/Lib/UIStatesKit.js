@@ -8,6 +8,16 @@ exports.toggleLoadingImpl = function(selector) {
   }
 }
 
+exports.turnOnLoadingImpl = function(selector) {
+  return function() {
+    if (selector) {
+      document.querySelectorAll(selector).forEach( function(el){
+        el.classList.add('loading');
+      });
+    }
+  }
+}
+
 exports.toggleErrorImpl = function(selector) {
   return function() {
       if (selector) {

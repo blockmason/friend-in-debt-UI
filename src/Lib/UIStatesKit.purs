@@ -10,10 +10,14 @@ import Halogen.HTML.Properties as HP
 
 type CssSelector = String
 
+foreign import turnOnLoadingImpl :: forall e. CssSelector -> Eff e Unit
 foreign import toggleLoadingImpl :: forall e. CssSelector -> Eff e Unit
 foreign import toggleErrorImpl :: forall e. CssSelector -> Eff e Unit
 foreign import clearAllErrorsImpl :: forall e. CssSelector -> Eff e Unit
 foreign import clearAllLoadingImpl :: forall e. CssSelector -> Eff e Unit
+
+turnOnLoading :: forall e. CssSelector -> Eff e Unit
+turnOnLoading selector = turnOnLoadingImpl selector
 
 toggleLoading :: forall e. CssSelector -> Eff e Unit
 toggleLoading selector = toggleLoadingImpl selector

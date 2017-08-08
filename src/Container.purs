@@ -43,6 +43,7 @@ data Query a
 type State = { loggedIn ∷ Boolean
              , myId     ∷ Maybe F.FoundationId
              , errorBus ∷ ContainerMsgBus
+             , errorToDisplay ∷ Maybe ContainerMsg
              , txs      ∷ Array E.TX
              , numPendingTodo ∷ Int
              , numPendingFriends ∷ Int
@@ -70,6 +71,7 @@ ui =
     initialState = { loggedIn: false
                    , myId: Nothing
                    , errorBus: Nothing
+                   , errorToDisplay: Nothing
                    , txs: []
                    , numPendingTodo: 0
                    , numPendingFriends: 0
@@ -83,13 +85,10 @@ ui =
       HH.div [ HP.id_ "container",
                HP.class_ (HH.ClassName $
                  "container " <>
-                 (R.getRouteNameFor state.currentScreen)  <>
-                 (if state.loggedIn && (isJust state.myId) then "" else " require-login")) ]
+                 (R.getRouteNameFor state.currentScreen)) ]
       [
-      -- , loggerOverlay false state.logText
-      -- , promptMetamask $ not state.loggedIn
-      -- , promptFoundation $ (isNothing state.myId) && state.loggedIn
-       topBar state
+      errorOverlay state
+      , topBar state
       , menu state
       , HH.div [ HP.class_ (HH.ClassName "create-debt-bar") ]
       [
@@ -122,20 +121,20 @@ ui =
           NetworkError → do
             hLog NetworkError
             H.liftEff $ UIStates.clearAllLoading Nothing
-            H.modify (_ { loggedIn = false })
+            H.modify (_ { loggedIn = false, errorToDisplay = Just NetworkError })
             pure next
           FIDError e → do
             case e of
               F.NoFoundationId → do
-                H.modify (_ { myId = Nothing })
+                H.modify (_ { myId = Nothing, errorToDisplay = Just (FIDError e) })
                 pure next
               F.NetworkError → do
                 hLog F.NetworkError
                 H.liftEff $ UIStates.clearAllLoading Nothing
-                H.modify (_ { loggedIn = false })
+                H.modify (_ { loggedIn = false, errorToDisplay = Just (FIDError e)  })
                 pure next
               _ → do
-                H.modify (_ { loggedIn = false })
+                H.modify (_ { loggedIn = false, errorToDisplay = Just (FIDError e)  })
                 pure next
           CheckMetamask → do
             mmStatus ← H.liftEff MM.loggedIn
@@ -183,40 +182,51 @@ ui =
         H.modify (\state → state {currentScreen = (fromMaybe R.BalancesScreen $ A.head state.history), history = (fromMaybe [] $ A.tail state.history)})
         pure next
 
-promptMetamask ∷ ∀ p. Boolean → H.HTML p Query
-promptMetamask notLoggedIn =
-  HH.div [ HP.id_ "metamaskOverlay"
-         , if notLoggedIn then HP.class_ (HH.ClassName "active")
-           else HP.class_ (HH.ClassName "in-active")]
-  [
-    HH.h6_ [ HH.text "Not logged in to Metamask." ]
-    , HH.button [ HE.onClick $ HE.input_ $ RefreshData
-                , HP.class_ $ HH.ClassName "btn-info"]
-      [ HH.i [HP.class_ (HH.ClassName "fa fa-refresh")][] ]
-  ]
+errorOverlay ∷ ∀ p. State → H.HTML p Query
+errorOverlay state =
+  case state.errorToDisplay of
+    Nothing →
+      HH.div [ HP.id_ "no-errors"][]
 
-promptFoundation ∷ ∀ p. Boolean → H.HTML p Query
-promptFoundation noFoundation =
-  HH.div [ HP.id_ "noFoundationOverlay"
-         , if noFoundation then HP.class_ (HH.ClassName "active")
-           else HP.class_ (HH.ClassName "in-active") ]
-  [
-    HH.h6_ [ HH.text "No Foundation ID detected." ]
-    , HH.button [ HE.onClick $ HE.input_ $ RefreshData
-                , HP.class_ $ HH.ClassName "btn-info"]
-      [ HH.i [HP.class_ (HH.ClassName "fa fa-user-plus")][], HH.text "Register" ]
-  ]
+    Just CheckMetamask →
+      HH.div [ HP.id_ "errorOverlay"][
+        HH.h6_ [ HH.text $ show CheckMetamask],
+        HH.button [ HE.onClick $ HE.input_ $ RefreshData
+                     , HP.class_ $ HH.ClassName "error-action"]
+           [ HH.i [HP.class_ (HH.ClassName "fa fa-refresh")][] ]
+      ]
+
+    Just (FIDError e) →
+        case e of
+          F.NoFoundationId →
+            HH.div [ HP.id_ "errorOverlay"][
+              HH.h6_ [ HH.text "No Foundation Id Detected"],
+              HH.button [ HE.onClick $ HE.input_ $ RefreshData
+                          , HP.class_ $ HH.ClassName "error-action"]
+                [ HH.i [HP.class_ (HH.ClassName "fa fa-user-plus")][], HH.text "Register" ]
+            ]
+          F.NetworkError →
+            HH.div [ HP.class_ (HH.ClassName "row error-notification")]
+            [HH.text "Ropsten Test Network failing to respond to transaction... "]
+          _ →
+            HH.div [ HP.id_ "no-errors"][]
+
+    Just genericError →
+      HH.div [ HP.class_ (HH.ClassName "row error-notification")]
+      [HH.text $ show genericError]
 
 refreshData ∷ ∀ e. H.ParentDSL State Query ChildQuery ChildSlot Void (FIDMonad e) Unit
 refreshData = do
   H.modify (_ { loggedIn = true })
-  H.liftEff $ UIStates.toggleLoading(".container")
+  H.liftEff $ UIStates.turnOnLoading(".container")
   mmStatus ← H.liftEff MM.loggedIn
   if mmStatus
     then do _ ← H.query' CP.cp1 unit (D.RefreshDebts unit)
             newmmStatus ← H.liftEff MM.loggedIn
-            H.modify (_ { loggedIn = newmmStatus })
-    else do H.modify (_ { loggedIn = mmStatus })
+            currentError ← H.gets _.errorToDisplay
+            let errorToDisplay = if newmmStatus then currentError else Just CheckMetamask
+            H.modify (_ { loggedIn = newmmStatus, errorToDisplay = errorToDisplay })
+    else do H.modify (_ { loggedIn = mmStatus, errorToDisplay = Just CheckMetamask  })
   H.liftEff $ UIStates.toggleLoading(".container")
 
 checkMetamask ∷ ∀ e. Boolean → Boolean
