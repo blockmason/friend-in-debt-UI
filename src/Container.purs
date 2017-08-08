@@ -191,7 +191,7 @@ errorOverlay state =
 
     Just CheckMetamask →
       HH.div [ HP.id_ "errorOverlay"][
-        HH.h6_ [ HH.text $ show CheckMetamask],
+        HH.h6_ [ HH.text $ "Can't connect to Metamask. Check Metamask or internet connection."],
         HH.button [ HE.onClick $ HE.input_ $ RefreshData
                      , HP.class_ $ HH.ClassName "error-action"]
            [ HH.i [HP.class_ (HH.ClassName "fa fa-refresh")][] ]
