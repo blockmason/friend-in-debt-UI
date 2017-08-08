@@ -61,11 +61,16 @@ $modals: (
 
     button {
       text-transform: uppercase;
+      position: relative;
 
       &:hover {
         background-color: $highlight;
         color: white;
         border-color: $highlight;
+      }
+
+      &.loading {
+        color: $highlight !important;
       }
     }
   }

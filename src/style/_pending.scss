@@ -59,10 +59,10 @@
     border: 1px solid #ddd;
     border-radius: 5px;
     margin-right: 0.5em;
+    position: relative;
 
     &:hover {
-      background: #8bc34a;
-      color: white;
+      color: #8bc34a;
       border-color: white;
     }
   }

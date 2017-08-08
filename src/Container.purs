@@ -28,7 +28,9 @@ import Network.Eth.FriendInDebt as F
 
 import FriendInDebt.Routes      as R
 import FriendInDebt.Config      as C
-import FriendInDebt.Blockchain (hasNetworkError, loadingOverlay, handleCall)
+import FriendInDebt.Blockchain (hasNetworkError, handleCall)
+
+import UI.UIStatesKit as UIStates
 
 data Query a
   = Init a
@@ -39,9 +41,9 @@ data Query a
   | DebtViewMsg D.Message a
 
 type State = { loggedIn ∷ Boolean
-             , loading  ∷ Boolean
              , myId     ∷ Maybe F.FoundationId
              , errorBus ∷ ContainerMsgBus
+             , errorToDisplay ∷ Maybe ContainerMsg
              , txs      ∷ Array E.TX
              , numPendingTodo ∷ Int
              , numPendingFriends ∷ Int
@@ -67,9 +69,9 @@ ui =
 
     initialState ∷ State
     initialState = { loggedIn: false
-                   , loading: true
                    , myId: Nothing
                    , errorBus: Nothing
+                   , errorToDisplay: Nothing
                    , txs: []
                    , numPendingTodo: 0
                    , numPendingFriends: 0
@@ -83,13 +85,9 @@ ui =
       HH.div [ HP.id_ "container",
                HP.class_ (HH.ClassName $
                  "container " <>
-                 (R.getRouteNameFor state.currentScreen)  <>
-                 (if state.loading then " loading" else "") <>
-                 (if state.loggedIn && (isJust state.myId) then "" else " require-login")) ]
-      [ loadingOverlay state.loading
-      , loggerOverlay false state.logText
-      , promptMetamask $ not state.loggedIn
-      , promptFoundation $ (isNothing state.myId) && state.loggedIn
+                 (R.getRouteNameFor state.currentScreen)) ]
+      [
+      errorOverlay state
       , topBar state
       , menu state
       , HH.div [ HP.class_ (HH.ClassName "create-debt-bar") ]
@@ -111,10 +109,10 @@ ui =
     eval ∷ Query ~> H.ParentDSL State Query ChildQuery ChildSlot Void (FIDMonad eff)
     eval = case _ of
       Init next → do
-        H.modify (_ { loading = true })
+        H.liftEff $ UIStates.toggleLoading(".container")
         bus ← H.liftAff $ Bus.make
         H.subscribe $ busEventSource (flip HandleMsg ES.Listening) bus
-        H.modify (_ { loggedIn = true, loading = true, errorBus = Just bus })
+        H.modify (_ { loggedIn = true, errorBus = Just bus })
         loadWeb3Loop C.web3Delay 30
         startCheckInterval (Just bus) C.checkMMInterval C.checkTxInterval
         pure next
@@ -122,20 +120,22 @@ ui =
         case msg of
           NetworkError → do
             hLog NetworkError
-            H.modify (_ { loggedIn = false, loading = false })
+            H.liftEff $ UIStates.clearAllLoading Nothing
+            H.modify (_ { loggedIn = false, errorToDisplay = Just NetworkError })
             pure next
           FIDError e → do
             case e of
               F.NoFoundationId → do
-                H.modify (_ { myId = Nothing })
+                H.modify (_ { myId = Nothing, errorToDisplay = Just (FIDError e) })
                 pure next
               F.NetworkError → do
                 hLog F.NetworkError
-                H.modify (_ { loggedIn = false, loading = false })
+                H.liftEff $ UIStates.clearAllLoading Nothing
+                H.modify (_ { loggedIn = false, errorToDisplay = Just (FIDError e)  })
                 pure next
               _ → do
                 hLog "some FID problem"
-                H.modify (_ { loggedIn = false })
+                H.modify (_ { loggedIn = false, errorToDisplay = Just (FIDError e)  })
                 pure next
           CheckMetamask → do
             mmStatus ← H.liftEff MM.loggedIn
@@ -167,8 +167,6 @@ ui =
         pure next
       DebtViewMsg msg next → do
         case msg of
-          D.SetLoading onOff → do
-            H.modify (\s → s { loading = onOff })
           D.ScreenChange screen →
             H.modify (\s → s { history = append [s.currentScreen] s.history
                              , currentScreen = screen })
@@ -185,40 +183,51 @@ ui =
         H.modify (\state → state {currentScreen = (fromMaybe R.BalancesScreen $ A.head state.history), history = (fromMaybe [] $ A.tail state.history)})
         pure next
 
-promptMetamask ∷ ∀ p. Boolean → H.HTML p Query
-promptMetamask notLoggedIn =
-  HH.div [ HP.id_ "metamaskOverlay"
-         , if notLoggedIn then HP.class_ (HH.ClassName "active")
-           else HP.class_ (HH.ClassName "in-active")]
-  [
-    HH.h6_ [ HH.text "Not logged in to Metamask." ]
-    , HH.button [ HE.onClick $ HE.input_ $ RefreshData
-                , HP.class_ $ HH.ClassName "btn-info"]
-      [ HH.i [HP.class_ (HH.ClassName "fa fa-refresh")][] ]
-  ]
+errorOverlay ∷ ∀ p. State → H.HTML p Query
+errorOverlay state =
+  case state.errorToDisplay of
+    Nothing →
+      HH.div [ HP.id_ "no-errors"][]
 
-promptFoundation ∷ ∀ p. Boolean → H.HTML p Query
-promptFoundation noFoundation =
-  HH.div [ HP.id_ "noFoundationOverlay"
-         , if noFoundation then HP.class_ (HH.ClassName "active")
-           else HP.class_ (HH.ClassName "in-active") ]
-  [
-    HH.h6_ [ HH.text "No Foundation ID detected." ]
-    , HH.button [ HE.onClick $ HE.input_ $ RefreshData
-                , HP.class_ $ HH.ClassName "btn-info"]
-      [ HH.i [HP.class_ (HH.ClassName "fa fa-user-plus")][], HH.text "Register" ]
-  ]
+    Just CheckMetamask →
+      HH.div [ HP.id_ "errorOverlay"][
+        HH.h6_ [ HH.text $ show CheckMetamask],
+        HH.button [ HE.onClick $ HE.input_ $ RefreshData
+                     , HP.class_ $ HH.ClassName "error-action"]
+           [ HH.i [HP.class_ (HH.ClassName "fa fa-refresh")][] ]
+      ]
+
+    Just (FIDError e) →
+        case e of
+          F.NoFoundationId →
+            HH.div [ HP.id_ "errorOverlay"][
+              HH.h6_ [ HH.text "No Foundation Id Detected"],
+              HH.button [ HE.onClick $ HE.input_ $ RefreshData
+                          , HP.class_ $ HH.ClassName "error-action"]
+                [ HH.i [HP.class_ (HH.ClassName "fa fa-user-plus")][], HH.text "Register" ]
+            ]
+          F.NetworkError →
+            HH.div [ HP.class_ (HH.ClassName "row error-notification")]
+            [HH.text "Ropsten Test Network failing to respond to transaction... "]
+          _ →
+            HH.div [ HP.id_ "no-errors"][]
+
+    Just genericError →
+      HH.div [ HP.class_ (HH.ClassName "row error-notification")]
+      [HH.text $ show genericError]
 
 refreshData ∷ ∀ e. H.ParentDSL State Query ChildQuery ChildSlot Void (FIDMonad e) Unit
 refreshData = do
-  H.modify (_ { loading = true })
+  H.liftEff $ UIStates.turnOnLoading(".container")
   mmStatus ← H.liftEff MM.loggedIn
   if mmStatus
     then do _ ← H.query' CP.cp1 unit (D.RefreshDebts unit)
             newmmStatus ← H.liftEff MM.loggedIn
-            H.modify (_ { loggedIn = newmmStatus })
-    else do H.modify (_ { loggedIn = false })
-  H.modify (_ { loading = false })
+            currentError ← H.gets _.errorToDisplay
+            let errorToDisplay = if newmmStatus then currentError else Just CheckMetamask
+            H.modify (_ { loggedIn = newmmStatus, errorToDisplay = errorToDisplay })
+    else do H.modify (_ { loggedIn = false, errorToDisplay = Just CheckMetamask  })
+  H.liftEff $ UIStates.toggleLoading(".container")
 
 checkMetamask ∷ ∀ e. Boolean → Boolean
               → H.ParentDSL State Query ChildQuery ChildSlot Void (FIDMonad e) Unit
@@ -315,10 +324,6 @@ menuItem screen state =
           HP.class_ (HH.ClassName $ "col-3 " <> if screen == state.currentScreen then "active" else ""),
           HE.onClick $ HE.input_ $ SetScreen screen] $ menuText
 
-
--- randomLoadingText ∷ String
--- randomLoadingText =
---   ["Interacting with Blockchain", "Waiting for Node Response", "Committing Data", "Transmitting", "Processing", "Waiting for Nodes"]
 
 loggerOverlay onOff logText =
   if onOff
