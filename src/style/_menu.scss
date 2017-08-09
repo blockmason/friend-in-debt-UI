@@ -4,7 +4,9 @@
   position: fixed;
   top: 0;
   width: 100%;
+  max-width: 400px;
   z-index: 5;
+  overflow: hidden;
 
   .logo-section {
     text-transform: uppercase;
@@ -95,6 +97,7 @@
   position: fixed;
   top: 45px;
   width: 100%;
+  max-width: 400px;
   z-index: 5;
 
   a {
