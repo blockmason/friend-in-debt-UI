@@ -46,6 +46,7 @@ $modals: (
     input, select {
       width: 100%;
       margin-bottom: 2em;
+      outline: 0;
     }
 
     input[type=text], input[type=number], select {
@@ -53,6 +54,7 @@ $modals: (
       background: none;
       border-bottom: 1px solid $highlight;
       border-radius: 0;
+      outline: 0;
 
       &::placeholder {
         color: #aaa;
@@ -94,16 +96,18 @@ $modals: (
   border-bottom: 3px dotted map-get($modals, create-debt-container);
 }
 
-.show-cents .amount-row {
-  margin: 0 0.1em;
+.create-debt-container {
+  .amount-row {
+    margin: 0 0.1em;
 
-  .debt-amount:first-of-type {
-    width: 40%;
-    text-align: left;
-  }
+    .debt-amount:first-of-type {
+      width: 40%;
+      text-align: left;
+    }
 
-  & > span {
-    font-size: 10px;
-    line-height: 20px;
+    & > span {
+      font-size: 10px;
+      line-height: 20px;
+    }
   }
 }

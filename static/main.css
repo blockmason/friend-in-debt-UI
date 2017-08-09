@@ -186,12 +186,14 @@ html {
       font-size: 18px; }
   .create-debt-container input, .create-debt-container select {
     width: 100%;
-    margin-bottom: 2em; }
+    margin-bottom: 2em;
+    outline: 0; }
   .create-debt-container input[type=text], .create-debt-container input[type=number], .create-debt-container select {
     border: 0;
     background: none;
     border-bottom: 1px solid #0275d8;
-    border-radius: 0; }
+    border-radius: 0;
+    outline: 0; }
     .create-debt-container input[type=text]::placeholder, .create-debt-container input[type=number]::placeholder, .create-debt-container select::placeholder {
       color: #aaa; }
   .create-debt-container button {
@@ -238,12 +240,14 @@ html {
       font-size: 18px; }
   .add-friend input, .add-friend select {
     width: 100%;
-    margin-bottom: 2em; }
+    margin-bottom: 2em;
+    outline: 0; }
   .add-friend input[type=text], .add-friend input[type=number], .add-friend select {
     border: 0;
     background: none;
     border-bottom: 1px solid orange;
-    border-radius: 0; }
+    border-radius: 0;
+    outline: 0; }
     .add-friend input[type=text]::placeholder, .add-friend input[type=number]::placeholder, .add-friend select::placeholder {
       color: #aaa; }
   .add-friend button {
@@ -272,12 +276,12 @@ html {
   color: #0275d8;
   border-bottom: 3px dotted #0275d8; }
 
-.show-cents .amount-row {
+.create-debt-container .amount-row {
   margin: 0 0.1em; }
-  .show-cents .amount-row .debt-amount:first-of-type {
+  .create-debt-container .amount-row .debt-amount:first-of-type {
     width: 40%;
     text-align: left; }
-  .show-cents .amount-row > span {
+  .create-debt-container .amount-row > span {
     font-size: 10px;
     line-height: 20px; }
 
