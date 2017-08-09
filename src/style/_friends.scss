@@ -1,4 +1,3 @@
-
 .friends-screen-container {
   margin-top: 10px;
 
@@ -63,4 +62,13 @@
     padding: 20px 5px;
   }
 
+}
+
+.balance-amount {
+  &.debt {
+     color: #BB2A2A;
+  }
+  &.credit {
+     color: green;
+  }
 }

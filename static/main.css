@@ -1224,6 +1224,12 @@ html {
     transition: 0.3s ease;
     padding: 20px 5px; }
 
+.balance-amount.debt {
+  color: #BB2A2A; }
+
+.balance-amount.credit {
+  color: green; }
+
 .pending-screen-container > div > .col {
   margin: 0; }
 
