@@ -1058,8 +1058,13 @@ html {
   color: #B8B8B8; }
 
 .balance-row .debt-amount {
-  font-size: 24px;
+  margin-top: 11px;
+  font-size: 18px;
   font-weight: 100; }
+  .balance-row .debt-amount.debt {
+    color: #BB2A2A; }
+  .balance-row .debt-amount.credit {
+    color: green; }
 
 .balance-row .thin-item {
   /* date: */

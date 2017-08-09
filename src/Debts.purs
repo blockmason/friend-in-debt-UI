@@ -407,7 +407,7 @@ displayBalanceLi state bal =
       totalDebts  = F.balTotalDebts bal
       mostRecent  = maybe "" formatDate $ F.balMostRecent bal
       curFriend = if creditor == me then debtor else creditor
-      status    = if creditor == me then "Lent to" else "Owes to"
+      status    = if creditor == me then "Owed to Me" else "I Owe"
       friendToShow = state.showItemizedDebtFor
       expandClass = (\f → if f == curFriend then "expand-itemized" else "hide-itemized") <$> friendToShow
   in
@@ -415,7 +415,10 @@ displayBalanceLi state bal =
            HE.onClick $ HE.input_ $ ShowItemizedDebtFor $ Just curFriend]
     $ [
       HH.div [HP.class_ $ HH.ClassName "col-4 debt-excerpt"][
-        HH.div [HP.class_ $ HH.ClassName "row debt-amount"][moneySpan amount],
+        HH.div [HP.class_ $ HH.ClassName $
+                "row debt-amount" <> if creditor == me then " credit" else " debt"
+               ]
+        [moneySpan amount],
         HH.div [HP.class_ $ HH.ClassName "row label-row"][HH.small_[HH.text "last"]],
         HH.div [HP.class_ $ HH.ClassName "row thin-item-row"]
           [
@@ -425,8 +428,8 @@ displayBalanceLi state bal =
       ],
       HH.div [HP.class_ $ HH.ClassName "col debt-details"][
         HH.div [HP.class_ $ HH.ClassName "col debt-relationship"][
-          HH.div [HP.class_ $ HH.ClassName "row"][HH.text status],
-          HH.div [HP.class_ $ HH.ClassName "row"][HH.h6_ [HH.text $ show curFriend]]
+          HH.div [HP.class_ $ HH.ClassName "row"][HH.text $ show curFriend],
+          HH.div [HP.class_ $ HH.ClassName "row"][HH.h6_ [HH.text $ ""]]
         ],
         HH.div [HP.class_ $ HH.ClassName "row label-row"][
           HH.div [HP.class_ $ HH.ClassName "col-6"][HH.small_[HH.text "currency"]],
