@@ -398,7 +398,7 @@ displayBalanceLi state bal =
       totalDebts  = F.balTotalDebts bal
       mostRecent  = maybe "" formatDate $ F.balMostRecent bal
       curFriend = if creditor == me then debtor else creditor
-      status    = if creditor == me then "Holds debts from:" else "Is owing..."
+      status    = if creditor == me then "Lent to" else "Owes to"
       friendToShow = state.showItemizedDebtFor
       expandClass = (\f → if f == curFriend then "expand-itemized" else "hide-itemized") <$> friendToShow
   in
