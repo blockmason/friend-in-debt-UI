@@ -5,7 +5,8 @@ body {
   height: 100%;
   color: #444;
   font-family: "Lato", Arial, sans-serif;
-  background-color: #444; }
+  background-color: #444;
+  overflow: hidden; }
 
 #loggerOverlay {
   position: absolute;
@@ -23,11 +24,11 @@ html {
   background-image: url("45-degree-fabric-light.png");
   max-width: 550px;
   box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.3);
-  height: 100vh;
+  min-height: 100%;
   overflow-y: scroll; }
 
 .page-container {
-  margin-top: 10px;
+  margin-top: 100px;
   min-height: 50vh; }
 
 /* loading overlays */
@@ -188,6 +189,8 @@ html {
     width: 100%;
     margin-bottom: 2em;
     outline: 0; }
+  .create-debt-container input.error {
+    border: 1px solid red !important; }
   .create-debt-container input[type=text], .create-debt-container input[type=number], .create-debt-container select {
     border: 0;
     background: none;
@@ -242,6 +245,8 @@ html {
     width: 100%;
     margin-bottom: 2em;
     outline: 0; }
+  .add-friend input.error {
+    border: 1px solid red !important; }
   .add-friend input[type=text], .add-friend input[type=number], .add-friend select {
     border: 0;
     background: none;
@@ -287,7 +292,11 @@ html {
 
 .top-bar {
   background: #ff5722;
-  line-height: 3em; }
+  line-height: 3em;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 5; }
   .top-bar .logo-section {
     text-transform: uppercase;
     color: white; }
@@ -346,7 +355,11 @@ html {
 .header-menu {
   background: #ff5722;
   padding: 1em;
-  box-shadow: 0 6px 5px 5px rgba(0, 0, 0, 0.3); }
+  box-shadow: 0 6px 5px 5px rgba(0, 0, 0, 0.3);
+  position: fixed;
+  top: 45px;
+  width: 100%;
+  z-index: 5; }
   .header-menu a {
     color: white;
     text-transform: uppercase;
@@ -1008,6 +1021,10 @@ html {
 .show-friends-screen .add-friend-bar {
   transform: none; }
 
+.show-create-debt-screen .create-debt-screen-container {
+  transform: none;
+  height: 300px; }
+
 .balances-screen-container ul {
   list-style: none;
   padding: 1em;
@@ -1017,7 +1034,7 @@ html {
       padding: 0; } }
 
 .balance-row {
-  height: 140px;
+  height: 115px;
   background: white;
   border-radius: 5px;
   overflow: hidden;
@@ -1025,6 +1042,8 @@ html {
   border-left: 5px solid orange;
   margin: 0;
   margin-bottom: 10px; }
+  .balance-row h6 {
+    font-size: 12px; }
 
 .balance-row:hover .highlight {
   filter: brightness(1.1); }
@@ -1131,15 +1150,22 @@ html {
   font-size: 10px;
   width: 100%; }
   .timeline-event:before {
-    content: '';
-    border: 3px solid #03a9f4;
-    background: white;
+    content: attr(data-timestamp);
+    background: #4caf50;
     border-radius: 50%;
-    height: 30px;
-    width: 30px;
+    height: 2.5em;
+    width: 2.5em;
     display: block;
     position: absolute;
-    left: 4.5em; }
+    left: 3.8em;
+    text-align: center;
+    line-height: 10px;
+    padding-top: 7px;
+    text-transform: uppercase;
+    color: white;
+    font-size: 12px; }
+  .timeline-event.negative:before {
+    background: #F44336; }
 
 .show-balances-screen .itemized-debts {
   display: none; }

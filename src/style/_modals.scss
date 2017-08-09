@@ -49,6 +49,10 @@ $modals: (
       outline: 0;
     }
 
+    input.error {
+      border: 1px solid red !important;
+    }
+
     input[type=text], input[type=number], select {
       border: 0;
       background: none;

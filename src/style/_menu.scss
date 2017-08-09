@@ -1,6 +1,10 @@
 .top-bar {
   background: #ff5722;
   line-height: 3em;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 5;
 
   .logo-section {
     text-transform: uppercase;
@@ -88,6 +92,10 @@
   background: #ff5722;
   padding: 1em;
   box-shadow: 0 6px 5px 5px rgba(0,0,0,0.3);
+  position: fixed;
+  top: 45px;
+  width: 100%;
+  z-index: 5;
 
   a {
     color: white;

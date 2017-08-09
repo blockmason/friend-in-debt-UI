@@ -39,3 +39,6 @@ hasNetworkError = not ∘ A.null ∘ (A.filter E.hasError)
 
 formatDate ∷ DateTime → String
 formatDate = (either (const "") id) ∘ (DTF.formatDateTime "YYYY-MM-DD")
+
+shortDate ∷ DateTime → String
+shortDate = (either (const "") id) ∘ (DTF.formatDateTime "MMM D")
