@@ -203,6 +203,7 @@ component =
         Credit → H.modify (_ { newCreditInput = debtInfo})
       pure next
     AddDebt debtType debt next → do
+      hLog debt
       H.liftEff $ UIStates.toggleLoading(".create-debt-button")
       s ← H.get
       handleTx NewTX s (ScreenChange R.BalancesScreen) $ F.newPendingDebt debt
@@ -675,11 +676,12 @@ inputFDebt debtType cur myId friends debtInfo =
        ]
      , HH.select [ HE.onValueChange
                    (HE.input (\v → if v == "Select a Friend"
-                                   then NoOp
+                                   then InputDebtDetails debtType $
+                                        debtInfo { counterParty = "" }
                                    else InputDebtDetails debtType $
                                         debtInfo { counterParty = v }))
                  ]
-       ([ HH.option_ [ HH.text "Select a Friend"] ]
+       ([ HH.option [ HP.selected true ] [ HH.text "Select a Friend"] ]
         <>
         ((\f → HH.option_ [ HH.text $ F.fiGetId f ]) <$> friends))
      , HH.input [ HP.type_ HP.InputText

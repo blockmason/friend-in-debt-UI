@@ -133,9 +133,12 @@ ui =
                 H.liftEff $ UIStates.clearAllLoading Nothing
                 H.modify (_ { loggedIn = false, errorToDisplay = Just (FIDError e)  })
                 pure next
+              F.TxError → do
+                hLog "Transaction cancelled or error"
+                pure next
               _ → do
-                hLog "some FID problem"
-                H.modify (_ { loggedIn = false, errorToDisplay = Just (FIDError e)  })
+                hLog e
+                refreshData
                 pure next
           CheckMetamask → do
             mmStatus ← H.liftEff MM.loggedIn
