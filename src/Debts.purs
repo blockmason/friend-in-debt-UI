@@ -312,8 +312,8 @@ pendingPage state =
 
 
 -- Itemized Debts for Friend Page
-displayItemizedDebtTimeline :: Maybe F.FoundationId → DebtsMap → Boolean → H.ComponentHTML Query
-displayItemizedDebtTimeline friendToShow debtsMap amIcreditor =
+displayItemizedDebtTimeline :: Maybe F.FoundationId → DebtsMap → F.FoundationId → H.ComponentHTML Query
+displayItemizedDebtTimeline friendToShow debtsMap me =
   case friendToShow of
     Just f →
       HH.div
@@ -322,13 +322,15 @@ displayItemizedDebtTimeline friendToShow debtsMap amIcreditor =
           HH.div [HP.class_ $ HH.ClassName "row"][HH.text "Debt History:"],
           HH.div [HP.class_ $ HH.ClassName "row"][HH.h6_ [HH.text $ show f]],
           HH.ul [HP.class_ $ HH.ClassName "row debt-timeline"]
-            $ (itemizedDebtLi amIcreditor) <$> (fromMaybe [] $ M.lookup f debtsMap)
+            $ (itemizedDebtLi me) <$> (fromMaybe [] $ M.lookup f debtsMap)
         ]
     Nothing → HH.div_ [ HH.text "" ]
 
-itemizedDebtLi ∷ Boolean → F.Debt → H.ComponentHTML Query
-itemizedDebtLi amIcreditor fd =
+itemizedDebtLi ∷ F.FoundationId → F.Debt → H.ComponentHTML Query
+itemizedDebtLi me fd =
   let mostRecent  = maybe "" shortDate $ F.debtTimestamp fd
+      amIcreditor = (F.debtCreditor fd) == me
+
   in
     HH.li [HP.class_ $ HH.ClassName $ "timeline-event " <> (if amIcreditor then "positive" else "negative"),
            HP.attr (HH.AttrName "data-timestamp") mostRecent
@@ -406,7 +408,6 @@ displayBalanceLi state bal =
       mostRecent  = maybe "" formatDate $ F.balMostRecent bal
       curFriend = if creditor == me then debtor else creditor
       status    = if creditor == me then "Lent to" else "Owes to"
-      amIcreditor  = if creditor == me then true else false
       friendToShow = state.showItemizedDebtFor
       expandClass = (\f → if f == curFriend then "expand-itemized" else "hide-itemized") <$> friendToShow
   in
@@ -436,7 +437,7 @@ displayBalanceLi state bal =
           HH.div [HP.class_ $ HH.ClassName "col thin-item"][HH.text $ show totalDebts <> " debts"]
         ]
       ],
-      (displayItemizedDebtTimeline friendToShow debtsMap amIcreditor)
+      (displayItemizedDebtTimeline friendToShow debtsMap me)
     ]
 
 -- Pending Friendships
