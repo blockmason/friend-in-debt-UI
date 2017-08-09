@@ -22,7 +22,7 @@ html {
 
 .container {
   background-image: url("45-degree-fabric-light.png");
-  max-width: 400px;
+  max-width: 450px;
   box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.3);
   min-height: 100%;
   overflow-y: scroll; }
@@ -296,7 +296,7 @@ html {
   position: fixed;
   top: 0;
   width: 100%;
-  max-width: 400px;
+  max-width: 450px;
   z-index: 5;
   overflow: hidden; }
   .top-bar .logo-section {
@@ -361,7 +361,7 @@ html {
   position: fixed;
   top: 45px;
   width: 100%;
-  max-width: 400px;
+  max-width: 450px;
   z-index: 5; }
   .header-menu a {
     color: white;
