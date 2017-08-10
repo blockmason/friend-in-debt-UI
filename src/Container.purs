@@ -155,7 +155,7 @@ ui =
                 Just b  → H.liftAff $ Bus.write NetworkError b
               else do
                 let pending = A.filter (\(Tuple s _) → E.notDone s) $ A.zip statii txs
-                if A.length pending /= A.length txs
+                if A.length pending == 0
                   then do
                     H.modify (_ { txs = (\(Tuple _ tx) → tx) <$> pending })
                     refreshData

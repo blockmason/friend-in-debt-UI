@@ -8357,11 +8357,8 @@ var PS = {};
   var Control_Monad_Aff = PS["Control.Monad.Aff"];
   var Control_Monad_Aff_Class = PS["Control.Monad.Aff.Class"];
   var Control_Monad_Eff = PS["Control.Monad.Eff"];
-  var Control_Monad_Eff_Class = PS["Control.Monad.Eff.Class"];
-  var Data_Either = PS["Data.Either"];
   var Data_Function = PS["Data.Function"];
   var Data_Functor = PS["Data.Functor"];
-  var Data_Maybe = PS["Data.Maybe"];
   var Data_Show = PS["Data.Show"];
   var Data_Unit = PS["Data.Unit"];
   var Network_Eth = PS["Network.Eth"];
@@ -8402,7 +8399,7 @@ var PS = {};
       if (v instanceof LoggedIn) {
           return true;
       };
-      throw new Error("Failed pattern match at Network.Eth.Metamask line 43, column 3 - line 45, column 26: " + [ v.constructor.name ]);
+      throw new Error("Failed pattern match at Network.Eth.Metamask line 45, column 3 - line 47, column 26: " + [ v.constructor.name ]);
   };
   exports["LoggedOut"] = LoggedOut;
   exports["LoggedIn"] = LoggedIn;
@@ -15469,7 +15466,7 @@ var PS = {};
                                   var pending = Data_Array.filter(function (v4) {
                                       return Network_Eth.notDone(v4.value0);
                                   })(Data_Array.zip(v3)(v1));
-                                  var $133 = Data_Array.length(pending) !== Data_Array.length(v1);
+                                  var $133 = Data_Array.length(pending) === 0;
                                   if ($133) {
                                       return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.modify(Halogen_Query_HalogenM.monadStateHalogenM)(function (v4) {
                                           var $137 = {};
