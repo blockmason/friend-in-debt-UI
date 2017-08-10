@@ -119,7 +119,7 @@ component =
              [ HP.class_ $ HH.ClassName "col-12" ]
              $ case (length state.balances) of
                 0 →
-                  [emptyBalance]
+                  [ emptyBalance ]
                 _ →
                   (displayBalanceLi state) <$> state.balances
       , page R.PendingScreen $ pendingPage state
