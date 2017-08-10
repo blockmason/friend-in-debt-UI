@@ -28,10 +28,12 @@ data ContainerMsg
   | CheckMetamask
   | CheckTxs
   | NetworkError
+  | WrongEthNetwork
 instance showContainerMsg ∷ Show ContainerMsg where
   show (FIDError fe) = show fe
   show CheckMetamask = "Checking Metamask status."
   show CheckTxs      = "Checking status of transactions."
   show NetworkError  = "NetworkError accessing blockchain"
+  show WrongEthNetwork = "WrongEthNetwork"
 
 type ContainerMsgBus = Maybe (Bus.BusRW ContainerMsg)

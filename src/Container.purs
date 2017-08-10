@@ -109,15 +109,23 @@ ui =
     eval ∷ Query ~> H.ParentDSL State Query ChildQuery ChildSlot Void (FIDMonad eff)
     eval = case _ of
       Init next → do
-        H.liftEff $ UIStates.toggleLoading(".container")
-        bus ← H.liftAff $ Bus.make
-        H.subscribe $ busEventSource (flip HandleMsg ES.Listening) bus
-        H.modify (_ { loggedIn = true, errorBus = Just bus })
-        loadWeb3Loop C.web3Delay 30
-        startCheckInterval (Just bus) C.checkMMInterval C.checkTxInterval
+        netId ← H.liftAff MM.getNetwork
+        if netId /= C.networkId
+          then do
+            H.modify (_ { errorToDisplay = Just WrongEthNetwork })
+          else do
+            bus ← H.liftAff $ Bus.make
+            H.liftEff $ UIStates.toggleLoading(".container")
+            H.subscribe $ busEventSource (flip HandleMsg ES.Listening) bus
+            H.modify (_ { loggedIn = true, errorBus = Just bus })
+            loadWeb3Loop C.web3Delay 30
+            startCheckInterval (Just bus) C.checkMMInterval C.checkTxInterval
         pure next
       HandleMsg msg next → do
         case msg of
+          WrongEthNetwork → do
+            H.modify (_ { errorToDisplay = Just WrongEthNetwork })
+            pure next
           NetworkError → do
             hLog NetworkError
             H.liftEff $ UIStates.clearAllLoading Nothing
@@ -191,6 +199,13 @@ errorOverlay state =
   case state.errorToDisplay of
     Nothing →
       HH.div [ HP.id_ "no-errors"][]
+
+    Just WrongEthNetwork →
+      HH.div [ HP.id_ "errorOverlay"]
+      [ HH.h6_ [ HH.text $ "Connected to wrong Ethereum network. Please switch your client to use Ropsten Test Network."]
+      , HH.button [ HE.onClick $ HE.input_ $ RefreshData
+                  , HP.class_ $ HH.ClassName "error-action"]
+        [ HH.i [HP.class_ (HH.ClassName "fa fa-refresh")][] ]]
 
     Just CheckMetamask →
       HH.div [ HP.id_ "errorOverlay"][
