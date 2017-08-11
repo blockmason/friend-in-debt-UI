@@ -13832,6 +13832,16 @@ var PS = {};
     }
   }
 
+  exports.turnOffLoadingImpl = function(selector) {
+    return function() {
+      if (selector) {
+        document.querySelectorAll(selector).forEach( function(el){
+          el.classList.remove('loading');
+        });
+      }
+    }
+  }
+
   exports.toggleErrorImpl = function(selector) {
     return function() {
         if (selector) {
@@ -13865,6 +13875,9 @@ var PS = {};
   var turnOnLoading = function (selector) {
       return $foreign.turnOnLoadingImpl(selector);
   };
+  var turnOffLoading = function (selector) {
+      return $foreign.turnOffLoadingImpl(selector);
+  };
   var toggleLoading = function (selector) {
       return $foreign.toggleLoadingImpl(selector);
   };
@@ -13878,11 +13891,12 @@ var PS = {};
       if (maybeParentSelector instanceof Data_Maybe.Just) {
           return $foreign.clearAllLoadingImpl(maybeParentSelector.value0);
       };
-      throw new Error("Failed pattern match at UI.UIStatesKit line 38, column 3 - line 42, column 27: " + [ maybeParentSelector.constructor.name ]);
+      throw new Error("Failed pattern match at UI.UIStatesKit line 42, column 3 - line 46, column 27: " + [ maybeParentSelector.constructor.name ]);
   };
   exports["clearAllLoading"] = clearAllLoading;
   exports["toggleError"] = toggleError;
   exports["toggleLoading"] = toggleLoading;
+  exports["turnOffLoading"] = turnOffLoading;
   exports["turnOnLoading"] = turnOnLoading;
 })(PS["UI.UIStatesKit"] = PS["UI.UIStatesKit"] || {});
 (function(exports) {
@@ -15211,7 +15225,7 @@ var PS = {};
                                   });
                               });
                           };
-                          throw new Error("Failed pattern match at Container line 263, column 3 - line 268, column 16: " + [ maybeBus.constructor.name ]);
+                          throw new Error("Failed pattern match at Container line 264, column 3 - line 269, column 16: " + [ maybeBus.constructor.name ]);
                       };
                   };
               };
@@ -15236,7 +15250,7 @@ var PS = {};
                                   };
                                   return new Data_Maybe.Just(FriendInDebt_Types.CheckMetamask.value);
                               })();
-                              return Control_Monad_State_Class.modify(Halogen_Query_HalogenM.monadStateHalogenM)(function (v4) {
+                              return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.modify(Halogen_Query_HalogenM.monadStateHalogenM)(function (v4) {
                                   var $85 = {};
                                   for (var $86 in v4) {
                                       if ({}.hasOwnProperty.call(v4, $86)) {
@@ -15246,6 +15260,8 @@ var PS = {};
                                   $85.loggedIn = v2;
                                   $85.errorToDisplay = errorToDisplay;
                                   return $85;
+                              }))(function () {
+                                  return Control_Monad_Eff_Class.liftEff(Halogen_Query_HalogenM.monadEffHalogenM(Control_Monad_Aff.monadEffAff))(UI_UIStatesKit.turnOffLoading(".error-action"));
                               });
                           });
                       });
@@ -15332,7 +15348,7 @@ var PS = {};
                   if (v instanceof Data_Maybe.Just) {
                       return Control_Monad_Aff_Class.liftAff(Halogen_Query_HalogenM.monadAffHalogenM(Control_Monad_Aff_Class.monadAffAff))(Control_Monad_Aff_Bus.write(FriendInDebt_Types.NetworkError.value)(v.value0));
                   };
-                  throw new Error("Failed pattern match at Container line 399, column 7 - line 401, column 58: " + [ v.constructor.name ]);
+                  throw new Error("Failed pattern match at Container line 400, column 7 - line 402, column 58: " + [ v.constructor.name ]);
               })())(function () {
                   return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(Data_Unit.unit);
               });
@@ -15351,7 +15367,7 @@ var PS = {};
       };
       if (state.errorToDisplay instanceof Data_Maybe.Just && state.errorToDisplay.value0 instanceof FriendInDebt_Types.FIDError) {
           if (state.errorToDisplay.value0.value0 instanceof Network_Eth_FriendInDebt_Types.NoFoundationId) {
-              return Halogen_HTML_Elements.div([ Halogen_HTML_Properties.id_("errorOverlay") ])([ Halogen_HTML_Elements.h6_([ Halogen_HTML_Core.text("No Foundation Id Detected") ]), Halogen_HTML_Elements.button([ Halogen_HTML_Events.onClick(Halogen_HTML_Events.input_(RefreshData.create)), Halogen_HTML_Properties.class_("error-action") ])([ Halogen_HTML_Elements.i([ Halogen_HTML_Properties.class_("fa fa-user-plus") ])([  ]), Halogen_HTML_Core.text("Register") ]) ]);
+              return Halogen_HTML_Elements.div([ Halogen_HTML_Properties.id_("errorOverlay") ])([ Halogen_HTML_Elements.h6_([ Halogen_HTML_Core.text("No Foundation Id Detected") ]), Halogen_HTML_Elements.a([ Halogen_HTML_Properties.href("http://fmanager.io"), Halogen_HTML_Properties.class_("btn error-action") ])([ Halogen_HTML_Elements.i([ Halogen_HTML_Properties.class_("fa fa-user-plus") ])([  ]), Halogen_HTML_Core.text("Register") ]) ]);
           };
           if (state.errorToDisplay.value0.value0 instanceof Network_Eth_FriendInDebt_Types.NetworkError) {
               return Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("row error-notification") ])([ Halogen_HTML_Core.text("Ropsten Test Network failing to respond to transaction... ") ]);
@@ -15361,7 +15377,7 @@ var PS = {};
       if (state.errorToDisplay instanceof Data_Maybe.Just) {
           return Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("row error-notification") ])([ Halogen_HTML_Core.text(Data_Show.show(FriendInDebt_Types.showContainerMsg)(state.errorToDisplay.value0)) ]);
       };
-      throw new Error("Failed pattern match at Container line 201, column 3 - line 237, column 36: " + [ state.errorToDisplay.constructor.name ]);
+      throw new Error("Failed pattern match at Container line 202, column 3 - line 237, column 36: " + [ state.errorToDisplay.constructor.name ]);
   };
   var checkMetamask = function (loggedIn) {
       return function (mmStatus) {
@@ -15591,8 +15607,10 @@ var PS = {};
               throw new Error("Failed pattern match at Container line 127, column 9 - line 173, column 22: " + [ v.value0.constructor.name ]);
           };
           if (v instanceof RefreshData) {
-              return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(refreshData)(function () {
-                  return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value0);
+              return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_Eff_Class.liftEff(Halogen_Query_HalogenM.monadEffHalogenM(Control_Monad_Aff.monadEffAff))(UI_UIStatesKit.turnOnLoading(".error-action")))(function () {
+                  return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(refreshData)(function () {
+                      return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value0);
+                  });
               });
           };
           if (v instanceof SetScreen) {
@@ -15683,7 +15701,7 @@ var PS = {};
                           return $190;
                       });
                   };
-                  throw new Error("Failed pattern match at Container line 182, column 9 - line 193, column 45: " + [ v.value0.constructor.name ]);
+                  throw new Error("Failed pattern match at Container line 183, column 9 - line 194, column 45: " + [ v.value0.constructor.name ]);
               })())(function () {
                   return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value1);
               });
@@ -15703,7 +15721,7 @@ var PS = {};
                   return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value0);
               });
           };
-          throw new Error("Failed pattern match at Container line 110, column 12 - line 197, column 18: " + [ v.constructor.name ]);
+          throw new Error("Failed pattern match at Container line 110, column 12 - line 198, column 18: " + [ v.constructor.name ]);
       };
       return Halogen_Component.lifecycleParentComponent(Data_Either.ordEither(Data_Ord.ordUnit)(Data_Ord.ordVoid))({
           initialState: Data_Function["const"](initialState), 

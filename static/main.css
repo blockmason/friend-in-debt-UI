@@ -78,7 +78,10 @@ html {
   left: 0; }
 
 .loading {
-  color: transparent; }
+  color: transparent;
+  outline: 0; }
+  .loading:focus {
+    outline: 0; }
   .loading:before {
     content: '';
     position: absolute;
@@ -199,14 +202,14 @@ html {
     outline: 0; }
     .create-debt-container input[type=text]::placeholder, .create-debt-container input[type=number]::placeholder, .create-debt-container select::placeholder {
       color: #aaa; }
-  .create-debt-container button {
+  .create-debt-container a, .create-debt-container button {
     text-transform: uppercase;
     position: relative; }
-    .create-debt-container button:hover {
+    .create-debt-container a:hover, .create-debt-container button:hover {
       background-color: #0275d8;
       color: white;
       border-color: #0275d8; }
-    .create-debt-container button.loading {
+    .create-debt-container a.loading, .create-debt-container button.loading {
       color: #0275d8 !important; }
 
 .add-friend {
@@ -255,14 +258,14 @@ html {
     outline: 0; }
     .add-friend input[type=text]::placeholder, .add-friend input[type=number]::placeholder, .add-friend select::placeholder {
       color: #aaa; }
-  .add-friend button {
+  .add-friend a, .add-friend button {
     text-transform: uppercase;
     position: relative; }
-    .add-friend button:hover {
+    .add-friend a:hover, .add-friend button:hover {
       background-color: orange;
       color: white;
       border-color: orange; }
-    .add-friend button.loading {
+    .add-friend a.loading, .add-friend button.loading {
       color: orange !important; }
 
 .create-debt-container ul {
