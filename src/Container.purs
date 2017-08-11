@@ -172,7 +172,6 @@ ui =
                   else pure unit
             pure next
       RefreshData next → do
-        H.liftEff $ UIStates.turnOnLoading(".error-action")
         refreshData
         pure next
       SetScreen screen next → do
@@ -223,7 +222,8 @@ errorOverlay state =
           F.NoFoundationId →
             HH.div [ HP.id_ "errorOverlay"][
               HH.h6_ [ HH.text "No Foundation Id Detected"],
-              HH.a [ HP.href "http://fmanager.io", HP.class_ $ HH.ClassName "btn error-action"]
+              HH.button [ HE.onClick $ HE.input_ $ RefreshData
+                          , HP.class_ $ HH.ClassName "error-action"]
                 [ HH.i [HP.class_ (HH.ClassName "fa fa-user-plus")][], HH.text "Register" ]
             ]
           F.NetworkError →
@@ -251,7 +251,6 @@ refreshData = do
                                      e                  → e
                                  else Just CheckMetamask
             H.modify (_ { loggedIn = newmmStatus, errorToDisplay = errorToDisplay })
-            H.liftEff $ UIStates.turnOffLoading(".error-action")
     else do H.modify (_ { loggedIn = false, errorToDisplay = Just CheckMetamask  })
   H.liftEff $ UIStates.toggleLoading(".container")
 
