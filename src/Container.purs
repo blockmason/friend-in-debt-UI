@@ -109,17 +109,19 @@ ui =
     eval ∷ Query ~> H.ParentDSL State Query ChildQuery ChildSlot Void (FIDMonad eff)
     eval = case _ of
       Init next → do
-        netId ← H.liftAff MM.getNetwork
-        if netId /= C.networkId
-          then do
-            H.modify (_ { errorToDisplay = Just WrongEthNetwork })
+        hasWeb3 ← H.liftEff MM.hasWeb3
+        if not hasWeb3 then H.modify (_ { errorToDisplay = Just CheckMetamask })
           else do
-            bus ← H.liftAff $ Bus.make
-            H.liftEff $ UIStates.toggleLoading(".container")
-            H.subscribe $ busEventSource (flip HandleMsg ES.Listening) bus
-            H.modify (_ { loggedIn = true, errorBus = Just bus })
-            loadWeb3Loop C.web3Delay 30
-            startCheckInterval (Just bus) C.checkMMInterval C.checkTxInterval
+            netId ← H.liftAff MM.getNetwork
+            if netId /= C.networkId
+              then H.modify (_ { errorToDisplay = Just WrongEthNetwork })
+              else do
+                bus ← H.liftAff $ Bus.make
+                H.liftEff $ UIStates.toggleLoading(".container")
+                H.subscribe $ busEventSource (flip HandleMsg ES.Listening) bus
+                H.modify (_ { loggedIn = true, errorBus = Just bus })
+                loadWeb3Loop C.web3Delay 30
+                startCheckInterval (Just bus) C.checkMMInterval C.checkTxInterval
         pure next
       HandleMsg msg next → do
         case msg of
