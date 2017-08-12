@@ -6,7 +6,7 @@
   <body onload="init();">
     <div id="myAddr">Waiting for address...</div>
     <div id="fId">Waiting for id...</div>
-    <div id="balances">Waiting for balances new...</div>
+    <div id="balances">Waiting for balances again...</div>
 
     <script type="text/javascript">
       var b2s = function(bytes) {
@@ -75,8 +75,12 @@
 //        debtContract.getMyFoundationId( function(e,r) {
         fContract.resolveToName(a, function(e, r) {
           if (!e) {
-            console.log(r.valueOf());
             div.innerHTML = "FoundationID: " + b2s(r.valueOf());
+            debtContract.confirmedDebtBalances(r.valueOf(), function(e,r) {
+              console.log(r.valueOf());
+              div2 = document.getElementById("balances");
+              div2.innerHTML = r.valueOf();
+            });
           }
           else {
             if (numTries > 0) {
