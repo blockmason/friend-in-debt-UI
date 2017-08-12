@@ -4,8 +4,8 @@
     <script src="js/ropsten-abi.js"></script>
   </head>
   <body onload="init();">
-    <div id="timtime">
-    </div>
+    <div id="myAddr"></div>
+    <div id="fId"></div>
 
     <script type="text/javascript">
       var b2s = function(bytes) {
@@ -19,7 +19,6 @@
         return s;
       };
 
-      var d;
       var foundationAbi;
       var fContract;
       var fAddress;
@@ -57,8 +56,9 @@
       };
 
       var checkId = function() {
+        var div = document.getElementById("fId");
         debtContract.getMyFoundationId(function(e, r) {
-          if (!e) console.log(b2s(r.valueOf()));
+          if (!e) div.innerHTML = b2s(r.valueOf());
             else {
                 console.error(e);
             }
@@ -67,7 +67,7 @@
 
       var init = function() {
         debtContract = web3.eth.contract(debtConfig.abi).at(debtConfig.address);
-        d =  document.getElementById("timtime");
+        var d = document.getElementById("myAddr");
         setTimeout(function() {
           getNetwork();
           checkId();
