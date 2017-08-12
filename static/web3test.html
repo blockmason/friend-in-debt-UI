@@ -79,7 +79,7 @@
             debtContract.confirmedDebtBalances(r.valueOf(), function(e,r) {
               console.log(r.valueOf());
               div2 = document.getElementById("balances");
-              div2.innerHTML = r.valueOf();
+              div2.innerHTML = "num balances: " + r.valueOf().length;
             });
           }
           else {
@@ -99,7 +99,7 @@
 //        var user = "0x74696d67616c6562616368000000000000000000000000000000000000000000";
         console.log("id: " + user);
         debtContract.confirmedDebtBalances(user, function(e,r) {
-          div.innerHTML = r.valueOf();
+          div.innerHTML = r.valueOf().length;
         });
       };
 
