@@ -61,6 +61,7 @@
         fContract.resolveToName(a, function(e, r) {
           if (!e) {
             console.log("successful check");
+            console.log(r.valueOf());
             div.innerHTML = b2s(r.valueOf());
           }
           else {
