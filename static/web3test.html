@@ -59,10 +59,10 @@
         console.log("about to check id");
         var div = document.getElementById("fId");
         fContract.resolveToName(a, function(e, r) {
-          console.log("checked id");
           if (!e) div.innerHTML = b2s(r.valueOf());
           else {
             if (numTries > 0) {
+              console.log("numTries was:  " + numTries);
               checkId(a, numTries - 1);
             }
             else
