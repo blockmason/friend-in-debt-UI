@@ -55,15 +55,15 @@
         });
       };
 
-      var checkId = function(numTries) {
+      var checkId = function(myAddr numTries) {
         console.log("about to check id");
         var div = document.getElementById("fId");
-        debtContract.getMyFoundationId(function(e, r) {
+        fContract.resolveToName(myAddr, function(e, r) {
           console.log("checked id");
           if (!e) div.innerHTML = b2s(r.valueOf());
           else {
             if (numTries > 0) {
-              checkId(numTries - 1);
+              checkId(myAddr, numTries - 1);
             }
             else
               console.log("timed out after some retries");
@@ -73,13 +73,13 @@
 
       var init = function() {
         debtContract = web3.eth.contract(debtConfig.abi).at(debtConfig.address);
+        fContract = web3.eth.contract(foundationAbi).at(foundationConfig.address);
         var d = document.getElementById("myAddr");
         setTimeout(function() {
-          myAddress = web3.eth.accounts[0];
+          myAddr = web3.eth.accounts[0];
           getNetwork();
-          checkId(4);
+          checkId(myAddr, 4);
 //          foundationAbi = web3.eth.contract(foundationConfig.abi);
-//          fContract = foundationAbi.at(foundationConfig.address);
 //          fAddress = foundationConfig.address;
           d.innerHTML = myAddress;
 //          addAddr("0x1A9a7bFA6C2CC628573E1514AE13947d83df9C80");
