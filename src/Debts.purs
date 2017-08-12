@@ -408,6 +408,7 @@ displayBalanceLi state bal =
       debtor   = F.balDebtor bal
       amount   = F.balAmount bal
       totalDebts  = F.balTotalDebts bal
+      debtStr  = if totalDebts == 1 then " debt" else " debts"
       mostRecent  = maybe "" formatDate $ F.balMostRecent bal
       curFriend = if creditor == me then debtor else creditor
       status    = if creditor == me then "Owed to Me" else "I Owe"
@@ -440,7 +441,7 @@ displayBalanceLi state bal =
         ],
         HH.div [HP.class_ $ HH.ClassName "row thin-item-row"][
           HH.div [HP.class_ $ HH.ClassName "col thin-item"][currencySpan amount],
-          HH.div [HP.class_ $ HH.ClassName "col thin-item"][HH.text $ show totalDebts <> " debts"]
+          HH.div [HP.class_ $ HH.ClassName "col thin-item"][HH.text $ show totalDebts <> debtStr]
         ]
       ],
       (displayItemizedDebtTimeline friendToShow debtsMap me)
