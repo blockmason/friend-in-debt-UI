@@ -56,8 +56,10 @@
       };
 
       var checkId = function() {
+        console.log("about to check id");
         var div = document.getElementById("fId");
         debtContract.getMyFoundationId(function(e, r) {
+          console.log("checked id");
           if (!e) div.innerHTML = b2s(r.valueOf());
             else {
                 console.error(e);
