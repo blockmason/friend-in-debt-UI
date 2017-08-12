@@ -1,6 +1,6 @@
 #Friend in Debt UI
 
-UI layer of Friend In Debt, a decentralized debt-tracking app between friends. 
+UI layer of Friend In Debt, a decentralized debt-tracking app between friends.
 
 ## Known Issues
 * Friends take awhile to show up even post-confirmation. Seems to be some sort of lag in the blockchain returning results/updating.
