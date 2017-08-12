@@ -12,3 +12,4 @@ UI layer of Friend In Debt, a decentralized debt-tracking app between friends.
 - 3. `./build.sh` to compile
 
 All Rights Reserved
+ 
