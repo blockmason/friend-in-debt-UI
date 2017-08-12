@@ -1,0 +1,93 @@
+<html>
+  <head>
+    <script src="js/web3.min.js"></script>
+    <script src="js/ropsten-abi.js"></script>
+  </head>
+  <body onload="init();">
+    <div id="timtime">
+    </div>
+
+    <script type="text/javascript">
+      var b2s = function(bytes) {
+        var s = "";
+        for(var i=2; i<bytes.length; i+=2) {
+          var num = parseInt(bytes.substring(i, i+2), 16);
+          if (num == 0) break;
+          var char = String.fromCharCode(num);
+          s += char;
+        }
+        return s;
+      };
+
+      var d;
+      var foundationAbi;
+      var fContract;
+      var fAddress;
+      var debtContract;
+
+      var myAddress;
+      var txHash;
+
+      var printTxStatus = function() {
+        setInterval(function() {
+          web3.eth.getTransaction(txHash, function(err, result) {
+            if ( err ) {
+              console.log(err);
+            }
+            else {
+              console.log(result);
+            }
+          });
+        }, 3000);
+      };
+
+      var addAddr = function(addr) {
+        var data = fContract.addPendingUnification.getData(addr);
+        sendFoundationTx(data);
+        printTxStatus();
+      };
+
+      var getNetwork = function() {
+        web3.version.getNetwork(function(err, netId) {
+          if ( typeof err == "undefined" )
+            console.log(netId);
+          else
+            console.log(err);
+        });
+      };
+
+      var checkId = function() {
+        debtContract.getMyFoundationId(function(e, r) {
+          if (!e) console.log(b2s(r.valueOf()));
+            else {
+                console.error(e);
+            }
+        });
+      };
+
+      var init = function() {
+        debtContract = web3.eth.contract(debtConfig.abi).at(debtConfig.address);
+        d =  document.getElementById("timtime");
+        setTimeout(function() {
+          getNetwork();
+          checkId();
+          foundationAbi = web3.eth.contract(foundationConfig.abi);
+          fContract = foundationAbi.at(foundationConfig.address);
+          fAddress = foundationConfig.address;
+          d.innerHTML = web3.eth.accounts[0];
+          myAddress = web3.eth.accounts[0];
+//          addAddr("0x1A9a7bFA6C2CC628573E1514AE13947d83df9C80");
+        }, 2000);
+      };
+
+      var sendFoundationTx = function(data) {
+        web3.eth.sendTransaction(
+          {to: fAddress, from: myAddress, data: data},
+          function(err, result) {
+            if ( !err )
+              txHash = result;
+          });
+      };
+    </script>
+  </body>
+</html>
