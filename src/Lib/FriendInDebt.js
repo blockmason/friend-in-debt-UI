@@ -32,11 +32,6 @@ exports.initImpl = function(dummyVal) {
         foundAbi = web3.eth.contract(foundationConfig.abi);
         foundContract = foundAbi.at(foundationConfig.address);
         foundContractAddress = foundationConfig.address;
-
-        Debt = TruffleContract(debtConfig);
-        Debt.setProvider(web3.currentProvider);
-        Friend = TruffleContract(friendConfig);
-        Friend.setProvider(web3.currentProvider);
     };
 };
 
@@ -74,10 +69,8 @@ exports.getMyFoundationIdImpl = function(callback) {
 exports.friendsImpl = function(callback) {
     return function(foundationId) {
         return function() {
-            Friend.deployed().then(function(instance) {
-                return instance.confirmedFriends.call(foundationId);
-            }).then(function(res) {
-                callback(confirmedFriends2Js(res.valueOf()))();
+            friendContract.confirmedFriends(foundationId, function(e,r) {
+                callback(confirmedFriends2Js(r.valueOf()))();
             });
         };
     };
@@ -86,10 +79,8 @@ exports.friendsImpl = function(callback) {
 exports.pendingFriendshipsImpl = function(callback) {
     return function(foundationId) {
         return function() {
-            Friend.deployed().then(function(instance) {
-                return instance.pendingFriends.call(foundationId);
-            }).then(function(res) {
-                callback(pendingFriends2Js(res.valueOf()))();
+            friendContract.pendingFriends(foundationId, function(e,r) {
+                callback(pendingFriends2Js(r.valueOf()))();
             });
         };
     };
@@ -150,10 +141,8 @@ exports.newPendingDebtImpl = function(callback) {
 exports.debtBalancesImpl = function(callback) {
     return function(foundationId) {
         return function() {
-            Debt.deployed().then(function(instance) {
-                return instance.confirmedDebtBalances.call(foundationId);
-            }).then(function(res) {
-                callback(debtBalances2Js(res.valueOf()))();
+            debtContract.confirmedDebtBalances(foundationId, function(e,r) {
+                callback(debtBalances2Js(r.valueOf()))();
             });
         };
     };
@@ -162,10 +151,8 @@ exports.debtBalancesImpl = function(callback) {
 exports.pendingDebtsImpl = function(callback) {
     return function(foundationId) {
         return function() {
-            Debt.deployed().then(function(instance) {
-                return instance.pendingDebts.call(foundationId);
-            }).then(function(res) {
-                callback(pendingDebts2Js(res.valueOf()))();
+            debtContract.pendingDebts(foundationId, function(e,r) {
+                callback(pendingDebts2Js(r.valueOf()))();
             });
         };
     };
@@ -175,10 +162,8 @@ exports.itemizedDebtsImpl = function(callback) {
     return function(myId) {
         return function(friendId) {
             return function() {
-                Debt.deployed().then(function(instance) {
-                    return instance.confirmedDebts.call(myId, friendId);
-                }).then(function(res) {
-                    callback(confirmedDebts2Js(res.valueOf()))();
+                debtContract.confirmedDebts(myId, friendId, function(e,r) {
+                    callback(confirmedDebts2Js(r.valueOf()))();
                 });
             };
         };
