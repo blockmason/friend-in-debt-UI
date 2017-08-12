@@ -90,8 +90,9 @@
 
       var getBalances = function() {
         var div = document.getElementById("balances");
-        debtContract.confirmedDebtBalances("timgalebach", function(e,r) {
-          console.log("new");
+        var user = web3.fromAscii("timgalebach", 32);
+        console.log("id: " + user);
+        debtContract.confirmedDebtBalances(user, function(e,r) {
           div.innerHTML = r.valueOf();
         });
       };
