@@ -35,7 +35,6 @@ exports.initImpl = function(dummyVal) {
     };
 };
 
-
 exports.currentUserImpl = function(dummyVal) {
     return function() {
         return web3.eth.accounts[0];

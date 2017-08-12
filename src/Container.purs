@@ -42,6 +42,7 @@ data Query a
 
 type State = { loggedIn ∷ Boolean
              , myId     ∷ Maybe F.FoundationId
+             , myAddr   ∷ Maybe E.EthAddress
              , errorBus ∷ ContainerMsgBus
              , errorToDisplay ∷ Maybe ContainerMsg
              , txs      ∷ Array E.TX
@@ -70,6 +71,7 @@ ui =
     initialState ∷ State
     initialState = { loggedIn: false
                    , myId: Nothing
+                   , myAddr: Nothing
                    , errorBus: Nothing
                    , errorToDisplay: Nothing
                    , txs: []
@@ -240,6 +242,8 @@ refreshData ∷ ∀ e. H.ParentDSL State Query ChildQuery ChildSlot Void (FIDMon
 refreshData = do
   H.liftEff $ UIStates.turnOnLoading(".container")
   mmStatus ← H.liftEff MM.loggedIn
+  myAddr   ← H.liftEff MM.currentUserAddress
+  H.modify (_ { myAddr = Just myAddr })
   if mmStatus
     then do _ ← H.query' CP.cp1 unit (D.RefreshDebts unit)
             newmmStatus ← H.liftEff MM.loggedIn
@@ -256,8 +260,15 @@ refreshData = do
 
 checkMetamask ∷ ∀ e. Boolean → Boolean
               → H.ParentDSL State Query ChildQuery ChildSlot Void (FIDMonad e) Unit
-checkMetamask loggedIn mmStatus =
-  if (loggedIn && mmStatus) then pure unit else refreshData
+checkMetamask loggedIn mmStatus = do
+  myAddr ← H.gets _.myAddr
+  if (loggedIn && mmStatus)
+    then do
+      newAddr ← Just <$> (H.liftEff MM.currentUserAddress)
+      if isNothing myAddr || myAddr /= newAddr
+        then refreshData
+        else pure unit
+    else refreshData
 
 startCheckInterval maybeBus mmInterval txInterval = do
   case maybeBus of
