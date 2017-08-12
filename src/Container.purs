@@ -153,7 +153,7 @@ ui =
                 refreshData
                 pure next
           CheckMetamask → do
-            mmStatus ← H.liftEff MM.loggedIn
+            mmStatus ← H.liftAff MM.loggedIn
             loggedIn ← H.gets _.loggedIn
             checkMetamask loggedIn mmStatus
             pure next
@@ -241,12 +241,12 @@ errorOverlay state =
 refreshData ∷ ∀ e. H.ParentDSL State Query ChildQuery ChildSlot Void (FIDMonad e) Unit
 refreshData = do
   H.liftEff $ UIStates.turnOnLoading(".container")
-  mmStatus ← H.liftEff MM.loggedIn
-  myAddr   ← H.liftEff MM.currentUserAddress
+  mmStatus ← H.liftAff MM.loggedIn
+  myAddr   ← H.liftAff MM.currentUserAddress
   H.modify (_ { myAddr = Just myAddr })
   if mmStatus
     then do _ ← H.query' CP.cp1 unit (D.RefreshDebts unit)
-            newmmStatus ← H.liftEff MM.loggedIn
+            newmmStatus ← H.liftAff MM.loggedIn
             currentError ← H.gets _.errorToDisplay
             let errorToDisplay = if newmmStatus
                                  then
@@ -264,7 +264,7 @@ checkMetamask loggedIn mmStatus = do
   myAddr ← H.gets _.myAddr
   if (loggedIn && mmStatus)
     then do
-      newAddr ← Just <$> (H.liftEff MM.currentUserAddress)
+      newAddr ← Just <$> (H.liftAff MM.currentUserAddress)
       if isNothing myAddr || myAddr /= newAddr
         then refreshData
         else pure unit
@@ -367,39 +367,13 @@ loggerOverlay onOff logText =
        map (\text → HH.p_ [HH.text text] ) logText
   else HH.div_ []
 
-runWeb3Tests delayTimeMs = do
-  H.liftAff $ delay (Milliseconds (toNumber delayTimeMs))
-  li ← H.liftEff MM.loggedIn
-  divLog li
-  H.liftAff $ delay (Milliseconds (toNumber delayTimeMs))
-  li ← H.liftEff MM.loggedIn
-  divLog li
-  H.liftAff $ delay (Milliseconds (toNumber delayTimeMs))
-  li ← H.liftEff MM.loggedIn
-  divLog li
-  H.liftAff $ delay (Milliseconds (toNumber delayTimeMs))
-  li ← H.liftEff MM.loggedIn
-  divLog li
-  H.liftAff $ delay (Milliseconds (toNumber delayTimeMs))
-  li ← H.liftEff MM.loggedIn
-  divLog li
-  H.liftAff $ delay (Milliseconds (toNumber delayTimeMs))
-  li ← H.liftEff MM.loggedIn
-  divLog li
-  H.liftAff $ delay (Milliseconds (toNumber delayTimeMs))
-  li ← H.liftEff MM.loggedIn
-  divLog li
-  H.liftAff $ delay (Milliseconds (toNumber delayTimeMs))
-  li ← H.liftEff MM.loggedIn
-  divLog li
-
 --keep checking if metamask is loaded
 loadWeb3Loop delayMs numTriesLeft =
   if numTriesLeft > 0
     then do
       hLog "Retrying"
       H.liftAff $ delay (Milliseconds (toNumber delayMs))
-      mmLoggedIn ← H.liftEff MM.loggedIn
+      mmLoggedIn ← H.liftAff MM.loggedIn
       if mmLoggedIn
         then do
           refreshData

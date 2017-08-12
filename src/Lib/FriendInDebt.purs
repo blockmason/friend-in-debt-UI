@@ -93,7 +93,7 @@ foreign import itemizedDebtsImpl ∷ DebtLookupFn'
 --
 checkAndInit ∷ MonadF Unit
 checkAndInit = do
-  loggedIn ← liftEff MM.loggedIn
+  loggedIn ← liftAff MM.loggedIn
   if loggedIn
     then liftEff $ initImpl unit
     else throwError NoMetamask

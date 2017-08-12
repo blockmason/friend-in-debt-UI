@@ -17,7 +17,7 @@ var friendAbi;
 var friendContract;
 var friendContractAddress;
 
-var myAddress;
+//var myAddress;
 
 exports.initImpl = function(dummyVal) {
     return function() {
@@ -199,7 +199,7 @@ exports.rejectDebtImpl = function(callback) {
 var sendDebtTx = function(data, value, callback) {
     web3.eth.sendTransaction(
         {to: debtContractAddress,
-         from: myAddress,
+//         from: myAddress,
          data: data,
          value: value},
         function(err, result) {
@@ -213,7 +213,7 @@ var sendDebtTx = function(data, value, callback) {
 var sendFriendTx = function(data, value, callback) {
     web3.eth.sendTransaction(
         {to: friendContractAddress,
-         from: myAddress,
+//         from: myAddress,
          data: data,
          value: value},
         function(err, result) {

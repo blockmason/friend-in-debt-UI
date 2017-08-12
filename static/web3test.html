@@ -104,15 +104,23 @@
         });
       };
 
+      var accounts = function() {
+        web3.eth.getAccounts(function(e,r) {
+          console.log(r);
+        });
+      };
+
+
       var init = function() {
         debtContract = web3.eth.contract(debtConfig.abi).at(debtConfig.address);
         fContract = web3.eth.contract(foundationConfig.abi).at(foundationConfig.address);
         var d = document.getElementById("myAddr");
+        accounts();
         setTimeout(function() {
-          myAddress = web3.eth.accounts[0];
-          checkId(myAddress, 4);
-          getBalances();
-          d.innerHTML = myAddress;
+//          myAddress = web3.eth.accounts[0];
+//          checkId(myAddress, 4);
+//          getBalances();
+//          d.innerHTML = myAddress;
 //          addAddr("0x1A9a7bFA6C2CC628573E1514AE13947d83df9C80");
         }, 2000);
       };
