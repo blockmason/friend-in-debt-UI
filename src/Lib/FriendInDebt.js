@@ -5,6 +5,10 @@ var Debt;
 var Friend;
 var Foundation;
 
+var foundAbi;
+var foundContract;
+var foundContractAddress;
+
 var debtAbi;
 var debtContract;
 var debtContractAddress;
@@ -25,12 +29,14 @@ exports.initImpl = function(dummyVal) {
         friendContract = friendAbi.at(friendConfig.address);
         friendContractAddress = friendConfig.address;
 
+        foundAbi = web3.eth.contract(foundationConfig.abi);
+        foundContract = foundAbi.at(foundationConfig.address);
+        foundContractAddress = foundationConfig.address;
+
         Debt = TruffleContract(debtConfig);
         Debt.setProvider(web3.currentProvider);
         Friend = TruffleContract(friendConfig);
         Friend.setProvider(web3.currentProvider);
-        Foundation = TruffleContract(foundationConfig);
-        Foundation.setProvider(web3.currentProvider);
     };
 };
 
@@ -44,10 +50,9 @@ exports.currentUserImpl = function(dummyVal) {
 exports.nameInUseImpl = function(callback) {
     return function(foundationId) {
         return function() {
-            Foundation.deployed().then(function(instance) {
-                return instance.resolveToAddresses.call(foundationId);
-            }).then(function(res) {
-                callback(res.valueOf().length > 0)();
+            foundContract.resolveToAddresses(foundationId, function(e, r) {
+                if (!e) callback(r.valueOf().length > 0)();
+                else    console.error(e);
             });
         };
     };
@@ -55,13 +60,12 @@ exports.nameInUseImpl = function(callback) {
 
 exports.getMyFoundationIdImpl = function(callback) {
     return function() {
-        Debt.deployed().then(function(instance) {
-            return instance.getMyFoundationId.call();
-        }).then(function(res) {
-            callback(b2s(res.valueOf()))();
-        }).catch(function(e) {
-            console.log("error");
-            callback("ERR");
+        debtContract.getMyFoundationId(function(e, r) {
+            if (!e) callback(b2s(r.valueOf()))();
+            else {
+                console.error(e);
+                callback("ERR")();
+            }
         });
     };
 };
