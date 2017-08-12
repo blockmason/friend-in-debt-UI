@@ -79,7 +79,8 @@
             debtContract.confirmedDebtBalances(r.valueOf(), function(e,r) {
               console.log(r.valueOf());
               div2 = document.getElementById("balances");
-              div2.innerHTML = "num balances: " + r.valueOf().length;
+              div2 = r.valueOf();
+//              div2.innerHTML = "num balances: " + r.valueOf().length;
             });
           }
           else {
