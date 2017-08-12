@@ -6,6 +6,7 @@
   <body onload="init();">
     <div id="myAddr"></div>
     <div id="fId"></div>
+    <div id="balances"></div>
 
     <script type="text/javascript">
       var b2s = function(bytes) {
@@ -17,6 +18,19 @@
           s += char;
         }
         return s;
+      };
+
+      var debtBalances2Js = function(debts) {
+        var balanceList = [];
+        for ( var i=0; i < debts[0].length; i++ ) {
+          var debt = { currency: b2s(debts[0][i]),
+                       amount: debts[1][i].toNumber(),
+                       counterParty: b2s(debts[2][i]),
+                       totalDebts: debts[3][i].toNumber(),
+                       mostRecent: debts[4][i].toNumber() };
+          balanceList.push(debt);
+        }
+        return balanceList;
       };
 
       var foundationAbi;
@@ -61,8 +75,6 @@
 //        debtContract.getMyFoundationId( function(e,r) {
         fContract.resolveToName(a, function(e, r) {
           if (!e) {
-            console.log("successful chek");
-            console.log(r.valueOf());
             div.innerHTML = "FoundationID: " + b2s(r.valueOf());
           }
           else {
@@ -76,6 +88,14 @@
         });
       };
 
+      var getBalances = function() {
+        var div = document.getElementById("balances");
+        debtContract.confirmedDebtBalances("timgalebach", function(e,r) {
+          console.log("new");
+          div.innerHTML = r.valueOf();
+        });
+      };
+
       var init = function() {
         debtContract = web3.eth.contract(debtConfig.abi).at(debtConfig.address);
         fContract = web3.eth.contract(foundationConfig.abi).at(foundationConfig.address);
@@ -83,6 +103,7 @@
         setTimeout(function() {
           myAddress = web3.eth.accounts[0];
           checkId(myAddress, 4);
+          getBalances();
           d.innerHTML = myAddress;
 //          addAddr("0x1A9a7bFA6C2CC628573E1514AE13947d83df9C80");
         }, 2000);
