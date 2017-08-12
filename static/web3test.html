@@ -58,9 +58,10 @@
       var checkId = function(a, numTries) {
         console.log("about to check id");
         var div = document.getElementById("fId");
-        fContract.resolveToName(a, function(e, r) {
+        debtContract.getMyFoundationId( function(e,r) {
+//        fContract.resolveToName(a, function(e, r) {
           if (!e) {
-            console.log("successful check");
+            console.log("successful chek");
             console.log(r.valueOf());
             div.innerHTML = "FoundationID: " + b2s(r.valueOf());
           }
