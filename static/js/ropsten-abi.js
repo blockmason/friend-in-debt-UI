@@ -9,24 +9,24 @@ var foundationConfig = {
 var friendReaderConfig = {
     "contract_name": "FriendReader",
     "abi": [{"constant":true,"inputs":[{"name":"ucac","type":"address"},{"name":"fId","type":"bytes32"}],"name":"numFriends","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"ucac","type":"address"},{"name":"_id1","type":"bytes32"},{"name":"_id2","type":"bytes32"}],"name":"areFriends","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"ucac","type":"address"},{"name":"fId","type":"bytes32"}],"name":"confirmedFriends","outputs":[{"name":"confirmedFriends","type":"bytes32[]"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"ucac","type":"address"},{"name":"fId","type":"bytes32"},{"name":"index","type":"uint256"}],"name":"friendIdByIndex","outputs":[{"name":"","type":"bytes32"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"ucac","type":"address"},{"name":"fId","type":"bytes32"}],"name":"pendingFriends","outputs":[{"name":"friendIds","type":"bytes32[]"},{"name":"confirmerIds","type":"bytes32[]"}],"payable":false,"type":"function"},{"inputs":[{"name":"friendContract","type":"address"}],"payable":false,"type":"constructor"}],
-    "address": "0xd9de9519fcb181458eb2aae1c3e7d52e247172e4",
+    "address": "0xe1ee0b302912b9261db349dfa153b50165dcf616",
     "network_id": 3
 };
 
 var debtReaderConfig = {
     "contract_name": "DebtReader",
     "abi": [{"constant":true,"inputs":[{"name":"ucac","type":"address"},{"name":"fId","type":"bytes32"}],"name":"pendingDebtTimestamps","outputs":[{"name":"timestamps","type":"uint256[]"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"ucac","type":"address"},{"name":"p1","type":"bytes32"},{"name":"p2","type":"bytes32"}],"name":"confirmedDebts","outputs":[{"name":"currency2","type":"bytes32[]"},{"name":"amounts2","type":"int256[]"},{"name":"descs2","type":"bytes32[]"},{"name":"debtors2","type":"bytes32[]"},{"name":"creditors2","type":"bytes32[]"},{"name":"timestamps2","type":"uint256[]"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"s","type":"bytes32"},{"name":"l","type":"bytes32[]"}],"name":"isMember","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"ucac","type":"address"},{"name":"fId","type":"bytes32"}],"name":"pendingDebts","outputs":[{"name":"debtIds","type":"uint256[]"},{"name":"confirmerIds","type":"bytes32[]"},{"name":"currency","type":"bytes32[]"},{"name":"amounts","type":"int256[]"},{"name":"descs","type":"bytes32[]"},{"name":"debtors","type":"bytes32[]"},{"name":"creditors","type":"bytes32[]"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"ucac","type":"address"},{"name":"p1","type":"bytes32"},{"name":"p2","type":"bytes32"}],"name":"numDebts","outputs":[{"name":"numDebts","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"ucac","type":"address"},{"name":"fId","type":"bytes32"}],"name":"confirmedDebtBalances","outputs":[{"name":"currency","type":"bytes32[]"},{"name":"amounts","type":"int256[]"},{"name":"counterpartyIds","type":"bytes32[]"},{"name":"totalDebts","type":"uint256[]"},{"name":"mostRecent","type":"uint256[]"}],"payable":false,"type":"function"},{"inputs":[{"name":"debtContract","type":"address"},{"name":"friendReaderContract","type":"address"},{"name":"foundationContract","type":"address"}],"payable":false,"type":"constructor"}],
-    "address": "0x8ac946f4eec30e360e7f0a01e690c32dd3b29bc3",
+    "address": "0xfb81c00f313a3268997441e63a8a5e2807fa472c",
     "network_id": 3
 };
 
 var fluxConfig = {
     "contract_name": "Flux",
     "abi": [{"constant":false,"inputs":[{"name":"ucac","type":"address"},{"name":"myId","type":"bytes32"},{"name":"friendId","type":"bytes32"},{"name":"debtId","type":"uint256"}],"name":"confirmDebt","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"ucac","type":"address"},{"name":"debtorId","type":"bytes32"},{"name":"creditorId","type":"bytes32"},{"name":"currencyCode","type":"bytes32"},{"name":"amount","type":"int256"},{"name":"desc","type":"bytes32"}],"name":"newDebt","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"ucac","type":"address"},{"name":"myId","type":"bytes32"},{"name":"friendId","type":"bytes32"}],"name":"deleteFriend","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"ucac","type":"address"},{"name":"myId","type":"bytes32"},{"name":"friendId","type":"bytes32"}],"name":"addFriend","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"ucac","type":"address"},{"name":"myId","type":"bytes32"},{"name":"friendId","type":"bytes32"},{"name":"debtId","type":"uint256"}],"name":"rejectDebt","outputs":[],"payable":false,"type":"function"},{"inputs":[{"name":"_adminId","type":"bytes32"},{"name":"debtContract","type":"address"},{"name":"friendContract","type":"address"},{"name":"friendReaderContract","type":"address"},{"name":"foundationContract","type":"address"}],"payable":false,"type":"constructor"}],
-    "address": "0x1b641c8be0a5022e1ae9111238fb7de5b5d0f5f9",
+    "address": "0xa9af2465ff0a09e920a42c8c074112ebf503e510",
     "network_id": 3
 };
 
 var fidConfig = {
-    "address": "0xa55b3e0e9b13fa88c3f9b264a681d7e8f29ad3a9"
+    "address": "0xeedb62eb265d2b42556ecd83324fe020d4731c19"
 };

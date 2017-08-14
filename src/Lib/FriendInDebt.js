@@ -1,43 +1,37 @@
 "use strict";
 //requires web3, Debt, Friend configs
 
-var Debt;
-var Friend;
-var Foundation;
-
-var foundAbi;
 var foundContract;
-var foundContractAddress;
+var foundAddress;
 
-var debtAbi;
-var debtContract;
-var debtContractAddress;
+var debtReader;
+var debtReaderAddress;
 
-var friendAbi;
-var friendContract;
-var friendContractAddress;
+var friendReader;
+var friendReaderAddress;
+
+var flux;
+var fluxAddress;
+
+var fidUcac;
 
 //var myAddress;
 
 exports.initImpl = function(dummyVal) {
     return function() {
-        debtAbi = web3.eth.contract(debtConfig.abi);
-        debtContract = debtAbi.at(debtConfig.address);
-        debtContractAddress = debtConfig.address;
+        debtReader = web3.eth.contract(debtReaderConfig.abi).at(debtReaderConfig.address);
+        debtReaderAddress = debtReaderConfig.address;
 
-        friendAbi = web3.eth.contract(friendConfig.abi);
-        friendContract = friendAbi.at(friendConfig.address);
-        friendContractAddress = friendConfig.address;
+        friendReader = web3.eth.contract(friendReaderConfig.abi).at(friendReaderConfig.address);
+        friendReaderAddress = friendReaderConfig.address;
 
-        foundAbi = web3.eth.contract(foundationConfig.abi);
-        foundContract = foundAbi.at(foundationConfig.address);
-        foundContractAddress = foundationConfig.address;
-    };
-};
+        flux = web3.eth.contract(fluxConfig.abi).at(fluxConfig.address);
+        fluxAddress = fluxConfig.address;
 
-exports.currentUserImpl = function(dummyVal) {
-    return function() {
-        return web3.eth.accounts[0];
+        foundContract = web3.eth.contract(foundationConfig.abi).at(foundationConfig.address);
+        foundAddress = foundationConfig.address;
+
+        fidUcac = fidConfig.address;
     };
 };
 
@@ -53,14 +47,16 @@ exports.nameInUseImpl = function(callback) {
 };
 
 exports.getMyFoundationIdImpl = function(callback) {
-    return function() {
-        debtContract.getMyFoundationId(function(e, r) {
-            if (!e) callback(b2s(r.valueOf()))();
-            else {
-                console.error(e);
-                callback("ERR")();
-            }
-        });
+    return function(addr) {
+        return function() {
+            foundContract.resolveToName(addr, function(e, r) {
+                if (!e) callback(b2s(r.valueOf()))();
+                else {
+                    console.error(e);
+                    callback("ERR")();
+                }
+            });
+        };
     };
 };
 
@@ -68,7 +64,7 @@ exports.getMyFoundationIdImpl = function(callback) {
 exports.friendsImpl = function(callback) {
     return function(foundationId) {
         return function() {
-            friendContract.confirmedFriends(foundationId, function(e,r) {
+            friendReader.confirmedFriends(fidUcac, foundationId, function(e,r) {
                 callback(confirmedFriends2Js(r.valueOf()))();
             });
         };
@@ -78,7 +74,7 @@ exports.friendsImpl = function(callback) {
 exports.pendingFriendshipsImpl = function(callback) {
     return function(foundationId) {
         return function() {
-            friendContract.pendingFriends(foundationId, function(e,r) {
+            friendReader.pendingFriends(fidUcac, foundationId, function(e,r) {
                 callback(pendingFriends2Js(r.valueOf()))();
             });
         };
@@ -89,8 +85,8 @@ exports.createFriendshipImpl = function(callback) {
     return function(myId) {
         return function(friendId) {
             return function() {
-                var data = friendContract.addFriend.getData(myId, friendId);
-                sendFriendTx(data, 0, callback);
+                var data = flux.addFriend.getData(fidUcac, myId, friendId);
+                sendFluxTx(data, 0, callback);
             };
         };
     };
@@ -100,8 +96,8 @@ exports.confirmFriendshipImpl = function(callback) {
     return function(myId) {
         return function(friendId) {
             return function() {
-                var data = friendContract.addFriend.getData(myId, friendId);
-                sendFriendTx(data, 0, callback);
+                var data = flux.addFriend.getData(fidUcac, myId, friendId);
+                sendFluxTx(data, 0, callback);
             };
         };
     };
@@ -111,8 +107,8 @@ exports.deleteFriendshipImpl = function(callback) {
     return function(myId) {
         return function(friendId) {
             return function() {
-                var data = friendContract.deleteFriend.getData(myId, friendId);
-                sendFriendTx(data, 0, callback);
+                var data = flux.deleteFriend.getData(fidUcac, myId, friendId);
+                sendFluxTx(data, 0, callback);
             };
         };
     };
@@ -127,8 +123,8 @@ exports.newPendingDebtImpl = function(callback) {
                 return function(currencyCode) {
                     return function(desc) {
                         return function() {
-                            var data = debtContract.newDebt.getData(debtContractAddress, debtor, creditor, currencyCode, amount, desc);
-                            sendDebtTx(data, 0, callback);
+                            var data = flux.newDebt.getData(fidUcac, debtor, creditor, currencyCode, amount, desc);
+                            sendFluxTx(data, 0, callback);
                         };
                     };
                 };
@@ -140,7 +136,7 @@ exports.newPendingDebtImpl = function(callback) {
 exports.debtBalancesImpl = function(callback) {
     return function(foundationId) {
         return function() {
-            debtContract.confirmedDebtBalances(foundationId, function(e,r) {
+            debtReader.confirmedDebtBalances(fidUcac, foundationId, function(e,r) {
                 callback(debtBalances2Js(r.valueOf()))();
             });
         };
@@ -150,7 +146,7 @@ exports.debtBalancesImpl = function(callback) {
 exports.pendingDebtsImpl = function(callback) {
     return function(foundationId) {
         return function() {
-            debtContract.pendingDebts(foundationId, function(e,r) {
+            debtReader.pendingDebts(fidUcac, foundationId, function(e,r) {
                 callback(pendingDebts2Js(r.valueOf()))();
             });
         };
@@ -161,7 +157,7 @@ exports.itemizedDebtsImpl = function(callback) {
     return function(myId) {
         return function(friendId) {
             return function() {
-                debtContract.confirmedDebts(myId, friendId, function(e,r) {
+                debtReader.confirmedDebts(fidUcac, myId, friendId, function(e,r) {
                     callback(confirmedDebts2Js(r.valueOf()))();
                 });
             };
@@ -174,8 +170,8 @@ exports.confirmDebtImpl = function(callback) {
         return function(friendId) {
             return function(debtId) {
                 return function() {
-                    var data = debtContract.confirmDebt.getData(myId, friendId, debtId);
-                    sendDebtTx(data, 0, callback);
+                    var data = flux.confirmDebt.getData(fidUcac, myId, friendId, debtId);
+                    sendFluxTx(data, 0, callback);
                 };
             };
         };
@@ -187,33 +183,18 @@ exports.rejectDebtImpl = function(callback) {
         return function(friendId) {
             return function(debtId) {
                 return function() {
-                    var data = debtContract.rejectDebt.getData(myId, friendId, debtId);
-                    sendDebtTx(data, 0, callback);
+                    var data = flux.rejectDebt.getData(fidUcac, myId, friendId, debtId);
+                    sendFluxTx(data, 0, callback);
                 };
             };
         };
     };
 };
 
-//helper functions
-var sendDebtTx = function(data, value, callback) {
+//helpers
+var sendFluxTx = function(data, value, callback) {
     web3.eth.sendTransaction(
-        {to: debtContractAddress,
-//         from: myAddress,
-         data: data,
-         value: value},
-        function(err, result) {
-            if ( !err )
-                callback(goodTx(result))();
-            else
-                callback(errTx())();
-        });
-};
-
-var sendFriendTx = function(data, value, callback) {
-    web3.eth.sendTransaction(
-        {to: friendContractAddress,
-//         from: myAddress,
+        {to: fluxAddress,
          data: data,
          value: value},
         function(err, result) {

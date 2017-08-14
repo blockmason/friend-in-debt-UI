@@ -58,7 +58,7 @@ runMonadF = runExceptT
 type PendingFriend = { friendId    ∷ StringId
                      , confirmerId ∷ StringId }
 
-type IdLookupFn   = ∀ e. (StringId → Eff e Unit) → Eff e Unit
+type IdLookupFn   = ∀ e. (StringId → Eff e Unit) → String → Eff e Unit
 type BalanceLookupFn = ∀ e. (Array RawBalance → Eff e Unit) → StringId → Eff e Unit
 type DebtLookupFn = ∀ e. (Array RawDebt → Eff e Unit) → StringId → Eff e Unit
 type DebtLookupFn' = ∀ e. (Array RawConfirmed → Eff e Unit) → StringId → StringId → Eff e Unit
@@ -73,7 +73,6 @@ type NewDebtTx  = ∀ e. (E.RawTx → Eff e Unit) → String → String → Numb
 type HandleDebtTx = ∀ e. (E.RawTx → Eff e Unit) → StringId → StringId → Number → Eff e Unit
 
 foreign import initImpl ∷ ∀ e. Unit → Eff e Unit
-foreign import currentUserImpl ∷ ∀ e. Unit → Eff e StringAddr
 foreign import getMyFoundationIdImpl ∷ IdLookupFn
 foreign import nameInUseImpl ∷ CheckNameFn
 
@@ -98,11 +97,6 @@ checkAndInit = do
     then liftEff $ initImpl unit
     else throwError NoMetamask
 
-currentUser ∷ MonadF E.EthAddress
-currentUser = do
-  checkAndInit
-  E.eaMkAddr <$> (liftEff $ currentUserImpl unit)
-
 nameInUse ∷ String → MonadF Boolean
 nameInUse foundationName = do
   checkAndInit
@@ -112,7 +106,8 @@ nameInUse foundationName = do
 foundationId ∷ MonadF FoundationId
 foundationId = do
   checkAndInit
-  fid ← liftAff $ makeAff (\err succ → getMyFoundationIdImpl succ)
+  addr ← liftAff MM.currentUserAddress
+  fid ← liftAff $ makeAff (\err succ → getMyFoundationIdImpl succ $ show addr)
   case fid of
     "ERR" → throwError NetworkError
     ""    → throwError NoFoundationId

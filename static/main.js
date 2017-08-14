@@ -7717,37 +7717,37 @@ var PS = {};
     "use strict";
   //requires web3, Debt, Friend configs
 
-  var Debt;
-  var Friend;
-  var Foundation;
-
-  var foundAbi;
   var foundContract;
-  var foundContractAddress;
+  var foundAddress;
 
-  var debtAbi;
-  var debtContract;
-  var debtContractAddress;
+  var debtReader;
+  var debtReaderAddress;
 
-  var friendAbi;
-  var friendContract;
-  var friendContractAddress;
+  var friendReader;
+  var friendReaderAddress;
+
+  var flux;
+  var fluxAddress;
+
+  var fidUcac;
 
   //var myAddress;
 
   exports.initImpl = function(dummyVal) {
       return function() {
-          debtAbi = web3.eth.contract(debtConfig.abi);
-          debtContract = debtAbi.at(debtConfig.address);
-          debtContractAddress = debtConfig.address;
+          debtReader = web3.eth.contract(debtReaderConfig.abi).at(debtReaderConfig.address);
+          debtReaderAddress = debtReaderConfig.address;
 
-          friendAbi = web3.eth.contract(friendConfig.abi);
-          friendContract = friendAbi.at(friendConfig.address);
-          friendContractAddress = friendConfig.address;
+          friendReader = web3.eth.contract(friendReaderConfig.abi).at(friendReaderConfig.address);
+          friendReaderAddress = friendReaderConfig.address;
 
-          foundAbi = web3.eth.contract(foundationConfig.abi);
-          foundContract = foundAbi.at(foundationConfig.address);
-          foundContractAddress = foundationConfig.address;
+          flux = web3.eth.contract(fluxConfig.abi).at(fluxConfig.address);
+          fluxAddress = fluxConfig.address;
+
+          foundContract = web3.eth.contract(foundationConfig.abi).at(foundationConfig.address);
+          foundAddress = foundationConfig.address;
+
+          fidUcac = fidConfig.address;
       };
   };
 
@@ -7763,14 +7763,16 @@ var PS = {};
   };
 
   exports.getMyFoundationIdImpl = function(callback) {
-      return function() {
-          debtContract.getMyFoundationId(function(e, r) {
-              if (!e) callback(b2s(r.valueOf()))();
-              else {
-                  console.error(e);
-                  callback("ERR")();
-              }
-          });
+      return function(addr) {
+          return function() {
+              foundContract.resolveToName(addr, function(e, r) {
+                  if (!e) callback(b2s(r.valueOf()))();
+                  else {
+                      console.error(e);
+                      callback("ERR")();
+                  }
+              });
+          };
       };
   };
 
@@ -7778,7 +7780,7 @@ var PS = {};
   exports.friendsImpl = function(callback) {
       return function(foundationId) {
           return function() {
-              friendContract.confirmedFriends(foundationId, function(e,r) {
+              friendReader.confirmedFriends(fidUcac, foundationId, function(e,r) {
                   callback(confirmedFriends2Js(r.valueOf()))();
               });
           };
@@ -7788,7 +7790,7 @@ var PS = {};
   exports.pendingFriendshipsImpl = function(callback) {
       return function(foundationId) {
           return function() {
-              friendContract.pendingFriends(foundationId, function(e,r) {
+              friendReader.pendingFriends(fidUcac, foundationId, function(e,r) {
                   callback(pendingFriends2Js(r.valueOf()))();
               });
           };
@@ -7799,8 +7801,8 @@ var PS = {};
       return function(myId) {
           return function(friendId) {
               return function() {
-                  var data = friendContract.addFriend.getData(myId, friendId);
-                  sendFriendTx(data, 0, callback);
+                  var data = flux.addFriend.getData(fidUcac, myId, friendId);
+                  sendFluxTx(data, 0, callback);
               };
           };
       };
@@ -7810,8 +7812,8 @@ var PS = {};
       return function(myId) {
           return function(friendId) {
               return function() {
-                  var data = friendContract.deleteFriend.getData(myId, friendId);
-                  sendFriendTx(data, 0, callback);
+                  var data = flux.deleteFriend.getData(fidUcac, myId, friendId);
+                  sendFluxTx(data, 0, callback);
               };
           };
       };
@@ -7826,8 +7828,8 @@ var PS = {};
                   return function(currencyCode) {
                       return function(desc) {
                           return function() {
-                              var data = debtContract.newDebt.getData(debtContractAddress, debtor, creditor, currencyCode, amount, desc);
-                              sendDebtTx(data, 0, callback);
+                              var data = flux.newDebt.getData(fidUcac, debtor, creditor, currencyCode, amount, desc);
+                              sendFluxTx(data, 0, callback);
                           };
                       };
                   };
@@ -7839,7 +7841,7 @@ var PS = {};
   exports.debtBalancesImpl = function(callback) {
       return function(foundationId) {
           return function() {
-              debtContract.confirmedDebtBalances(foundationId, function(e,r) {
+              debtReader.confirmedDebtBalances(fidUcac, foundationId, function(e,r) {
                   callback(debtBalances2Js(r.valueOf()))();
               });
           };
@@ -7849,7 +7851,7 @@ var PS = {};
   exports.pendingDebtsImpl = function(callback) {
       return function(foundationId) {
           return function() {
-              debtContract.pendingDebts(foundationId, function(e,r) {
+              debtReader.pendingDebts(fidUcac, foundationId, function(e,r) {
                   callback(pendingDebts2Js(r.valueOf()))();
               });
           };
@@ -7860,7 +7862,7 @@ var PS = {};
       return function(myId) {
           return function(friendId) {
               return function() {
-                  debtContract.confirmedDebts(myId, friendId, function(e,r) {
+                  debtReader.confirmedDebts(fidUcac, myId, friendId, function(e,r) {
                       callback(confirmedDebts2Js(r.valueOf()))();
                   });
               };
@@ -7873,8 +7875,8 @@ var PS = {};
           return function(friendId) {
               return function(debtId) {
                   return function() {
-                      var data = debtContract.confirmDebt.getData(myId, friendId, debtId);
-                      sendDebtTx(data, 0, callback);
+                      var data = flux.confirmDebt.getData(fidUcac, myId, friendId, debtId);
+                      sendFluxTx(data, 0, callback);
                   };
               };
           };
@@ -7886,33 +7888,18 @@ var PS = {};
           return function(friendId) {
               return function(debtId) {
                   return function() {
-                      var data = debtContract.rejectDebt.getData(myId, friendId, debtId);
-                      sendDebtTx(data, 0, callback);
+                      var data = flux.rejectDebt.getData(fidUcac, myId, friendId, debtId);
+                      sendFluxTx(data, 0, callback);
                   };
               };
           };
       };
   };
 
-  //helper functions
-  var sendDebtTx = function(data, value, callback) {
+  //helpers
+  var sendFluxTx = function(data, value, callback) {
       web3.eth.sendTransaction(
-          {to: debtContractAddress,
-  //         from: myAddress,
-           data: data,
-           value: value},
-          function(err, result) {
-              if ( !err )
-                  callback(goodTx(result))();
-              else
-                  callback(errTx())();
-          });
-  };
-
-  var sendFriendTx = function(data, value, callback) {
-      web3.eth.sendTransaction(
-          {to: friendContractAddress,
-  //         from: myAddress,
+          {to: fluxAddress,
            data: data,
            value: value},
           function(err, result) {
@@ -8079,6 +8066,9 @@ var PS = {};
   var txStr = function (v) {
       return v.value0;
   }; 
+  var showEthAddress = new Data_Show.Show(function (v) {
+      return v;
+  });
   var rawToTxStatus = function (v) {
       if (v === "Pending") {
           return Pending.value;
@@ -8141,6 +8131,7 @@ var PS = {};
   exports["rawToTX"] = rawToTX;
   exports["rawToTxStatus"] = rawToTxStatus;
   exports["txStr"] = txStr;
+  exports["showEthAddress"] = showEthAddress;
   exports["eqEthAddress"] = eqEthAddress;
 })(PS["Network.Eth"] = PS["Network.Eth"] || {});
 (function(exports) {
@@ -8931,18 +8922,20 @@ var PS = {};
       return Control_Monad_Error_Class.throwError(Control_Monad_Except_Trans.monadThrowExceptT(Control_Monad_Aff.monadAff))(Network_Eth_FriendInDebt_Types.NoMetamask.value);
   });
   var foundationId = Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_Except_Trans.bindExceptT(Control_Monad_Aff.monadAff))(checkAndInit)(function () {
-      return Control_Bind.bind(Control_Monad_Except_Trans.bindExceptT(Control_Monad_Aff.monadAff))(Control_Monad_Aff_Class.liftAff(Control_Monad_Aff_Class.monadAffExceptT(Control_Monad_Aff_Class.monadAffAff))(Control_Monad_Aff.makeAff(function (err) {
-          return function (succ) {
-              return $foreign.getMyFoundationIdImpl(succ);
-          };
-      })))(function (v) {
-          if (v === "ERR") {
-              return Control_Monad_Error_Class.throwError(Control_Monad_Except_Trans.monadThrowExceptT(Control_Monad_Aff.monadAff))(Network_Eth_FriendInDebt_Types.NetworkError.value);
-          };
-          if (v === "") {
-              return Control_Monad_Error_Class.throwError(Control_Monad_Except_Trans.monadThrowExceptT(Control_Monad_Aff.monadAff))(Network_Eth_FriendInDebt_Types.NoFoundationId.value);
-          };
-          return Control_Applicative.pure(Control_Monad_Except_Trans.applicativeExceptT(Control_Monad_Aff.monadAff))(v);
+      return Control_Bind.bind(Control_Monad_Except_Trans.bindExceptT(Control_Monad_Aff.monadAff))(Control_Monad_Aff_Class.liftAff(Control_Monad_Aff_Class.monadAffExceptT(Control_Monad_Aff_Class.monadAffAff))(Network_Eth_Metamask.currentUserAddress))(function (v) {
+          return Control_Bind.bind(Control_Monad_Except_Trans.bindExceptT(Control_Monad_Aff.monadAff))(Control_Monad_Aff_Class.liftAff(Control_Monad_Aff_Class.monadAffExceptT(Control_Monad_Aff_Class.monadAffAff))(Control_Monad_Aff.makeAff(function (err) {
+              return function (succ) {
+                  return $foreign.getMyFoundationIdImpl(succ)(Data_Show.show(Network_Eth.showEthAddress)(v));
+              };
+          })))(function (v1) {
+              if (v1 === "ERR") {
+                  return Control_Monad_Error_Class.throwError(Control_Monad_Except_Trans.monadThrowExceptT(Control_Monad_Aff.monadAff))(Network_Eth_FriendInDebt_Types.NetworkError.value);
+              };
+              if (v1 === "") {
+                  return Control_Monad_Error_Class.throwError(Control_Monad_Except_Trans.monadThrowExceptT(Control_Monad_Aff.monadAff))(Network_Eth_FriendInDebt_Types.NoFoundationId.value);
+              };
+              return Control_Applicative.pure(Control_Monad_Except_Trans.applicativeExceptT(Control_Monad_Aff.monadAff))(v1);
+          });
       });
   });
   var confirmedFriends = Control_Bind.bind(Control_Monad_Except_Trans.bindExceptT(Control_Monad_Aff.monadAff))(foundationId)(function (v) {
@@ -8990,8 +8983,8 @@ var PS = {};
           return Control_Bind.bind(Control_Monad_Except_Trans.bindExceptT(Control_Monad_Aff.monadAff))(foundationId)(function (v) {
               var friendId = Network_Eth_Foundation.fiGetId(Network_Eth_FriendInDebt_Types.debtCounterparty(Network_Eth_Foundation.fiMkId(v))(debt));
               var debtId = Network_Eth_FriendInDebt_Types.debtGetId(debt);
-              var $54 = Network_Eth_FriendInDebt_Types.isValidDebtId(debtId);
-              if ($54) {
+              var $56 = Network_Eth_FriendInDebt_Types.isValidDebtId(debtId);
+              if ($56) {
                   return Control_Bind.bind(Control_Monad_Except_Trans.bindExceptT(Control_Monad_Aff.monadAff))(Control_Monad_Aff_Class.liftAff(Control_Monad_Aff_Class.monadAffExceptT(Control_Monad_Aff_Class.monadAffAff))(Control_Monad_Aff.makeAff(function (v1) {
                       return function (s) {
                           return handleDebtFn(s)(v)(friendId)(Network_Eth_FriendInDebt_Types.getDebtId(debtId));
@@ -9023,15 +9016,15 @@ var PS = {};
               return $foreign.pendingDebtsImpl(succ)(v);
           };
       })))(function (v1) {
-          var sent = function ($76) {
+          var sent = function ($78) {
               return Data_Array.filter(function (d) {
                   return Data_Eq.notEq(Network_Eth_Foundation.eqFoundationId)(v)(Network_Eth_FriendInDebt_Types.debtToConfirm(d));
-              })(Data_Functor.map(Data_Functor.functorArray)(Network_Eth_FriendInDebt_Types.rawToDebt)($76));
+              })(Data_Functor.map(Data_Functor.functorArray)(Network_Eth_FriendInDebt_Types.rawToDebt)($78));
           };
-          var todo = function ($77) {
+          var todo = function ($79) {
               return Data_Array.filter(function (d) {
                   return Data_Eq.eq(Network_Eth_Foundation.eqFoundationId)(v)(Network_Eth_FriendInDebt_Types.debtToConfirm(d));
-              })(Data_Functor.map(Data_Functor.functorArray)(Network_Eth_FriendInDebt_Types.rawToDebt)($77));
+              })(Data_Functor.map(Data_Functor.functorArray)(Network_Eth_FriendInDebt_Types.rawToDebt)($79));
           };
           return Control_Applicative.pure(Control_Monad_Except_Trans.applicativeExceptT(Control_Monad_Aff.monadAff))({
               todo: todo(v1), 
