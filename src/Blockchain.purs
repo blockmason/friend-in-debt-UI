@@ -14,7 +14,7 @@ import Network.Eth.FriendInDebt as F
 
 --helper to query the blockchain
 --blankVal is a value to return if there's an error
---writes a message to the error bus if there's an error
+--writes a message to the error bus if there's an errore
 handleCall errorBus blankVal affCall = do
   case errorBus of
     Nothing → do
