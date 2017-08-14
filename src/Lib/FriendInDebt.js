@@ -13,7 +13,8 @@ var friendReaderAddress;
 var flux;
 var fluxAddress;
 
-var fidUcac;
+var fidContract;
+var fidIdUcac;
 
 //var myAddress;
 
@@ -31,7 +32,8 @@ exports.initImpl = function(dummyVal) {
         foundContract = web3.eth.contract(foundationConfig.abi).at(foundationConfig.address);
         foundAddress = foundationConfig.address;
 
-        fidUcac = fidConfig.address;
+        fidContract = fidConfig.address;
+        fidIdUcac   = fidConfig.idUcac;
     };
 };
 
@@ -64,7 +66,7 @@ exports.getMyFoundationIdImpl = function(callback) {
 exports.friendsImpl = function(callback) {
     return function(foundationId) {
         return function() {
-            friendReader.confirmedFriends(fidUcac, foundationId, function(e,r) {
+            friendReader.confirmedFriends(fidIdUcac, foundationId, function(e,r) {
                 callback(confirmedFriends2Js(r.valueOf()))();
             });
         };
@@ -74,7 +76,7 @@ exports.friendsImpl = function(callback) {
 exports.pendingFriendshipsImpl = function(callback) {
     return function(foundationId) {
         return function() {
-            friendReader.pendingFriends(fidUcac, foundationId, function(e,r) {
+            friendReader.pendingFriends(fidIdUcac, foundationId, function(e,r) {
                 callback(pendingFriends2Js(r.valueOf()))();
             });
         };
@@ -85,7 +87,7 @@ exports.createFriendshipImpl = function(callback) {
     return function(myId) {
         return function(friendId) {
             return function() {
-                var data = flux.addFriend.getData(fidUcac, myId, friendId);
+                var data = flux.addFriend.getData(fidContract, myId, friendId);
                 sendFluxTx(data, 0, callback);
             };
         };
@@ -96,7 +98,7 @@ exports.confirmFriendshipImpl = function(callback) {
     return function(myId) {
         return function(friendId) {
             return function() {
-                var data = flux.addFriend.getData(fidUcac, myId, friendId);
+                var data = flux.addFriend.getData(fidContract, myId, friendId);
                 sendFluxTx(data, 0, callback);
             };
         };
@@ -107,7 +109,7 @@ exports.deleteFriendshipImpl = function(callback) {
     return function(myId) {
         return function(friendId) {
             return function() {
-                var data = flux.deleteFriend.getData(fidUcac, myId, friendId);
+                var data = flux.deleteFriend.getData(fidContract, myId, friendId);
                 sendFluxTx(data, 0, callback);
             };
         };
@@ -123,7 +125,7 @@ exports.newPendingDebtImpl = function(callback) {
                 return function(currencyCode) {
                     return function(desc) {
                         return function() {
-                            var data = flux.newDebt.getData(fidUcac, debtor, creditor, currencyCode, amount, desc);
+                            var data = flux.newDebt.getData(fidContract, debtor, creditor, currencyCode, amount, desc);
                             sendFluxTx(data, 0, callback);
                         };
                     };
@@ -136,7 +138,7 @@ exports.newPendingDebtImpl = function(callback) {
 exports.debtBalancesImpl = function(callback) {
     return function(foundationId) {
         return function() {
-            debtReader.confirmedDebtBalances(fidUcac, foundationId, function(e,r) {
+            debtReader.confirmedDebtBalances(fidIdUcac, foundationId, function(e,r) {
                 callback(debtBalances2Js(r.valueOf()))();
             });
         };
@@ -146,7 +148,7 @@ exports.debtBalancesImpl = function(callback) {
 exports.pendingDebtsImpl = function(callback) {
     return function(foundationId) {
         return function() {
-            debtReader.pendingDebts(fidUcac, foundationId, function(e,r) {
+            debtReader.pendingDebts(fidIdUcac, foundationId, function(e,r) {
                 callback(pendingDebts2Js(r.valueOf()))();
             });
         };
@@ -157,7 +159,7 @@ exports.itemizedDebtsImpl = function(callback) {
     return function(myId) {
         return function(friendId) {
             return function() {
-                debtReader.confirmedDebts(fidUcac, myId, friendId, function(e,r) {
+                debtReader.confirmedDebts(fidIdUcac, myId, friendId, function(e,r) {
                     callback(confirmedDebts2Js(r.valueOf()))();
                 });
             };
@@ -170,7 +172,7 @@ exports.confirmDebtImpl = function(callback) {
         return function(friendId) {
             return function(debtId) {
                 return function() {
-                    var data = flux.confirmDebt.getData(fidUcac, myId, friendId, debtId);
+                    var data = flux.confirmDebt.getData(fidContract, myId, friendId, debtId);
                     sendFluxTx(data, 0, callback);
                 };
             };
@@ -183,7 +185,7 @@ exports.rejectDebtImpl = function(callback) {
         return function(friendId) {
             return function(debtId) {
                 return function() {
-                    var data = flux.rejectDebt.getData(fidUcac, myId, friendId, debtId);
+                    var data = flux.rejectDebt.getData(fidIdUcac, myId, friendId, debtId);
                     sendFluxTx(data, 0, callback);
                 };
             };
