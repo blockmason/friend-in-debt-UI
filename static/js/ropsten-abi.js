@@ -28,5 +28,5 @@ var fluxConfig = {
 };
 
 var fidConfig = {
-    "address": "0xeedb62eb265d2b42556ecd83324fe020d4731c19"
+    "address": "0x3626794f48ea9069f7bca73c76006a097ae7cea9"
 };
