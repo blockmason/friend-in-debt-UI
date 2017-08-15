@@ -191,8 +191,12 @@ ui =
             H.modify (_ { numPendingTodo = n })
           D.NumPendingFriends n →
             H.modify (_ { numPendingFriends = n })
-          D.LoadId fid →
+          D.LoadId fid → do
+            ed ← H.gets _.errorToDisplay
             H.modify (_ { myId = Just fid })
+            case ed of
+              Just (FIDError F.NoFoundationId) → H.modify (_{errorToDisplay=Nothing})
+              _    → pure unit
         pure next
       PreviousScreen next → do
         H.modify (\state → state {currentScreen = (fromMaybe R.BalancesScreen $ A.head state.history), history = (fromMaybe [] $ A.tail state.history)})
