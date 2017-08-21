@@ -195,7 +195,7 @@ ui =
             ed ← H.gets _.errorToDisplay
             H.modify (_ { myId = Just fid })
             case ed of
-              Just (FIDError F.NoFoundationId) → H.modify (_{errorToDisplay=Nothing})
+              Just (FIDError F.NoFoundationId) → H.modify (_{errorToDisplay=ed})
               _    → pure unit
         pure next
       PreviousScreen next → do
@@ -228,7 +228,7 @@ errorOverlay state =
           F.NoFoundationId →
             HH.div [ HP.id_ "errorOverlay"][
               HH.h6_ [ HH.text "No Foundation Id Detected"],
-              HH.button [ HE.onClick $ HE.input_ $ RefreshData
+              HH.a [ HP.href "http://fmanager.io"
                           , HP.class_ $ HH.ClassName "error-action"]
                 [ HH.i [HP.class_ (HH.ClassName "fa fa-user-plus")][], HH.text "Register" ]
             ]

@@ -58,7 +58,9 @@ html {
     display: block;
     border: 1px solid #eee;
     border-radius: 5px;
-    background: transparent; }
+    background: transparent;
+    text-align: center;
+    text-decoration: none; }
 
 #no-errors {
   display: none; }
